@@ -3,10 +3,10 @@
 
 Fluxo (feito pelo Claude agendado, com o conector do BigQuery):
   1) python tools/atualizar.py sql [--desde AAAA-MM-DD] [--dir /tmp/atu]
-        -> grava q_m0..q_m7.sql, q_k.sql, q_ultimo.sql (desde padrao = dia 1 do mes anterior)
+        -> grava q_m0..q_m9.sql, q_k.sql, q_ultimo.sql (desde padrao = dia 1 do mes anterior)
   2) rodar cada .sql com mcp execute_sql_readonly (projectId vistaprocessos); resultados grandes o
      conector salva em arquivo (caminho aparece na resposta). Anotar o caminho de cada resultado.
-  3) DASH_SENHA=... python tools/atualizar.py montar --desde D --ultimo U --k ARQ_K ARQ_M0 ARQ_M1 ... ARQ_M7
+  3) DASH_SENHA=... python tools/atualizar.py montar --desde D --ultimo U --k ARQ_K ARQ_M0 ARQ_M1 ... ARQ_M9
         -> decifra docs/data.enc.json, troca as linhas com dia >= desde pelas novas, mescla K, recifra.
   4) python tools/build_estatico.py fonte/dashboard-gralha-funil.html --site docs/index.html --enc docs/data.enc.json
 """
@@ -40,7 +40,7 @@ def sql_k(desde):
 
 def cmd_sql(a):
     os.makedirs(a.dir, exist_ok=True)
-    for m in range(8):
+    for m in range(10):
         open(os.path.join(a.dir, f"q_m{m}.sql"), "w").write(sql_m(a.desde, m))
     open(os.path.join(a.dir, "q_k.sql"), "w").write(sql_k(a.desde))
     open(os.path.join(a.dir, "q_ultimo.sql"), "w").write(g.SQL_L)
@@ -63,7 +63,9 @@ def cmd_montar(a):
         return t[v]
     dmin = (datetime.date.fromisoformat(a.desde) - D0).days
     hoje = datetime.date.today()
-    antigas = [r for r in d["rows"] if r[1] < dmin]
+    mets = set(int(x) for x in a.metricas.split(",")) if a.metricas else set(range(10))
+    # com --metricas, so essas metricas sao substituidas; as demais ficam como estao
+    antigas = [r for r in d["rows"] if r[1] < dmin or r[0] not in mets]
     novas, cont = [], {}
     for arq in a.arquivos:
         for r in json.load(open(arq, encoding="utf-8"))["rows"]:
@@ -78,7 +80,7 @@ def cmd_montar(a):
                 row += [ix("cc", p[14]) if p[14] else -1, ix("cl", p[15]) if p[15] else -1,
                         float(p[16]) if p[16] else 0, 1 if m == 7 else int(p[17])]
                 novas.append(row); cont[m] = cont.get(m, 0) + 1
-    assert set(cont) == set(range(8)), f"faltam metricas no resultado: {sorted(cont)} (esperado 0..7)"
+    assert set(cont) == mets, f"faltam metricas no resultado: {sorted(cont)} (esperado {sorted(mets)})"
     rows = antigas + novas
     rows.sort(key=lambda x: (x[0], x[1]))
     K = d.get("K", {})
@@ -100,6 +102,6 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(); sp = ap.add_subparsers(dest="c", required=True)
     s = sp.add_parser("sql"); s.add_argument("--desde", default=desde_padrao()); s.add_argument("--dir", default="/tmp/atu")
     m = sp.add_parser("montar"); m.add_argument("--desde", required=True); m.add_argument("--ultimo", required=True)
-    m.add_argument("--k"); m.add_argument("arquivos", nargs="+")
+    m.add_argument("--k"); m.add_argument("--metricas", help="ex.: 8,9 (reconstroi so essas metricas)"); m.add_argument("arquivos", nargs="+")
     a = ap.parse_args()
     cmd_sql(a) if a.c == "sql" else cmd_montar(a)

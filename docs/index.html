@@ -22,10 +22,10 @@ h1{font:600 clamp(26px,3.6vw,36px)/1.15 Sora,system-ui,sans-serif;margin:14px 0 
 .ctl button{font:inherit;font-weight:600;border:0;border-radius:999px;background:linear-gradient(135deg,#8a1f33,#6e1428);color:#fff;padding:7px 16px;cursor:pointer}
 .ctl button:hover{opacity:.9}:focus-visible{outline:2px solid var(--br);outline-offset:2px}
 #st{color:var(--mut);font-size:12px;margin:-14px 0 22px}
-.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.tiles{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-bottom:18px}@media(max-width:1000px){.tiles{grid-template-columns:repeat(3,1fr)}}
 .tile,.panel{background:var(--sf);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh)}
-.tile{padding:18px 20px}.tile small{color:var(--mut);font-size:12px;font-weight:500}
-.tile b{display:block;font:600 27px/1.25 Sora,system-ui,sans-serif;margin:4px 0 6px}
+.tile{padding:16px 14px}.tile small{color:var(--mut);font-size:12px;font-weight:500}
+.tile b{display:block;font:600 22px/1.25 Sora,system-ui,sans-serif;margin:4px 0 6px}
 .panel{padding:8px 24px 22px}
 .ph{display:flex;justify-content:space-between;align-items:baseline;padding:16px 0 10px}
 .ph h2{font:600 17px Sora,system-ui,sans-serif;margin:0}.ph span{color:var(--mut);font-size:12px}
@@ -142,7 +142,7 @@ window.__cuboLoader=async()=>{const r=await fetch("data.enc.json",{cache:"defaul
    Cubo X: linhas [m,dia,cl,loja,equipe,corretor,veiculo,bairro,tipo,cond,lanc,cod,dorm,area,nome,cc,kc,valor,n]
    m: 0 leads, 1 oportunidade, 2 visita, 3 proposta, 4 fechamento, 5 vendas, 6 qualquer evento de dados, 7 qualquer evento do histórico */
 (function(){
-const MNAME=["leads","oportunidade","visitas","proposta","fechamento","vendas"],IDX={loja:3,equipe:4,corretor:5,veiculo:6,bairro:7,tipo:8,cond:9,lanc:10,cod:11,dorm:12,area:13};
+const MNAME=["leads","oportunidade","visitas","proposta","fechamento","vendas"],MK=[...MNAME.map((n,k)=>[n,k]),["agenciamentos",8],["placas",9]],IDX={loja:3,equipe:4,corretor:5,veiculo:6,bairro:7,tipo:8,cond:9,lanc:10,cod:11,dorm:12,area:13};
 const COLIDX={nome_agencia_usuario:3,nome_equipe_usuario:4,nome_usuario:5,veiculocaptacao_dn:6,bairro_imovel:7,Bairro:7,categoria_imovel:8,Categoria:8,Empreendimento:9,condominio_imovel:9,Lancamento:10,lancamento_imovel:10,CodigoEmImovel:11,Dormitorios:12,dormitorios_imovel:12,AreaPrivativa:13,areaprivativa_imovel:13,nomecliente_dn:14};
 let C=null;
 const U=Date.UTC,dIdx=s=>Math.round((U(+s.slice(0,4),+s.slice(5,7)-1,+s.slice(8,10))-U(2020,0,1))/864e5),dIso=n=>new Date(U(2020,0,1)+n*864e5).toISOString().slice(0,10);
@@ -166,11 +166,12 @@ function qFunil(q){const per=[];let m=/SELECT 'atual' per,DATE '(\d{4}-\d\d-\d\d
  const F=filters(q),out=[],lo=Math.min(...per.map(p=>p[1])),hi=Math.max(...per.map(p=>p[2]));
  per.forEach(([nm,a,b])=>{const u=MNAME.map(()=>new Set()),t=MNAME.map(()=>0),neg=new Map();
   for(const r of C.X){const k=r[0];if(k>5||r[1]<a||r[1]>b||!okF(r,F))continue;if(r[2]>=0)u[k].add(r[2]);t[k]+=r[18];if(k===5&&r[2]>=0){const o=neg.get(r[2]);if(o===undefined||r[17]>o)neg.set(r[2],r[17])}}
-  MNAME.forEach((n,k)=>out.push([nm,n,u[k].size,t[k]]));let s=0;neg.forEach(v=>s+=v);out.push([nm,"vgv",Math.round(s),neg.size])});return out}
+  MNAME.forEach((n,k)=>out.push([nm,n,u[k].size,t[k]]));let s=0;neg.forEach(v=>s+=v);out.push([nm,"vgv",Math.round(s),neg.size]);
+  [["agenciamentos",8],["placas",9]].forEach(([n,km])=>{const z=new Set();let tt=0;for(const r of C.X){if(r[0]!==km||r[1]<a||r[1]>b||!okF(r,F))continue;z.add(r[2]);tt+=r[18]}out.push([nm,n,z.size,tt])})});return out}
 
 /* 2. Evolução */
 function qEvo(q){const [a,b]=range(q),F=filters(q),B=/DATE_TRUNC\(dt,WEEK\(MONDAY\)\)/.test(q)?weekStart:/DATE_TRUNC\(dt,MONTH\)/.test(q)?monthStart:dIso,mp=new Map();
- for(const r of C.X){const k=r[0];if(k>5||r[2]<0||r[1]<a||r[1]>b||!okF(r,F))continue;const key=MNAME[k]+"|"+B(r[1]);mult(mp,key,()=>new Set()).add(r[2])}
+ for(const r of C.X){const k=r[0];if((k>5&&k<8)||k>9||r[2]<0||r[1]<a||r[1]>b||!okF(r,F))continue;const key=(k<6?MNAME[k]:k===8?"agenciamentos":"placas")+"|"+B(r[1]);mult(mp,key,()=>new Set()).add(r[2])}
  const o=[];mp.forEach((s,key)=>{const [m,bk]=key.split("|");o.push([bk,m,s.size])});return o}
 
 /* 3. Veículos · Vendas */
@@ -209,7 +210,7 @@ const qUlt=()=>[[C.ultimo]];
 function qDaily(q){const m=/IF\(dt=DATE '(\d{4}-\d\d-\d\d)',cl,NULL\)\) a1,COUNT\(DISTINCT IF\(dt=DATE '(\d{4}-\d\d-\d\d)',cl,NULL\)\) a2,COUNT\(DISTINCT IF\(dt BETWEEN DATE '(\d{4}-\d\d-\d\d)' AND DATE '(\d{4}-\d\d-\d\d)',cl,NULL\)\) mtd,COUNT\(DISTINCT IF\(dt BETWEEN DATE '(\d{4}-\d\d-\d\d)' AND DATE '(\d{4}-\d\d-\d\d)',cl,NULL\)\) pm/.exec(q),
  d1=dIdx(m[1]),d2=dIdx(m[2]),ms=dIdx(m[3]),pms=dIdx(m[5]),pme=dIdx(m[6]),F=filters(q),out=[],mk=()=>({a1:new Set(),a2:new Set(),mtd:new Set(),pm:new Set(),ult:-1}),
  add=(g,r)=>{const c=r[2];if(r[1]===d1)g.a1.add(c);if(r[1]===d2)g.a2.add(c);if(r[1]>=ms&&r[1]<=d1)g.mtd.add(c);if(r[1]>=pms&&r[1]<=pme)g.pm.add(c);if(r[1]>g.ult)g.ult=r[1]};
- MNAME.forEach((n,k)=>{const T=mk(),E=new Map(),CO=new Map();
+ MK.forEach(([n,k])=>{const T=mk(),E=new Map(),CO=new Map();
   for(const r of C.X){if(r[0]!==k||r[2]<0||r[1]<pms||r[1]>d1||!okF(r,F))continue;const eq=lab(r,4,"(vazio)"),co=lab(r,5,"(vazio)");add(T,r);add(mult(E,eq,mk),r);add(mult(CO,eq+"\u0001"+co,mk),r)}
   const row=(eq,co,g)=>out.push([n,eq,co,g.a1.size,g.a2.size,g.mtd.size,g.pm.size,g.ult<0?null:dIso(g.ult)]);
   CO.forEach((g,key)=>{const p=key.split("\u0001");row(p[0],p[1],g)});E.forEach((g,eq)=>row(eq,null,g));row(null,null,T)});return out}
@@ -234,7 +235,7 @@ function qLojas(q){const [a,b]=range(q),mp=new Map();
 function qRes(q){const [a,b]=range(q),dm=/COALESCE\(NULLIF\(CAST\((\w+) AS STRING\),''\),'([^']*)'\) d,CodigoCorretor cor,'cap' m/.exec(q),di=COLIDX[dm[1]],sem=dm[2],
  G=new Map(),mk=()=>({c:new Set(),cap:0,vis:0,pro:0,ven:new Set(),neg:new Map()}),T=mk();
  const add=(g,r)=>{if(r[15]>=0)g.c.add(r[15]);if(r[0]===0)g.cap+=r[18];if(r[0]===2)g.vis+=r[18];if(r[0]===3)g.pro+=r[18];if(r[0]===5&&r[2]>=0){g.ven.add(r[2]);const o=g.neg.get(r[2]);if(o===undefined||r[17]>o)g.neg.set(r[2],r[17])}};
- for(const r of C.X){if(r[1]<a||r[1]>b)continue;const d=dims(r,di)||sem;add(mult(G,d,mk),r);add(T,r)}
+ for(const r of C.X){if(r[0]>7||r[1]<a||r[1]>b)continue;const d=dims(r,di)||sem;add(mult(G,d,mk),r);add(T,r)}
  const val=g=>{let s=0;g.neg.forEach(v=>s+=v);return s},row=(d,g)=>[d,g.c.size,g.cap,g.vis,g.pro,g.ven.size,val(g)],out=[];G.forEach((g,d)=>out.push(row(d,g)));out.push(row(null,T));return out}
 
 function route(q){
@@ -273,6 +274,7 @@ function dfltRange(t){t=t||new Date();const y=t.getFullYear(),m=t.getMonth(),d=t
 function applyDflt(){const r=dfltRange();[["a","b"],["rka","rkb"],["rqa","rqb"],["lja","ljb"],["c2a","c2b"]].forEach(([x,y])=>{$(x).value=r.a;$(y).value=r.b});$("c1a").value=r.a1;$("c1b").value=r.b1}
 applyDflt();
 let mcp,un=null,D={};
+const IMV="(SELECT DATE(i.data_cadastro) dt,CAST(i.codigo AS STRING) cl,LOWER(i.tem_placa)='sim' pl,a.nome nome_agencia_usuario,u.equipe_nome nome_equipe_usuario,u.nome nome_usuario,CAST(NULL AS STRING) veiculocaptacao_dn FROM `nitro_dados.vista_imoveis` i LEFT JOIN `nitro_dados.vista_agencias` a ON a.imobiliaria_id=1 AND a.codigo=i.codigo_agencia LEFT JOIN `nitro_dados.vista_usuarios` u ON u.imobiliaria_id=1 AND u.codigo=i.codigo_corretor WHERE i.imobiliaria_id=1 AND DATE(i.data_cadastro) BETWEEN DATE '2026-01-01' AND CURRENT_DATE('America/Sao_Paulo'))";
 function sql(r){const T=`(SELECT 'atual' per,DATE '${r.a}' d1,DATE '${r.b}' d2 UNION ALL SELECT 'anterior',DATE '${r.pa}',DATE '${r.pb}') p`;
  const X="NOT IN ('Negócio ganho','Negócio perdido')",G="`nitro_dados.vw_consolidado_dados_gralha`",H="`nitro_dados.vw_consolidado_historico_gralha`";
  return `WITH p AS (SELECT * FROM ${T})
@@ -282,13 +284,15 @@ UNION ALL SELECT per,'fechamento',COUNT(DISTINCT d.CodigoCliente),COUNT(*) FROM 
 UNION ALL SELECT per,'vendas',COUNT(DISTINCT d.CodigoNegocio),COUNT(*) FROM p JOIN ${G} d ON d.Data BETWEEN p.d1 AND p.d2${fw("d")} WHERE d.Assunto IN ('Negócio ganho','Negocio Ganho via API') GROUP BY per
 UNION ALL SELECT per,'vgv',CAST(SUM(v) AS INT64),COUNT(*) FROM (SELECT per,d.CodigoNegocio,MAX(CAST(d.valornegocio_dn AS FLOAT64)) v FROM p JOIN ${G} d ON d.Data BETWEEN p.d1 AND p.d2${fw("d")} WHERE d.Assunto IN ('Negócio ganho','Negocio Ganho via API') GROUP BY per,d.CodigoNegocio) GROUP BY per
 UNION ALL SELECT per,'visitas',COUNT(DISTINCT h.CodigoCliente),COUNT(*) FROM p JOIN ${H} h ON h.Data BETWEEN p.d1 AND p.d2${fw("h")} WHERE LOWER(h.Assunto)='visita' GROUP BY per
-UNION ALL SELECT per,'proposta',COUNT(DISTINCT h.CodigoCliente),COUNT(*) FROM p JOIN ${H} h ON h.Data BETWEEN p.d1 AND p.d2${fw("h")} WHERE h.Assunto='Proposta' GROUP BY per`}
+UNION ALL SELECT per,'proposta',COUNT(DISTINCT h.CodigoCliente),COUNT(*) FROM p JOIN ${H} h ON h.Data BETWEEN p.d1 AND p.d2${fw("h")} WHERE h.Assunto='Proposta' GROUP BY per
+UNION ALL SELECT per,'agenciamentos',COUNT(DISTINCT x.cl),COUNT(*) FROM p JOIN ${IMV} x ON x.dt BETWEEN p.d1 AND p.d2${fw("x")} GROUP BY per
+UNION ALL SELECT per,'placas',COUNT(DISTINCT IF(x.pl,x.cl,NULL)),COUNTIF(x.pl) FROM p JOIN ${IMV} x ON x.dt BETWEEN p.d1 AND p.d2${fw("x")} GROUP BY per`}
 const dl=(a,b)=>b?(a-b)/b*100:null,ch=p=>p===null?`<span class="chip na">sem base</span>`:`<span class="chip ${p>=0?"pos":"neg"}">${p>0?"+":""}${Math.round(p)}%</span>`;
 const g=(per,m,k)=>(D[per]&&D[per][m]?D[per][m][k]:0),u=m=>g("atual",m,"u"),pu=m=>g("anterior",m,"u"),pc=(a,b)=>b?(a/b*100).toFixed(2).replace(".",",")+"%":"-";
 function render(){
  const vg=g("atual","vgv","u");
- $("tl").innerHTML=[["VGV","R$ "+(vg/1e6).toFixed(2).replace(".",",")+" Mi",dl(vg,g("anterior","vgv","u"))],["Vendas",f(u("vendas")),dl(u("vendas"),pu("vendas"))],["Leads captados",f(u("leads")),dl(u("leads"),pu("leads"))],["Conversão lead para venda",pc(u("vendas"),u("leads")),null]]
-  .map(([a,b,c],i)=>`<div class="tile"><small>${a}</small><b>${b}</b>${i<3?ch(c)+' <small>vs. anterior</small>':'<small>vendas / leads</small>'}</div>`).join("");
+ $("tl").innerHTML=[["VGV","R$ "+(vg/1e6).toFixed(2).replace(".",",")+" Mi",dl(vg,g("anterior","vgv","u"))],["Vendas",f(u("vendas")),dl(u("vendas"),pu("vendas"))],["Leads captados",f(u("leads")),dl(u("leads"),pu("leads"))],["Conversão lead para venda",pc(u("vendas"),u("leads")),null,"vendas / leads"],["Agenciamentos",f(u("agenciamentos")),dl(u("agenciamentos"),pu("agenciamentos"))],["Placas",f(u("placas")),dl(u("placas"),pu("placas"))]]
+  .map(([a,b,c,cp])=>`<div class="tile"><small>${a}</small><b>${b}</b>${cp?`<small>${cp}</small>`:ch(c)+' <small>vs. anterior</small>'}</div>`).join("");
  let h="";
  ST.forEach(([nm,sb,m],i)=>{if(i){const q=ST[i-1][2];h+=`<div class="cv"><span>${u(q)?Math.round(u(m)/u(q)*100)+"%":"-"}</span></div>`}
   h+=`<div class="r"><div class="nm">${nm}${sb?`<small>${sb}</small>`:""}</div><div class="tr"><div class="bf" style="width:${W[i]}%;background:${CO[i]}">${f(u(m))}</div></div>
@@ -307,18 +311,18 @@ function load(){const a=$("a").value,b=$("b").value;
    $("st").textContent=`${br(r.a)} a ${br(r.b)} · anterior: ${r.pa<DESDE?"sem base (antes de 01/01/2026)":br(r.pa)+" a "+br(r.pb)} · atualizado em ${new Date(ev.result.cache?ev.result.cache.storedAt:Date.now()).toLocaleString("pt-BR")}`}catch(e){fail({message:e.message})}},
   {cache:{staleTime:3600000}})}
 
-const MET=[["Captação (Leads)","leads"],["Oportunidade","oportunidade"],["Visita","visitas"],["Proposta","proposta"],["Fechamento","fechamento"],["Vendas","vendas"]],MS=["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+const MET=[["Captação (Leads)","leads"],["Oportunidade","oportunidade"],["Visita","visitas"],["Proposta","proposta"],["Fechamento","fechamento"],["Vendas","vendas"],["Agenciamentos","agenciamentos"],["Placas","placas"]],MS=["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
 let gran="dia",met="leads",E={},un2=null,rg=null;
 function sqlE(a,b,g){const B=g==="dia"?"dt":g==="semana"?"DATE_TRUNC(dt,WEEK(MONDAY))":"DATE_TRUNC(dt,MONTH)",X="COALESCE(Assunto,'') NOT IN ('Negócio ganho','Negócio perdido')";
- const q=(m,v,w,c)=>`SELECT CAST(${B} AS STRING) b,'${m}' m,COUNT(DISTINCT cl) u FROM (SELECT DATE(Data) dt,${c} cl FROM \`nitro_dados.${v}\` WHERE DATE(Data) BETWEEN DATE '${a}' AND DATE '${b}'${fw()}${w?" AND "+w:""}) GROUP BY 1`,G="vw_consolidado_dados_gralha",H="vw_consolidado_historico_gralha";
- return [q("leads","vw_consolidado_clientes_capturados_gralha","","CodigoCliente"),q("oportunidade",G,`EtapaAcaoId IN ('9','5','1') AND ${X}`,"CodigoCliente"),q("fechamento",G,`EtapaAcaoId IN ('8','4','12') AND ${X}`,"CodigoCliente"),q("vendas",G,"Assunto IN ('Negócio ganho','Negocio Ganho via API')","CodigoNegocio"),q("visitas",H,"LOWER(Assunto)='visita'","CodigoCliente"),q("proposta",H,"Assunto='Proposta'","CodigoCliente")].join(" UNION ALL ")}
+ const q=(m,v,w,c)=>`SELECT CAST(${B} AS STRING) b,'${m}' m,COUNT(DISTINCT cl) u FROM (SELECT DATE(Data) dt,${c} cl FROM \`nitro_dados.${v}\` WHERE DATE(Data) BETWEEN DATE '${a}' AND DATE '${b}'${fw()}${w?" AND "+w:""}) GROUP BY 1`,G="vw_consolidado_dados_gralha",H="vw_consolidado_historico_gralha",qi=(m,w)=>`SELECT CAST(${B} AS STRING) b,'${m}' m,COUNT(DISTINCT cl) u FROM (SELECT dt,cl FROM ${IMV} x WHERE dt BETWEEN DATE '${a}' AND DATE '${b}'${fw()}${w?" AND "+w:""}) GROUP BY 1`;
+ return [q("leads","vw_consolidado_clientes_capturados_gralha","","CodigoCliente"),q("oportunidade",G,`EtapaAcaoId IN ('9','5','1') AND ${X}`,"CodigoCliente"),q("fechamento",G,`EtapaAcaoId IN ('8','4','12') AND ${X}`,"CodigoCliente"),q("vendas",G,"Assunto IN ('Negócio ganho','Negocio Ganho via API')","CodigoNegocio"),q("visitas",H,"LOWER(Assunto)='visita'","CodigoCliente"),q("proposta",H,"Assunto='Proposta'","CodigoCliente"),qi("agenciamentos",""),qi("placas","pl")].join(" UNION ALL ")}
 function bks(a,b,g){const o=[];let d=P(a);const e=P(b);if(g==="semana")d=ad(d,-((d.getUTCDay()+6)%7));if(g==="mes")d=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),1));
  while(d<=e){o.push(iso(d));d=g==="dia"?ad(d,1):g==="semana"?ad(d,7):new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+1,1))}return o}
 const lb=(k,g,multi)=>{const [y,m,dd]=k.split("-");return g==="mes"?MS[+m-1]+"/"+y.slice(2):g==="semana"||multi?dd+"/"+m:String(+dd)};
-function renderE(){if(!rg)return;const bk=bks(rg.a,rg.b,gran),v=bk.map(k=>(E[met]||{})[k]||0),mx=Math.max(1,...v),st=[1,2,5,10,20,25,50,100,200,250,500,1000].find(x=>mx/x<=4)||2000,top=st*Math.ceil(mx/st),multi=rg.a.slice(0,7)!==rg.b.slice(0,7),k=Math.ceil(bk.length/16),name=MET.find(x=>x[1]===met)[0];
+function renderE(){if(!rg)return;const bk=bks(rg.a,rg.b,gran),v=bk.map(k=>(E[met]||{})[k]||0),mx=Math.max(1,...v),st=[1,2,5,10,20,25,50,100,200,250,500,1000].find(x=>mx/x<=4)||2000,top=st*Math.ceil(mx/st),multi=rg.a.slice(0,7)!==rg.b.slice(0,7),k=Math.ceil(bk.length/16),name=MET.find(x=>x[1]===met)[0],un0=met==="agenciamentos"||met==="placas"?"imóveis":"clientes únicos";
  let h="";for(let y=0;y<=top;y+=st)h+=`<div class="gl" style="bottom:${y/top*100}%"><span>${y}</span></div>`;
  h+='<div class="bars">'+bk.map((x,i)=>`<div class="bc" title="${lb(x,gran,true)}: ${f(v[i])}"><span class="bv">${bk.length<=31?f(v[i]):""}</span><div class="bb" style="height:${v[i]/top*100}%"></div>${i%k===0?`<span class="bx">${lb(x,gran,multi)}</span>`:""}</div>`).join("")+"</div>";
- $("ch").innerHTML=h;$("ch").setAttribute("aria-label",`${name} por ${gran}`);$("mt").textContent=`${name} · clientes únicos por ${gran==="mes"?"mês":gran}`}
+ $("ch").innerHTML=h;$("ch").setAttribute("aria-label",`${name} por ${gran}`);$("mt").textContent=`${name} · ${un0} por ${gran==="mes"?"mês":gran}`}
 function loadE(r){rg=r;if(un2)un2();un2=mcp.watchTool(SV,TL,{projectId:PR,query:sqlE(r.a,r.b,gran)},ev=>{if(ev.type==="error"){$("ch").innerHTML='<div class="msg"><b>Não foi possível carregar a evolução</b>Tente atualizar.</div>';return}
   try{const x={};ev.result.payload.rows.forEach(w=>{const [b,m,u]=w.f.map(c=>c.v);(x[m]=x[m]||{})[b]=+u});E=x;renderE()}catch(e){$("ch").innerHTML='<div class="msg"><b>Resposta inesperada</b>Tente atualizar.</div>'}},{cache:{staleTime:3600000}})}
 function setM(){$("mets").innerHTML=MET.map(([n,k])=>`<button aria-pressed="${k===met}" data-m="${k}">${n}</button>`).join("");document.querySelectorAll("#mets button").forEach(b=>b.onclick=()=>{met=b.dataset.m;setM();renderE()})}
@@ -392,13 +396,14 @@ function loadOpts(){const q=`SELECT k,v FROM (SELECT 'loja' k,nome_agencia_usuar
   OPTS={};Object.keys(o).forEach(x=>OPTS[x]=o[x]);fillCmp();fillRq();document.querySelectorAll(".fb select").forEach(e=>{const k=e.dataset.k,cur=FL[k];e.innerHTML='<option value="">Todos</option>'+(o[k]||[]).map(v=>`<option value="${esc2(v)}">${esc2(v)}</option>`).join("");e.value=(o[k]||[]).includes(cur)?cur:"";FL[k]=e.value})}catch(e){}},{cache:{staleTime:86400000}})}
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",x===b));document.querySelectorAll("[role=tabpanel]").forEach(p=>p.hidden=p.id!=="panel-"+b.dataset.tab)});
 
-const DM=[["Leads","leads"],["Oportunidade","oportunidade"],["Visita","visitas"],["Proposta","proposta"],["Fechamento","fechamento"],["Vendas","vendas"]];
+const DM=[["Leads","leads"],["Oportunidade","oportunidade"],["Visita","visitas"],["Proposta","proposta"],["Fechamento","fechamento"],["Vendas","vendas"],["Agenciamentos","agenciamentos"],["Placas","placas"]];
 let DY={},unY=null,unL=null,yLoaded=false,YG=null,ym="leads";
 function dyRange(ref){const d1=P(ref),y=d1.getUTCFullYear(),m=d1.getUTCMonth(),pms=new Date(Date.UTC(y,m-1,1)),pml=new Date(Date.UTC(y,m,0));return{d1:iso(d1),d2:iso(ad(d1,-1)),ms:iso(new Date(Date.UTC(y,m,1))),pms:iso(pms),pme:iso(ad(pms,Math.min(d1.getUTCDate(),pml.getUTCDate())-1))}}
 const sqlL=()=>`SELECT CAST(MAX(dt) AS STRING) l FROM (SELECT DATE(Data) dt FROM \`nitro_dados.vw_consolidado_clientes_capturados_gralha\` UNION ALL SELECT Data FROM \`nitro_dados.vw_consolidado_dados_gralha\` UNION ALL SELECT Data FROM \`nitro_dados.vw_consolidado_historico_gralha\`) WHERE dt < CURRENT_DATE('America/Sao_Paulo')`;
 function sqlY(g){const X="COALESCE(Assunto,'') NOT IN ('Negócio ganho','Negócio perdido')",G="vw_consolidado_dados_gralha",H="vw_consolidado_historico_gralha",
- c=(m,v,w,cl)=>`SELECT '${m}' m,eq,cor,COUNT(DISTINCT IF(dt=DATE '${g.d1}',cl,NULL)) a1,COUNT(DISTINCT IF(dt=DATE '${g.d2}',cl,NULL)) a2,COUNT(DISTINCT IF(dt BETWEEN DATE '${g.ms}' AND DATE '${g.d1}',cl,NULL)) mtd,COUNT(DISTINCT IF(dt BETWEEN DATE '${g.pms}' AND DATE '${g.pme}',cl,NULL)) pm,CAST(MAX(dt) AS STRING) ult FROM (SELECT DATE(Data) dt,CAST(${cl} AS STRING) cl,COALESCE(NULLIF(nome_equipe_usuario,''),'(vazio)') eq,COALESCE(NULLIF(nome_usuario,''),'(vazio)') cor FROM \`nitro_dados.${v}\` WHERE DATE(Data) BETWEEN DATE '${g.pms}' AND DATE '${g.d1}'${fw()}${w?" AND "+w:""}) GROUP BY GROUPING SETS ((eq,cor),(eq),())`;
- return [c("leads","vw_consolidado_clientes_capturados_gralha","","CodigoCliente"),c("oportunidade",G,`EtapaAcaoId IN ('9','5','1') AND ${X}`,"CodigoCliente"),c("visitas",H,"LOWER(Assunto)='visita'","CodigoCliente"),c("proposta",H,"Assunto='Proposta'","CodigoCliente"),c("fechamento",G,`EtapaAcaoId IN ('8','4','12') AND ${X}`,"CodigoCliente"),c("vendas",G,"Assunto IN ('Negócio ganho','Negocio Ganho via API')","CodigoNegocio")].join(" UNION ALL ")}
+ c=(m,v,w,cl)=>`SELECT '${m}' m,eq,cor,COUNT(DISTINCT IF(dt=DATE '${g.d1}',cl,NULL)) a1,COUNT(DISTINCT IF(dt=DATE '${g.d2}',cl,NULL)) a2,COUNT(DISTINCT IF(dt BETWEEN DATE '${g.ms}' AND DATE '${g.d1}',cl,NULL)) mtd,COUNT(DISTINCT IF(dt BETWEEN DATE '${g.pms}' AND DATE '${g.pme}',cl,NULL)) pm,CAST(MAX(dt) AS STRING) ult FROM (SELECT DATE(Data) dt,CAST(${cl} AS STRING) cl,COALESCE(NULLIF(nome_equipe_usuario,''),'(vazio)') eq,COALESCE(NULLIF(nome_usuario,''),'(vazio)') cor FROM \`nitro_dados.${v}\` WHERE DATE(Data) BETWEEN DATE '${g.pms}' AND DATE '${g.d1}'${fw()}${w?" AND "+w:""}) GROUP BY GROUPING SETS ((eq,cor),(eq),())`,
+ ci=(m,w)=>`SELECT '${m}' m,eq,cor,COUNT(DISTINCT IF(dt=DATE '${g.d1}',cl,NULL)) a1,COUNT(DISTINCT IF(dt=DATE '${g.d2}',cl,NULL)) a2,COUNT(DISTINCT IF(dt BETWEEN DATE '${g.ms}' AND DATE '${g.d1}',cl,NULL)) mtd,COUNT(DISTINCT IF(dt BETWEEN DATE '${g.pms}' AND DATE '${g.pme}',cl,NULL)) pm,CAST(MAX(dt) AS STRING) ult FROM (SELECT dt,cl,COALESCE(NULLIF(nome_equipe_usuario,''),'(vazio)') eq,COALESCE(NULLIF(nome_usuario,''),'(vazio)') cor FROM ${IMV} x WHERE dt BETWEEN DATE '${g.pms}' AND DATE '${g.d1}'${fw()}${w?" AND "+w:""}) GROUP BY GROUPING SETS ((eq,cor),(eq),())`;
+ return [c("leads","vw_consolidado_clientes_capturados_gralha","","CodigoCliente"),c("oportunidade",G,`EtapaAcaoId IN ('9','5','1') AND ${X}`,"CodigoCliente"),c("visitas",H,"LOWER(Assunto)='visita'","CodigoCliente"),c("proposta",H,"Assunto='Proposta'","CodigoCliente"),c("fechamento",G,`EtapaAcaoId IN ('8','4','12') AND ${X}`,"CodigoCliente"),c("vendas",G,"Assunto IN ('Negócio ganho','Negocio Ganho via API')","CodigoNegocio"),ci("agenciamentos",""),ci("placas","pl")].join(" UNION ALL ")}
 const vr2=(a,b)=>b?(a-b)/b*100:null,nz=v=>v?f(v):"";
 const ic=k=>{const c={up:["#7fbf8e","#2f7d46"],dn:["#ef8a80","#b3342a"],fl:["#f0b84a","#b07d12"]}[k],d={up:"M5 11l4-4 4 4",dn:"M5 7l4 4 4-4",fl:"M5 9h8"}[k];return `<svg class="ic" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="8" fill="${c[0]}" stroke="${c[1]}" stroke-width="1.4"/><path d="${d}" fill="none" stroke="${c[1]}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`};
 const vcell=v=>{if(v===null)return"<td></td>";const k=v>0.05?"up":v<-0.05?"dn":"fl";return `<td class="vd ${k}"><span class="vv">${ic(k)}${v.toFixed(1).replace(".",",")}%</span></td>`};

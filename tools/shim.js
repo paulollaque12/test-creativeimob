@@ -4,7 +4,7 @@
    Cubo X: linhas [m,dia,cl,loja,equipe,corretor,veiculo,bairro,tipo,cond,lanc,cod,dorm,area,nome,cc,kc,valor,n]
    m: 0 leads, 1 oportunidade, 2 visita, 3 proposta, 4 fechamento, 5 vendas, 6 qualquer evento de dados, 7 qualquer evento do histórico */
 (function(){
-const MNAME=["leads","oportunidade","visitas","proposta","fechamento","vendas"],IDX={loja:3,equipe:4,corretor:5,veiculo:6,bairro:7,tipo:8,cond:9,lanc:10,cod:11,dorm:12,area:13};
+const MNAME=["leads","oportunidade","visitas","proposta","fechamento","vendas"],MK=[...MNAME.map((n,k)=>[n,k]),["agenciamentos",8],["placas",9]],IDX={loja:3,equipe:4,corretor:5,veiculo:6,bairro:7,tipo:8,cond:9,lanc:10,cod:11,dorm:12,area:13};
 const COLIDX={nome_agencia_usuario:3,nome_equipe_usuario:4,nome_usuario:5,veiculocaptacao_dn:6,bairro_imovel:7,Bairro:7,categoria_imovel:8,Categoria:8,Empreendimento:9,condominio_imovel:9,Lancamento:10,lancamento_imovel:10,CodigoEmImovel:11,Dormitorios:12,dormitorios_imovel:12,AreaPrivativa:13,areaprivativa_imovel:13,nomecliente_dn:14};
 let C=null;
 const U=Date.UTC,dIdx=s=>Math.round((U(+s.slice(0,4),+s.slice(5,7)-1,+s.slice(8,10))-U(2020,0,1))/864e5),dIso=n=>new Date(U(2020,0,1)+n*864e5).toISOString().slice(0,10);
@@ -28,11 +28,12 @@ function qFunil(q){const per=[];let m=/SELECT 'atual' per,DATE '(\d{4}-\d\d-\d\d
  const F=filters(q),out=[],lo=Math.min(...per.map(p=>p[1])),hi=Math.max(...per.map(p=>p[2]));
  per.forEach(([nm,a,b])=>{const u=MNAME.map(()=>new Set()),t=MNAME.map(()=>0),neg=new Map();
   for(const r of C.X){const k=r[0];if(k>5||r[1]<a||r[1]>b||!okF(r,F))continue;if(r[2]>=0)u[k].add(r[2]);t[k]+=r[18];if(k===5&&r[2]>=0){const o=neg.get(r[2]);if(o===undefined||r[17]>o)neg.set(r[2],r[17])}}
-  MNAME.forEach((n,k)=>out.push([nm,n,u[k].size,t[k]]));let s=0;neg.forEach(v=>s+=v);out.push([nm,"vgv",Math.round(s),neg.size])});return out}
+  MNAME.forEach((n,k)=>out.push([nm,n,u[k].size,t[k]]));let s=0;neg.forEach(v=>s+=v);out.push([nm,"vgv",Math.round(s),neg.size]);
+  [["agenciamentos",8],["placas",9]].forEach(([n,km])=>{const z=new Set();let tt=0;for(const r of C.X){if(r[0]!==km||r[1]<a||r[1]>b||!okF(r,F))continue;z.add(r[2]);tt+=r[18]}out.push([nm,n,z.size,tt])})});return out}
 
 /* 2. Evolução */
 function qEvo(q){const [a,b]=range(q),F=filters(q),B=/DATE_TRUNC\(dt,WEEK\(MONDAY\)\)/.test(q)?weekStart:/DATE_TRUNC\(dt,MONTH\)/.test(q)?monthStart:dIso,mp=new Map();
- for(const r of C.X){const k=r[0];if(k>5||r[2]<0||r[1]<a||r[1]>b||!okF(r,F))continue;const key=MNAME[k]+"|"+B(r[1]);mult(mp,key,()=>new Set()).add(r[2])}
+ for(const r of C.X){const k=r[0];if((k>5&&k<8)||k>9||r[2]<0||r[1]<a||r[1]>b||!okF(r,F))continue;const key=(k<6?MNAME[k]:k===8?"agenciamentos":"placas")+"|"+B(r[1]);mult(mp,key,()=>new Set()).add(r[2])}
  const o=[];mp.forEach((s,key)=>{const [m,bk]=key.split("|");o.push([bk,m,s.size])});return o}
 
 /* 3. Veículos · Vendas */
@@ -71,7 +72,7 @@ const qUlt=()=>[[C.ultimo]];
 function qDaily(q){const m=/IF\(dt=DATE '(\d{4}-\d\d-\d\d)',cl,NULL\)\) a1,COUNT\(DISTINCT IF\(dt=DATE '(\d{4}-\d\d-\d\d)',cl,NULL\)\) a2,COUNT\(DISTINCT IF\(dt BETWEEN DATE '(\d{4}-\d\d-\d\d)' AND DATE '(\d{4}-\d\d-\d\d)',cl,NULL\)\) mtd,COUNT\(DISTINCT IF\(dt BETWEEN DATE '(\d{4}-\d\d-\d\d)' AND DATE '(\d{4}-\d\d-\d\d)',cl,NULL\)\) pm/.exec(q),
  d1=dIdx(m[1]),d2=dIdx(m[2]),ms=dIdx(m[3]),pms=dIdx(m[5]),pme=dIdx(m[6]),F=filters(q),out=[],mk=()=>({a1:new Set(),a2:new Set(),mtd:new Set(),pm:new Set(),ult:-1}),
  add=(g,r)=>{const c=r[2];if(r[1]===d1)g.a1.add(c);if(r[1]===d2)g.a2.add(c);if(r[1]>=ms&&r[1]<=d1)g.mtd.add(c);if(r[1]>=pms&&r[1]<=pme)g.pm.add(c);if(r[1]>g.ult)g.ult=r[1]};
- MNAME.forEach((n,k)=>{const T=mk(),E=new Map(),CO=new Map();
+ MK.forEach(([n,k])=>{const T=mk(),E=new Map(),CO=new Map();
   for(const r of C.X){if(r[0]!==k||r[2]<0||r[1]<pms||r[1]>d1||!okF(r,F))continue;const eq=lab(r,4,"(vazio)"),co=lab(r,5,"(vazio)");add(T,r);add(mult(E,eq,mk),r);add(mult(CO,eq+"\u0001"+co,mk),r)}
   const row=(eq,co,g)=>out.push([n,eq,co,g.a1.size,g.a2.size,g.mtd.size,g.pm.size,g.ult<0?null:dIso(g.ult)]);
   CO.forEach((g,key)=>{const p=key.split("\u0001");row(p[0],p[1],g)});E.forEach((g,eq)=>row(eq,null,g));row(null,null,T)});return out}
@@ -96,7 +97,7 @@ function qLojas(q){const [a,b]=range(q),mp=new Map();
 function qRes(q){const [a,b]=range(q),dm=/COALESCE\(NULLIF\(CAST\((\w+) AS STRING\),''\),'([^']*)'\) d,CodigoCorretor cor,'cap' m/.exec(q),di=COLIDX[dm[1]],sem=dm[2],
  G=new Map(),mk=()=>({c:new Set(),cap:0,vis:0,pro:0,ven:new Set(),neg:new Map()}),T=mk();
  const add=(g,r)=>{if(r[15]>=0)g.c.add(r[15]);if(r[0]===0)g.cap+=r[18];if(r[0]===2)g.vis+=r[18];if(r[0]===3)g.pro+=r[18];if(r[0]===5&&r[2]>=0){g.ven.add(r[2]);const o=g.neg.get(r[2]);if(o===undefined||r[17]>o)g.neg.set(r[2],r[17])}};
- for(const r of C.X){if(r[1]<a||r[1]>b)continue;const d=dims(r,di)||sem;add(mult(G,d,mk),r);add(T,r)}
+ for(const r of C.X){if(r[0]>7||r[1]<a||r[1]>b)continue;const d=dims(r,di)||sem;add(mult(G,d,mk),r);add(T,r)}
  const val=g=>{let s=0;g.neg.forEach(v=>s+=v);return s},row=(d,g)=>[d,g.c.size,g.cap,g.vis,g.pro,g.ven.size,val(g)],out=[];G.forEach((g,d)=>out.push(row(d,g)));out.push(row(null,T));return out}
 
 function route(q){

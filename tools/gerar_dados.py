@@ -22,9 +22,24 @@ METR = [(0,"c","TRUE","CodigoCliente"),
         (4,"d",f"EtapaAcaoId IN ('8','4','12') AND {X}","CodigoCliente"),
         (5,"d",G,"CodigoNegocio"),
         (6,"d","TRUE",None),   # 6 = corretores ativos (qualquer evento em dados)
-        (7,"h","TRUE",None)]   # 7 = corretores com qualquer evento no historico (Ranking/Lojas)
+        (7,"h","TRUE",None),   # 7 = corretores com qualquer evento no historico (Ranking/Lojas)
+        (8,"i","TRUE","codigo"),                      # 8 = agenciamentos (imoveis cadastrados, por data_cadastro)
+        (9,"i","LOWER(i.tem_placa)='sim'","codigo")]  # 9 = placas (imoveis com tem_placa = Sim)
+
+IMOVEIS_FROM = ("`nitro_dados.vista_imoveis` i LEFT JOIN `nitro_dados.vista_agencias` a ON a.imobiliaria_id=1 AND a.codigo=i.codigo_agencia "
+                "LEFT JOIN `nitro_dados.vista_usuarios` u ON u.imobiliaria_id=1 AND u.codigo=i.codigo_corretor")
+
+def sel_i(code, cond, ent, desde):
+    # imoveis nao tem veiculo/bairro/etc. no cubo: so loja (agencia), equipe e corretor (usuario)
+    base = {"loja": "COALESCE(a.nome,'')", "equipe": "COALESCE(u.equipe_nome,'')", "corretor": "COALESCE(u.nome,'')"}
+    dims = [base.get(n, "''") + f" {n}" for n in DIMS]
+    return (f"SELECT {code} m, dt, cl, {', '.join(DIMS)}, cc, kc, MAX(v) v, COUNT(*) n FROM ("
+            f"SELECT DATE(i.data_cadastro) dt, CAST(i.{ent} AS STRING) cl, {', '.join(dims)}, CAST(NULL AS STRING) cc, CAST(NULL AS STRING) kc, CAST(NULL AS FLOAT64) v "
+            f"FROM {IMOVEIS_FROM} WHERE i.imobiliaria_id=1 AND DATE(i.data_cadastro) BETWEEN DATE '{desde}' AND CURRENT_DATE('America/Sao_Paulo') AND {cond}) "
+            f"GROUP BY m, dt, cl, {', '.join(DIMS)}, cc, kc")
 
 def sel(code, v, cond, ent, desde):
+    if v == "i": return sel_i(code, cond, ent, desde)
     dims = []
     for i, n in enumerate(DIMS):
         if (code == 6 and i > 3) or (code == 7 and i > 2):
