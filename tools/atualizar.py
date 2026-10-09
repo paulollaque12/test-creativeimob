@@ -3,7 +3,7 @@
 
 Fluxo (feito pelo Claude agendado, com o conector do BigQuery):
   1) python tools/atualizar.py sql [--desde AAAA-MM-DD] [--dir /tmp/atu]
-        -> grava q_m0..q_m9.sql, q_k.sql, q_ultimo.sql (desde padrao = dia 1 do mes anterior)
+        -> grava q_m0..q_m11.sql, q_k.sql, q_ultimo.sql (desde padrao = dia 1 do mes anterior)
   2) rodar cada .sql com mcp execute_sql_readonly (projectId vistaprocessos); resultados grandes o
      conector salva em arquivo (caminho aparece na resposta). Anotar o caminho de cada resultado.
   3) DASH_SENHA=... python tools/atualizar.py montar --desde D --ultimo U --k ARQ_K ARQ_M0 ARQ_M1 ... ARQ_M9
@@ -40,7 +40,7 @@ def sql_k(desde):
 
 def cmd_sql(a):
     os.makedirs(a.dir, exist_ok=True)
-    for m in range(10):
+    for m in range(12):
         open(os.path.join(a.dir, f"q_m{m}.sql"), "w").write(sql_m(a.desde, m))
     open(os.path.join(a.dir, "q_k.sql"), "w").write(sql_k(a.desde))
     open(os.path.join(a.dir, "q_ultimo.sql"), "w").write(g.SQL_L)
@@ -63,7 +63,7 @@ def cmd_montar(a):
         return t[v]
     dmin = (datetime.date.fromisoformat(a.desde) - D0).days
     hoje = datetime.date.today()
-    mets = set(int(x) for x in a.metricas.split(",")) if a.metricas else set(range(10))
+    mets = set(int(x) for x in a.metricas.split(",")) if a.metricas else set(range(12))
     # com --metricas, so essas metricas sao substituidas; as demais ficam como estao
     antigas = [r for r in d["rows"] if r[1] < dmin or r[0] not in mets]
     novas, cont = [], {}

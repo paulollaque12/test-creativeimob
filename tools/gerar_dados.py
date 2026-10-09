@@ -24,15 +24,29 @@ METR = [(0,"c","TRUE","CodigoCliente"),
         (6,"d","TRUE",None),   # 6 = corretores ativos (qualquer evento em dados)
         (7,"h","TRUE",None),   # 7 = corretores com qualquer evento no historico (Ranking/Lojas)
         (8,"i","TRUE","codigo"),                      # 8 = agenciamentos (imoveis cadastrados, por data_cadastro)
-        (9,"i","LOWER(i.tem_placa)='sim'","codigo")]  # 9 = placas (imoveis com tem_placa = Sim)
+        (9,"i","LOWER(i.tem_placa)='sim'","codigo"),  # 9 = placas (imoveis com tem_placa = Sim)
+        (10,"i","TRUE","codigo"),                     # 10 = imoveis vendidos (CodigoEmImovel de negocio ganho, data da venda)
+        (11,"i","LOWER(i.tem_placa)='sim'","codigo")] # 11 = imoveis vendidos com placa
 
 IMOVEIS_FROM = ("`nitro_dados.vista_imoveis` i LEFT JOIN `nitro_dados.vista_agencias` a ON a.imobiliaria_id=1 AND a.codigo=i.codigo_agencia "
                 "LEFT JOIN `nitro_dados.vista_usuarios` u ON u.imobiliaria_id=1 AND u.codigo=i.codigo_corretor")
 
+# celula do mapa (Produto): indice de latitude|longitude em passos de 0.004 grau, so na area da Grande Florianopolis
+LA, LO = "SAFE_CAST(i.latitude AS FLOAT64)", "SAFE_CAST(i.longitude AS FLOAT64)"
+CELULA = (f"IF({LA} BETWEEN -28.3 AND -27.2 AND {LO} BETWEEN -49.3 AND -48.2, CONCAT(CAST(CAST(FLOOR({LA}/0.004) AS INT64) AS STRING),'|',"
+          f"CAST(CAST(FLOOR({LO}/0.004) AS INT64) AS STRING)), '')")
+
 def sel_i(code, cond, ent, desde):
-    # imoveis nao tem veiculo/bairro/etc. no cubo: so loja (agencia), equipe e corretor (usuario)
-    base = {"loja": "COALESCE(a.nome,'')", "equipe": "COALESCE(u.equipe_nome,'')", "corretor": "COALESCE(u.nome,'')"}
+    # imoveis: so loja (agencia), equipe e corretor (usuario) do captador, bairro e celula do mapa (campo 'area')
+    base = {"loja": "COALESCE(a.nome,'')", "equipe": "COALESCE(u.equipe_nome,'')", "corretor": "COALESCE(u.nome,'')",
+            "bairro": "COALESCE(NULLIF(i.bairro,''),'')", "area": CELULA}
     dims = [base.get(n, "''") + f" {n}" for n in DIMS]
+    if code >= 10:   # vendidos: um registro por imovel e dia de venda
+        return (f"SELECT {code} m, dt, cl, {', '.join(DIMS)}, cc, kc, MAX(v) v, COUNT(*) n FROM ("
+                f"SELECT sv.dt dt, CAST(i.{ent} AS STRING) cl, {', '.join(dims)}, CAST(NULL AS STRING) cc, CAST(NULL AS STRING) kc, CAST(NULL AS FLOAT64) v "
+                f"FROM (SELECT CAST(CodigoEmImovel AS STRING) cl, DATE(Data) dt FROM `{V['d']}` WHERE DATE(Data) BETWEEN DATE '{desde}' AND CURRENT_DATE('America/Sao_Paulo') "
+                f"AND {G} AND CodigoEmImovel IS NOT NULL GROUP BY 1, 2) sv JOIN {IMOVEIS_FROM.replace('`nitro_dados.vista_imoveis` i', '`nitro_dados.vista_imoveis` i ON i.imobiliaria_id=1 AND i.codigo=sv.cl', 1)} "
+                f"WHERE {cond}) GROUP BY m, dt, cl, {', '.join(DIMS)}, cc, kc")
     return (f"SELECT {code} m, dt, cl, {', '.join(DIMS)}, cc, kc, MAX(v) v, COUNT(*) n FROM ("
             f"SELECT DATE(i.data_cadastro) dt, CAST(i.{ent} AS STRING) cl, {', '.join(dims)}, CAST(NULL AS STRING) cc, CAST(NULL AS STRING) kc, CAST(NULL AS FLOAT64) v "
             f"FROM {IMOVEIS_FROM} WHERE i.imobiliaria_id=1 AND DATE(i.data_cadastro) BETWEEN DATE '{desde}' AND CURRENT_DATE('America/Sao_Paulo') AND {cond}) "

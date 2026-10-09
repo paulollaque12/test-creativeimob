@@ -6,12 +6,12 @@ Página: `docs/index.html` = `fonte/dashboard-gralha-funil.html` (o dashboard ao
 
 ## Passo a passo (feito pelo Claude agendado, 07:00 America/Sao_Paulo)
 1. `git pull` e instalar dependência: `pip install --break-system-packages cryptography`.
-2. `python tools/atualizar.py sql` -> grava `/tmp/atu/q_m0..q_m9.sql`, `q_k.sql`, `q_ultimo.sql`.
+2. `python tools/atualizar.py sql` -> grava `/tmp/atu/q_m0..q_m11.sql`, `q_k.sql`, `q_ultimo.sql`.
    (janela padrão = dia 1 do mês anterior até hoje; reprocessa o período recente para pegar correções do CRM.)
 3. Rodar CADA arquivo com `execute_sql_readonly` (projectId `vistaprocessos`, `timeoutMs` 120000), colando o texto da consulta sem alterar.
    Todas as consultas têm uma linha de enchimento, então o conector SEMPRE salva o resultado num arquivo e devolve o caminho (erro "exceeds maximum allowed tokens ... saved to <caminho>" é o esperado). Anotar o caminho de cada uma.
    Rodar `q_ultimo.sql` também (resultado pequeno, inline): é a data do último dia da base (`ULTIMO`).
-4. `DASH_SENHA=<senha> python tools/atualizar.py montar --desde <DESDE> --ultimo <ULTIMO> --k <arquivo q_k> <arq q_m0> ... <arq q_m9>`
+4. `DASH_SENHA=<senha> python tools/atualizar.py montar --desde <DESDE> --ultimo <ULTIMO> --k <arquivo q_k> <arq q_m0> ... <arq q_m11>`
    (DESDE = a data impressa no passo 2). Deve imprimir contagens para as 8 métricas (0..7); se faltar alguma, parar sem publicar.
 5. `python tools/build_estatico.py fonte/dashboard-gralha-funil.html --site docs/index.html --enc docs/data.enc.json`
 6. Conferir: `ultimo` do cubo = `ULTIMO`, número de linhas próximo ao anterior (não pode cair mais que ~2%).

@@ -100,7 +100,28 @@ function qRes(q){const [a,b]=range(q),dm=/COALESCE\(NULLIF\(CAST\((\w+) AS STRIN
  for(const r of C.X){if(r[0]>7||r[1]<a||r[1]>b)continue;const d=dims(r,di)||sem;add(mult(G,d,mk),r);add(T,r)}
  const val=g=>{let s=0;g.neg.forEach(v=>s+=v);return s},row=(d,g)=>[d,g.c.size,g.cap,g.vis,g.pro,g.ven.size,val(g)],out=[];G.forEach((g,d)=>out.push(row(d,g)));out.push(row(null,T));return out}
 
+
+/* 12. Produto (imoveis): m8 cadastrados, m9 com placa, m10 vendidos (data da venda), m11 vendidos com placa. dims: loja/equipe/corretor do captador, bairro (7), celula "i|j" (13) */
+function perOf(q){const per=[];let m=/SELECT 'atual' per,DATE '(\d{4}-\d\d-\d\d)' d1,DATE '(\d{4}-\d\d-\d\d)' d2/.exec(q);per.push(["atual",dIdx(m[1]),dIdx(m[2])]);
+ m=/SELECT 'anterior',DATE '(\d{4}-\d\d-\d\d)',DATE '(\d{4}-\d\d-\d\d)'/.exec(q);if(m)per.push(["anterior",dIdx(m[1]),dIdx(m[2])]);return per}
+function qProd1(q){const F=filters(q),out=[];perOf(q).forEach(([nm,a,b])=>{const s={8:new Set(),9:new Set(),10:new Set(),11:new Set()};
+ for(const r of C.X){const k=r[0];if(k<8||r[1]<a||r[1]>b||!okF(r,F))continue;s[k].add(r[2])}
+ out.push([nm,"cad",s[8].size],[nm,"pl",s[9].size],[nm,"vend",s[10].size],[nm,"vend_pl",s[11].size])});return out}
+function qProd2(q){const [a,b]=range(q),F=filters(q),PS=0.004,pick=k=>{const m=new Map();for(const r of C.X){if(r[0]!==k||r[1]<a||r[1]>b||!okF(r,F))continue;if(!m.has(r[2]))m.set(r[2],r)}return m},
+ cad=pick(8),pl=pick(9),vd=pick(10),vp=pick(11),ev=[];cad.forEach((r,c)=>ev.push([r,0,pl.has(c)]));vd.forEach((r,c)=>ev.push([r,1,vp.has(c)]));
+ const mk=()=>[0,0,0,0,0,0,0],grp=(kf)=>{const g=new Map();ev.forEach(([r,t,p])=>{const o=mult(g,kf(r),mk);o[t?2:0]++;if(p)o[t?3:1]++;
+   const cs=dims(r,13);if(cs){const [i,j]=cs.split("|");o[4]+=(+i+.5)*PS;o[5]+=(+j+.5)*PS;o[6]++}});return g},out=[],ROW=(k,x,y,o,c)=>[k,x,y,o[0],o[1],o[2],o[3],c&&o[6]?o[4]/o[6]:null,c&&o[6]?o[5]/o[6]:null];
+ [["loja",3,"(sem loja)"],["equipe",4,"(sem equipe)"],["corretor",5,"(sem corretor)"]].forEach(([k,di,sem])=>grp(r=>lab(r,di,sem)).forEach((o,n)=>out.push(ROW(k,n,null,o,false))));
+ const t=mk();ev.forEach(([r,tt,p])=>{t[tt?2:0]++;if(p)t[tt?3:1]++});out.push(ROW("tot",null,null,t,false));
+ [...grp(r=>lab(r,7,"(sem bairro)")).entries()].sort((x,y)=>(y[1][0]+y[1][2])-(x[1][0]+x[1][2])||(x[0]<y[0]?-1:1)).slice(0,60).forEach(([n,o])=>out.push(ROW("bai",n,null,o,true)));
+ const cells=new Map();ev.forEach(([r,tt,p])=>{const cs=dims(r,13);if(!cs)return;const o=mult(cells,cs,mk);o[tt?2:0]++;if(p)o[tt?3:1]++});
+ cells.forEach((o,cs)=>{const [i,j]=cs.split("|");out.push(ROW("cell",i,j,o,false))});
+ const bg=new Map();for(const r of C.X){if(r[0]!==8)continue;const cs=dims(r,13);if(cs)mult(bg,cs,()=>new Set()).add(r[2])}
+ bg.forEach((st,cs)=>{const [i,j]=cs.split("|");out.push(["bg",i,j,st.size,0,0,0,null,null])});return out}
+
 function route(q){
+ if(q.includes("'vend_pl'"))return qProd1(q);
+ if(q.includes("'bai' k,bairro a"))return qProd2(q);
  if(q.includes("'leads' m,COUNT(DISTINCT c.CodigoCliente) u,COUNT(*) t FROM p JOIN"))return qFunil(q);
  if(q.includes("WITH e AS (SELECT")&&q.includes("'cap' m"))return qRes(q);
  if(q.includes("SELECT nome_agencia_usuario n,'leads' m"))return qLojas(q);
