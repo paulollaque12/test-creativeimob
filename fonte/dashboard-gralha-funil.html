@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Dashboard Performance CRM</title><!-- v2026-10-09y overview sem linha de periodo/atualizado -->
+<title>Dashboard Performance CRM</title><!-- v2026-10-09z ordenar colunas; ranking desde 01/01 -->
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#f4f5f9;--hv:#e9ebf4;--sf:#fff;--ink:#1b2142;--mut:#7b819a;--line:#e6e8f0;--br:#8a1f33;--nv:#2f3f80;--tr:#eef0f6;--pos:#1f7a46;--posb:#e7f4ec;--neg:#b3342a;--negb:#fbeaea;--sh:0 1px 2px rgba(27,33,66,.04),0 10px 28px rgba(27,33,66,.06);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -93,7 +93,7 @@ td{transition:background .12s}.vt tbody tr:hover td,.dt tbody tr:hover td,.st tb
 .bi{margin:0 0 14px;color:var(--mut);font-size:13px;line-height:1.5;max-width:90ch}.panel>.bi{margin-top:-2px}.insg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:start}@media(max-width:1000px){.insg{grid-template-columns:1fr}}
 .insq{padding:20px 20px 8px}.insh h2{font:600 16px/1.3 Sora,system-ui,sans-serif;margin:0;color:var(--nv)}.insh span{display:block;color:var(--mut);font-size:12px;margin-top:2px;min-height:18px}
 .insb{border-top:1px solid var(--line);margin-top:14px;padding-top:14px}.insl{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}.insl i{width:8px;height:8px;border-radius:50%;background:var(--pos)}.insb.low .insl i{background:var(--neg)}.insn{color:var(--mut);font-size:13px;padding:12px 0 6px}.ins{display:flex;gap:12px;padding:12px 0}.insb .ins+.ins{border-top:1px solid var(--line)}.insi{flex:none;margin-top:1px}.insi .ic{width:20px;height:20px}.ins b{display:block;font-weight:600;line-height:1.35}.ins p{margin:4px 0 0;color:var(--mut);font-size:13px}
-</style>
+.vt th,.cl th,.st th,#pdtab th,#ytb th{cursor:pointer;user-select:none}th[aria-sort=descending]::after{content:" \2193"}th[aria-sort=ascending]::after{content:" \2191"}</style>
 </head>
 <body>
 <div class="wrap">
@@ -164,7 +164,7 @@ function dfltRange(t){t=t||new Date();const y=t.getFullYear(),m=t.getMonth(),d=t
  S=d===1?new Date(y,m-1,1):new Date(y,m,1),E=d===1?new Date(y,m,0):new Date(y,m,d-1),
  S1=new Date(S.getFullYear(),S.getMonth()-1,1),ld=new Date(S.getFullYear(),S.getMonth(),0).getDate(),E1=new Date(S1.getFullYear(),S1.getMonth(),d===1?ld:Math.min(ld,E.getDate()));
  return{a:L(S),b:L(E),a1:L(S1),b1:L(E1)}}
-function applyDflt(){const r=dfltRange();[["a","b"],["rka","rkb"],["rqa","rqb"],["lja","ljb"],["c2a","c2b"]].forEach(([x,y])=>{$(x).value=r.a;$(y).value=r.b});$("c1a").value=r.a1;$("c1b").value=r.b1}
+function applyDflt(){const r=dfltRange();[["a","b"],["rqa","rqb"],["lja","ljb"],["c2a","c2b"]].forEach(([x,y])=>{$(x).value=r.a;$(y).value=r.b});$("rka").value=DESDE;$("rkb").value=r.b;$("c1a").value=r.a1;$("c1b").value=r.b1}
 applyDflt();
 let mcp,un=null,D={};
 const IMV="(SELECT DATE(i.data_cadastro) dt,CAST(i.codigo AS STRING) cl,LOWER(i.tem_placa)='sim' pl,a.nome nome_agencia_usuario,u.equipe_nome nome_equipe_usuario,u.nome nome_usuario,CAST(NULL AS STRING) veiculocaptacao_dn FROM `nitro_dados.vista_imoveis` i LEFT JOIN `nitro_dados.vista_agencias` a ON a.imobiliaria_id=1 AND a.codigo=i.codigo_agencia LEFT JOIN `nitro_dados.vista_usuarios` u ON u.imobiliaria_id=1 AND u.codigo=i.codigo_corretor WHERE i.imobiliaria_id=1 AND DATE(i.data_cadastro) BETWEEN DATE '2026-01-01' AND CURRENT_DATE('America/Sao_Paulo'))";
@@ -549,6 +549,18 @@ function loadIn(){inLoaded=true;if(inUL)inUL();
   INK.forEach(([k])=>{if(inU[k])inU[k]();inU[k]=mcp.watchTool(SV,TL,{projectId:PR,query:sqlIn(W[k])},e2=>{const el=$("inq-"+k);if(e2.type==="error"){if(el)el.innerHTML=`<div class="insh"><h2>${INK.find(x=>x[0]===k)[1]}</h2></div><div class="msg"><b>Não foi possível carregar</b>Tente atualizar.</div>`;return}
    try{const X={};e2.result.payload.rows.forEach(r=>{const [per,m,kk,n,u,v]=r.f.map(c=>c.v);(((X[per]=X[per]||{})[m]=X[per][m]||{})[kk]=X[per][m][kk]||{})[n||""]={u:+u,v:+v}});inRender(k,W,X)}catch(e){if(el)el.innerHTML='<div class="msg"><b>Resposta inesperada</b>Tente atualizar.</div>'}},{cache:{staleTime:3600000}})})},{cache:{staleTime:3600000}})}
 document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>{if(b.dataset.tab==="ins")$("hctl").hidden=true,$("gfb").hidden=true;if(b.dataset.tab==="ins"&&mcp&&!inLoaded)loadIn()}));
+/* ===== ordenar por coluna nas tabelas sem ordenação própria (Veículos, Corretores por cliente, Detalhamento, Produto, Daily) ===== */
+(function(){const SEL=".vt,.cl,.st,#pdtab table,#ytb table",
+ num=s=>{s=(s||"").replace(/\u00a0/g," ").trim();if(!s||/^[-–—]$/.test(s))return null;const m=s.replace(/R\$|%|\s/g,"");if(!/^[-+−]?[\d.]+(,\d+)?$/.test(m))return NaN;return parseFloat(m.replace("−","-").replace(/\./g,"").replace(",","."))},
+ txt=c=>{if(!c)return"";const k=c.cloneNode(true);k.querySelectorAll(".xp").forEach(x=>x.remove());return k.textContent.trim()};
+document.addEventListener("click",e=>{const th=e.target.closest("th");if(!th)return;const t=th.closest("table");if(!t||!t.matches(SEL)||th.closest("tfoot"))return;
+ const hr=th.closest("tr"),i=[...hr.children].indexOf(th),rows=[...t.querySelectorAll("tr")].filter(r=>r!==hr&&!r.closest("thead")&&!r.closest("tfoot")&&r.querySelector("td")&&r.children.length>i);if(!rows.length)return;
+ const raw=r=>txt(r.children[i]),nums=rows.map(r=>num(raw(r))),isN=nums.every(v=>v===null||!isNaN(v))&&nums.some(v=>v!==null),
+ d=t._s&&t._s.i===i?!t._s.d:isN;t._s={i,d};
+ const key=r=>isN?num(raw(r)):raw(r),cmp=(a,b)=>{const x=key(a),y=key(b);if(isN){if(x===null&&y===null)return 0;if(x===null)return 1;if(y===null)return -1;return d?y-x:x-y}return(d?-1:1)*String(x).localeCompare(String(y),"pt-BR")};
+ if(t.querySelector("tr.tm")){const g=[];rows.forEach(r=>{if(r.classList.contains("tm"))g.push({t:r,c:[]});else if(g.length)g[g.length-1].c.push(r)});g.sort((a,b)=>cmp(a.t,b.t));const tb=g[0].t.parentNode;g.forEach(o=>{tb.appendChild(o.t);o.c.sort(cmp).forEach(c=>tb.appendChild(c))})}
+ else{const p=rows[0].parentNode;rows.sort(cmp).forEach(r=>p.appendChild(r))}
+ hr.querySelectorAll("th").forEach(x=>x.removeAttribute("aria-sort"));th.setAttribute("aria-sort",d?"descending":"ascending")})})();
 (async()=>{try{mcp=await claude.use("mcp")}catch(e){mcp=null}
  if(!mcp){$("st").textContent="";$("fn").innerHTML='<div class="msg"><b>Abra pelo Claude</b>Esta página precisa do Claude para acessar o BigQuery.</div>';$("insg").innerHTML='<div class="msg" style="grid-column:1/-1"><b>Abra pelo Claude</b>Esta página precisa do Claude para acessar o BigQuery.</div>';return}loadOpts();load()})();
 </script>
