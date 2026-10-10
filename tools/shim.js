@@ -49,7 +49,7 @@ function qCorV(q){const [a,b]=range(q),F=filters(q),at=new Set(),vd=new Set(),vd
   if(r[0]===5){if(r[15]>=0){vd.add(r[15]);mult(vdv,dims(r,6)||"(sem veículo)",()=>new Set()).add(r[15])}
    if(r[16]>=0){const o=mult(cli,r[16],()=>({ve:"",nm:""}));if(dims(r,6)&&(!o.ve||dims(r,6)>o.ve))o.ve=dims(r,6);const n=dims(r,14);if(n&&(!o.nm||n>o.nm))o.nm=n}}}
  const out=[["ativos",null,at.size,null],["vendas",null,vd.size,null]];vdv.forEach((s,k)=>out.push(["vendas_v",k,s.size,null]));
- const tot=new Set(),totv=new Map(),L=[];cli.forEach((o,c)=>{const cors=C.K[String(c)]||[],v=o.ve||"(sem veículo)";cors.forEach(x=>{tot.add(x);mult(totv,v,()=>new Set()).add(x)});L.push([S("cl",c)+"¦"+(o.nm||""),cors.length,v])});
+ const tot=new Set(),totv=new Map(),L=[];cli.forEach((o,c)=>{const cors=C.K[String(c)]||[],v=o.ve||"(sem veículo)";cors.forEach(x=>{tot.add(x);mult(totv,v,()=>new Set()).add(x)});L.push([S("cl",c),cors.length,v])});
  out.push(["tot",null,tot.size,null]);totv.forEach((s,k)=>out.push(["tot_v",k,s.size,null]));
  L.sort((x,y)=>y[1]-x[1]||(x[0]<y[0]?-1:1));L.slice(0,500).forEach(x=>out.push(["cli",x[0],x[1],x[2]]));return out}
 

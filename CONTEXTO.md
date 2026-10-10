@@ -51,3 +51,7 @@ Primeira aba na ordem (ícone ✦ + "Insights" + BETA pequeno), mas a página in
 ## Ordenação e Ranking (v43)
 - Clique no nome da coluna ordena (1º clique: maior para menor nas colunas numéricas, A–Z nas de texto; 2º clique inverte; seta ↓/↑ no cabeçalho). Tabelas com ordenação própria já existente: Desempenho por dimensão, Ranking, Conversão por corretor, Resultados (Lojas). As demais (Veículos·Vendas, Corretores por cliente, Detalhamento, Produto, Daily) usam o ordenador genérico de DOM no fim do script (`SEL`); no Daily ordena as equipes e, dentro de cada equipe, os corretores.
 - Ranking · Equipes: datas padrão = 01/01/2026 (`DESDE`) até D-1 (dinâmico, `dfltRange().b`); as demais abas seguem do dia 1 do mês até D-1.
+
+## Decisões finais do usuário (10/10/2026)
+- Overview "vs. anterior": manter como está (N dias imediatamente antes). Print 34/9: deixar. LGPD: a lista "Corretores por cliente com venda" mostra só o código do cliente (nome removido da consulta e do shim; a dimensão "Nome Cliente" do Desempenho por dimensão ainda existe).
+- Desempenho por dimensão: colunas de métricas com largura igual (112 px, `table.dt`, `--n`), cabeçalho/valores/total centralizados.
