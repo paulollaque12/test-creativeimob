@@ -39,3 +39,10 @@ GROUPING SETS não aceita COALESCE direto; nomes JS/CSS únicos (já existem unL
 
 ## Decisões e pendências
 Metas fora do dashboard; VGV por negócio; demonstração antiga (Netlify) descontinuada. LGPD: a lista "Corretores por cliente com venda" mostra nomes de clientes (decisão pendente, espelho é público com senha). Pendências: print 34 agenciamentos / 9 placas (não reproduzido), teste da rotina diária com as métricas 8–11, DAX de corretores ativos (Ranking), caixa de linguagem natural.
+
+## Aba Insights (BETA) — v39
+Primeira aba (ícone ✦ + "Insights" + BETA pequeno), é a aba inicial. 3 quadrantes (Diário, Semanal, Mensal) com 3 insights cada, **gerados por regras em JS** a cada abertura (sem texto escrito à mão; nada a atualizar na rotina diária — o cubo/BigQuery já alimentam). Referência = último dia fechado da base (L, mesma `sqlL` do Daily).
+- Janelas: dia = L vs L-1; semana = segunda..L vs mesmos dias da semana anterior; mês = dia 1..L vs mesmo nº de dias do mês anterior (`inWin`).
+- Consulta `sqlIn(w)` (prefixo `/*ins*/`, 1 por quadrante): por período (atual/anterior) × métrica (leads, oportunidade, visitas, proposta, fechamento, vendas+VGV, agenciamentos, placas) × dimensão (loja/equipe/corretor/tot). Espelho: `qIns` em `tools/shim.js` (rota `startsWith("/*ins*/")`). Validado contra BigQuery (1–5/10 vs 1–5/9: leads 147/193, visitas 68/135, vendas 4/6, VGV 3,22/5,705 Mi).
+- Motor `inGen(k,X)`: candidatos = variação do total (|Δ|≥2/3/5 por quadrante ou ≥40%), VGV, equipe/loja que mais moveu cada métrica, corretor líder (vendas/proposta/visita), conversão entre etapas (só semanal/mensal, Δ≥2 p.p., denominadores mínimos), equipe/loja que zerou. Score = peso da métrica (vendas 5 … placas 1,6) × magnitude; seleção top 3 com máx. 2 por métrica e 2 por tipo; preenche com fatos neutros se faltar.
+- Ajustes: limiares em `inGen` (`mt`,`md`,`mz`,`md2`,`pp`); pesos em `INM`. Evolução futura: narrativa por LLM na rotina diária (guardar em arquivo) — não implementada.

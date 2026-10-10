@@ -119,7 +119,15 @@ function qProd2(q){const [a,b]=range(q),F=filters(q),PS=0.004,pick=k=>{const m=n
  const bg=new Map();for(const r of C.X){if(r[0]!==8)continue;const cs=dims(r,13);if(cs)mult(bg,cs,()=>new Set()).add(r[2])}
  bg.forEach((st,cs)=>{const [i,j]=cs.split("|");out.push(["bg",i,j,st.size,0,0,0,null,null])});return out}
 
+/* 13. Insights: por periodo (atual/anterior) x metrica x dimensao (loja/equipe/corretor/tot) -> [per,m,k,n,u,v]; vendas leva o VGV (max por negocio) */
+function qIns(q){const out=[],NM={0:"leads",1:"oportunidade",2:"visitas",3:"proposta",4:"fechamento",5:"vendas",8:"agenciamentos",9:"placas"};
+ perOf(q).forEach(([nm,a,b])=>{const mp=new Map();
+  for(const r of C.X){const k=r[0];if(!NM[k]||r[2]<0||r[1]<a||r[1]>b)continue;const lj=dims(r,3)||"(vazio)",eq=dims(r,4)||"(vazio)",co=dims(r,5)||"(vazio)";
+   [["loja",lj],["equipe",eq],["corretor",co],["tot",""]].forEach(([kk,n])=>{const key=NM[k]+"\u0001"+kk+"\u0001"+n,o=mult(mp,key,()=>({s:new Set(),v:new Map()}));o.s.add(r[2]);if(k===5){const x=o.v.get(r[2]);if(x===undefined||r[17]>x)o.v.set(r[2],r[17])}})}
+  mp.forEach((o,key)=>{const [m,kk,n]=key.split("\u0001");let v=0;o.v.forEach(x=>v+=x);out.push([nm,m,kk,n,o.s.size,v])})});return out}
+
 function route(q){
+ if(q.startsWith("/*ins*/"))return qIns(q);
  if(q.includes("'vend_pl'"))return qProd1(q);
  if(q.includes("'bai' k,bairro a"))return qProd2(q);
  if(q.includes("'leads' m,COUNT(DISTINCT c.CodigoCliente) u,COUNT(*) t FROM p JOIN"))return qFunil(q);
