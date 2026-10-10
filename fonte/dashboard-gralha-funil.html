@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Dashboard Performance CRM</title><!-- v2026-10-09x textos introdutorios por bloco -->
+<title>Dashboard Performance CRM</title><!-- v2026-10-09y overview sem linha de periodo/atualizado -->
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#f4f5f9;--hv:#e9ebf4;--sf:#fff;--ink:#1b2142;--mut:#7b819a;--line:#e6e8f0;--br:#8a1f33;--nv:#2f3f80;--tr:#eef0f6;--pos:#1f7a46;--posb:#e7f4ec;--neg:#b3342a;--negb:#fbeaea;--sh:0 1px 2px rgba(27,33,66,.04),0 10px 28px rgba(27,33,66,.06);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -108,7 +108,7 @@ td{transition:background .12s}.vt tbody tr:hover td,.dt tbody tr:hover td,.st tb
 <section id="panel-overview" role="tabpanel" aria-labelledby="tab-overview">
 
 <div id="st" role="status">Conectando ao BigQuery...</div>
-<p class="bi">Resumo do período selecionado no topo. A variação compara com o período anterior de mesmo tamanho.</p><div id="tl" class="tiles"></div>
+<div id="tl" class="tiles"></div>
 <div class="panel"><div class="ph"><h2>Jornada do lead à venda</h2><span>Clientes únicos · totais ao lado</span></div><p class="bi">Quantos clientes únicos chegaram a cada etapa do funil e a conversão de uma etapa para a seguinte. O total ao lado conta todas as movimentações.</p><div id="fn"></div></div>
 <div class="panel" style="margin-top:18px"><div class="ph"><h2>Evolução</h2><div class="seg" role="group" aria-label="Eixo X"><button data-g="dia" aria-pressed="true">Dia</button><button data-g="semana" aria-pressed="false">Semana</button><button data-g="mes" aria-pressed="false">Mês</button></div></div>
 <p class="bi">Como a métrica escolhida evolui ao longo do tempo. Escolha a métrica à direita e agrupe por dia, semana ou mês.</p><div class="ev"><div class="evl"><div class="mt" id="mt"></div><div class="ch" id="ch" role="img"></div></div><div><div class="mt">Métricas de análise</div><div class="mets" id="mets" role="group" aria-label="Métrica de análise"></div></div></div></div>
@@ -201,7 +201,7 @@ function load(){const a=$("a").value,b=$("b").value;
  loadE(r);loadV(r);loadD(r);un=mcp.watchTool(SV,TL,{projectId:PR,query:sql(r)},ev=>{if(ev.type==="error")return fail(ev.error);
   try{const p=ev.result.payload;if(!p||!Array.isArray(p.rows))throw new Error("Resposta inesperada.");const x={};
    p.rows.forEach(w=>{const [per,m,uu,t]=w.f.map(c=>c.v);(x[per]=x[per]||{})[m]={u:+uu,t:+t}});D=x;render();$("panel-overview").classList.remove("busy");
-   $("st").textContent=`${br(r.a)} a ${br(r.b)} · anterior: ${r.pa<DESDE?"sem base (antes de 01/01/2026)":br(r.pa)+" a "+br(r.pb)} · atualizado em ${new Date(ev.result.cache?ev.result.cache.storedAt:Date.now()).toLocaleString("pt-BR")}`}catch(e){fail({message:e.message})}},
+   $("st").textContent="";}catch(e){fail({message:e.message})}},
   {cache:{staleTime:3600000}})}
 
 const MET=[["Captação (Leads)","leads"],["Oportunidade","oportunidade"],["Visita","visitas"],["Proposta","proposta"],["Fechamento","fechamento"],["Vendas","vendas"],["Agenciamentos","agenciamentos"],["Placas","placas"]],MS=["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
