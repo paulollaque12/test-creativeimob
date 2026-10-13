@@ -55,3 +55,8 @@ Primeira aba na ordem (ícone ✦ + "Insights" + BETA pequeno), mas a página in
 ## Decisões finais do usuário (10/10/2026)
 - Overview "vs. anterior": manter como está (N dias imediatamente antes). Print 34/9: deixar. LGPD: a lista "Corretores por cliente com venda" mostra só o código do cliente (nome removido da consulta e do shim; a dimensão "Nome Cliente" do Desempenho por dimensão ainda existe).
 - Desempenho por dimensão: colunas de métricas com largura igual (112 px, `table.dt`, `--n`), cabeçalho/valores/total centralizados.
+
+## Layout mobile (10/10/2026) e incidente do conector (13/10/2026)
+- Mobile: bloco CSS "celular" no fim do `<style>` (fonte). Corrige página forçada a ~856 px (`.ev` com `1fr`, `.tabs` sem rolagem, `.cmh` em 3 colunas). Abas rolam de lado; Comparativo empilha os dois períodos; tabelas largas rolam dentro do cartão. Auditado a 360 e 390 px (Playwright `is_mobile`), todas as abas sem rolagem lateral. As páginas por equipe e o lab ainda NÃO têm esse CSS.
+- Incidente: em 10–13/10 as rotinas (06:52 gerencial, 07:21 equipes) terminaram em ~30 s sem publicar porque o conector do Google Cloud BigQuery caiu. Dados ficaram em 09/10 até a reconexão. Reconectado em 13/10 com outra conta Google (precisa de `bigquery.jobUser`, `bigquery.dataViewer` e `mcp.toolUser` no projeto `vistaprocessos`). Rotinas disparadas manualmente; base em 12/10.
+- Sintoma de falha: ausência de commit "dados ate AAAA-MM-DD" no dia. Rotina "concluída" não garante publicação. Ideia pendente: alerta quando a rotina parar.
