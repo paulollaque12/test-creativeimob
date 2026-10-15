@@ -63,3 +63,6 @@ Primeira aba na ordem (ícone ✦ + "Insights" + BETA pequeno), mas a página in
 
 ## Aba Equipes e nova ordem das abas (15/10/2026)
 Ordem: Insights, Overview, Comparativo, Daily, Ranking, Produto, Lojas, Equipes. A aba Equipes (`#panel-eq`) tem filtro de Loja + datas; funil por equipe (`sqlLJ` com dim `nome_equipe_usuario` e filtro de loja) e tabelas Resultados Equipes/Corretor (`sqlT(...,lj)`, `loadT(a,b,"eq",lj)`). Shim: `qEquipes` e filtros em `qRes`. Botao lua/sol de tema no header (localStorage `gralha-tema`, padrao claro).
+
+## Fechamento de 15/10/2026 (entrega ao cliente em 16/10)
+Estado: artefato v50, abas Insights/Overview/Comparativo/Daily/Ranking/Produto/Lojas/Equipes, tema lua/sol, layout mobile, rotinas 06:52 (gerencial) e 07:21 (equipes) ativas e lendo `fonte/` deste repo. Copia da skill atualizada em `skill/SKILL.md`.
