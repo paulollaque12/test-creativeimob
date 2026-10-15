@@ -98,10 +98,10 @@ function qEquipes(q){const [a,b]=range(q),F=filters(q),mp=new Map();
  const out=[];mp.forEach((s,key)=>{const i=key.lastIndexOf("|");out.push([key.slice(0,i),key.slice(i+1),s.size])});return out}
 
 /* 11. Resultados (Equipes / Loja / Corretor) */
-function qRes(q){const [a,b]=range(q),dm=/COALESCE\(NULLIF\(CAST\((\w+) AS STRING\),''\),'([^']*)'\) d,CodigoCorretor cor,'cap' m/.exec(q),di=COLIDX[dm[1]],sem=dm[2],
+function qRes(q){const EC=/NULLIF\(CONCAT\(IFNULL\(nome_equipe_usuario,''\),'¦',IFNULL\(nome_usuario,''\)\),'¦'\),'([^']*)'\) d,CodigoCorretor cor,'cap' m/.exec(q),[a,b]=range(q),dm=EC?null:/COALESCE\(NULLIF\(CAST\((\w+) AS STRING\),''\),'([^']*)'\) d,CodigoCorretor cor,'cap' m/.exec(q),di=dm?COLIDX[dm[1]]:0,sem=EC?EC[1]:dm[2],
  G=new Map(),mk=()=>({c:new Set(),cap:0,vis:0,pro:0,ven:new Set(),neg:new Map()}),T=mk();
  const add=(g,r)=>{if(r[15]>=0)g.c.add(r[15]);if(r[0]===0)g.cap+=r[18];if(r[0]===2)g.vis+=r[18];if(r[0]===3)g.pro+=r[18];if(r[0]===5&&r[2]>=0){g.ven.add(r[2]);const o=g.neg.get(r[2]);if(o===undefined||r[17]>o)g.neg.set(r[2],r[17])}};
- const F=filters(q);for(const r of C.X){if(r[0]>7||r[1]<a||r[1]>b||!okF(r,F))continue;const d=dims(r,di)||sem;add(mult(G,d,mk),r);add(T,r)}
+ const F=filters(q);for(const r of C.X){if(r[0]>7||r[1]<a||r[1]>b||!okF(r,F))continue;const ek=EC?(dims(r,4)||"")+"¦"+(dims(r,5)||""):null,d=(EC?(ek==="¦"?"":ek):dims(r,di))||sem;add(mult(G,d,mk),r);add(T,r)}
  const val=g=>{let s=0;g.neg.forEach(v=>s+=v);return s},row=(d,g)=>[d,g.c.size,g.cap,g.vis,g.pro,g.ven.size,val(g)],out=[];G.forEach((g,d)=>out.push(row(d,g)));out.push(row(null,T));return out}
 
 
