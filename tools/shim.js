@@ -93,11 +93,15 @@ function qLojas(q){const [a,b]=range(q),mp=new Map();
  for(const r of C.X){const k=r[0];if(k>5||r[2]<0||r[1]<a||r[1]>b)continue;const n=dims(r,3);if(!n)continue;mult(mp,n+"|"+MNAME[k],()=>new Set()).add(r[2])}
  const out=[];mp.forEach((s,key)=>{const i=key.lastIndexOf("|");out.push([key.slice(0,i),key.slice(i+1),s.size])});return out}
 
+function qEquipes(q){const [a,b]=range(q),F=filters(q),mp=new Map();
+ for(const r of C.X){const k=r[0];if(k>5||r[2]<0||r[1]<a||r[1]>b||!okF(r,F))continue;const n=dims(r,4);if(!n)continue;mult(mp,n+"|"+MNAME[k],()=>new Set()).add(r[2])}
+ const out=[];mp.forEach((s,key)=>{const i=key.lastIndexOf("|");out.push([key.slice(0,i),key.slice(i+1),s.size])});return out}
+
 /* 11. Resultados (Equipes / Loja / Corretor) */
 function qRes(q){const [a,b]=range(q),dm=/COALESCE\(NULLIF\(CAST\((\w+) AS STRING\),''\),'([^']*)'\) d,CodigoCorretor cor,'cap' m/.exec(q),di=COLIDX[dm[1]],sem=dm[2],
  G=new Map(),mk=()=>({c:new Set(),cap:0,vis:0,pro:0,ven:new Set(),neg:new Map()}),T=mk();
  const add=(g,r)=>{if(r[15]>=0)g.c.add(r[15]);if(r[0]===0)g.cap+=r[18];if(r[0]===2)g.vis+=r[18];if(r[0]===3)g.pro+=r[18];if(r[0]===5&&r[2]>=0){g.ven.add(r[2]);const o=g.neg.get(r[2]);if(o===undefined||r[17]>o)g.neg.set(r[2],r[17])}};
- for(const r of C.X){if(r[0]>7||r[1]<a||r[1]>b)continue;const d=dims(r,di)||sem;add(mult(G,d,mk),r);add(T,r)}
+ const F=filters(q);for(const r of C.X){if(r[0]>7||r[1]<a||r[1]>b||!okF(r,F))continue;const d=dims(r,di)||sem;add(mult(G,d,mk),r);add(T,r)}
  const val=g=>{let s=0;g.neg.forEach(v=>s+=v);return s},row=(d,g)=>[d,g.c.size,g.cap,g.vis,g.pro,g.ven.size,val(g)],out=[];G.forEach((g,d)=>out.push(row(d,g)));out.push(row(null,T));return out}
 
 
@@ -133,6 +137,7 @@ function route(q){
  if(q.includes("'leads' m,COUNT(DISTINCT c.CodigoCliente) u,COUNT(*) t FROM p JOIN"))return qFunil(q);
  if(q.includes("WITH e AS (SELECT")&&q.includes("'cap' m"))return qRes(q);
  if(q.includes("SELECT nome_agencia_usuario n,'leads' m"))return qLojas(q);
+ if(q.includes("SELECT nome_equipe_usuario n,'leads' m"))return qEquipes(q);
  if(q.includes("GROUPING SETS ((m,eq),(eq),(m),())"))return qRank(q);
  if(q.includes("n,'leads' m,COUNT(DISTINCT cl) u FROM (SELECT COALESCE(NULLIF(nome_usuario"))return qConv(q);
  if(q.includes("GROUPING SETS ((eq,cor),(eq),())"))return qDaily(q);
