@@ -66,3 +66,9 @@ Ordem: Insights, Overview, Comparativo, Daily, Ranking, Produto, Lojas, Equipes.
 
 ## Fechamento de 15/10/2026 (entrega ao cliente em 16/10)
 Estado: artefato v50, abas Insights/Overview/Comparativo/Daily/Ranking/Produto/Lojas/Equipes, tema lua/sol, layout mobile, rotinas 06:52 (gerencial) e 07:21 (equipes) ativas e lendo `fonte/` deste repo. Copia da skill atualizada em `skill/SKILL.md`.
+
+## Regra de contagem Visita/Proposta (15/10/2026, alinhada ao Ranking Lançamentos do CRM)
+- Visita = Assunto 'Visita' com `Statusvisita='Finalizado'` (cancelada/confirmada/sem status nao contam).
+- Proposta: eventos contados 1 por cliente+dia (cubo m3 com n=1; SQL ao vivo com COUNT DISTINCT cliente|dia). Clientes distintos nao mudam.
+- Cubo m2/m3 reconstruido desde 2026-01-01. Setembro: Champions 72 vis/10 prop, Aguias 27, Exupery 79/8.
+- Diferenca restante vs CRM: equipe atual aplicada ao historico e corretores desligados ausentes das views.

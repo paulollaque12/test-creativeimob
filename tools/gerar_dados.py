@@ -17,7 +17,7 @@ G = "Assunto IN ('Negócio ganho','Negocio Ganho via API')"
 # (codigo, view, filtro, coluna da entidade distinta)
 METR = [(0,"c","TRUE","CodigoCliente"),
         (1,"d",f"EtapaAcaoId IN ('9','5','1') AND {X}","CodigoCliente"),
-        (2,"h","LOWER(Assunto)='visita'","CodigoCliente"),
+        (2,"h","LOWER(Assunto)='visita' AND Statusvisita='Finalizado'","CodigoCliente"),
         (3,"h","LOWER(Assunto)='proposta'","CodigoCliente"),
         (4,"d",f"EtapaAcaoId IN ('8','4','12') AND {X}","CodigoCliente"),
         (5,"d",G,"CodigoNegocio"),
@@ -63,7 +63,8 @@ def sel(code, v, cond, ent, desde):
     ent_s = f"CAST({ent} AS STRING)" if ent else "CAST(NULL AS STRING)"
     kc = "CAST(CodigoCliente AS STRING)" if code == 5 else "CAST(NULL AS STRING)"
     val = "CAST(valornegocio_dn AS FLOAT64)" if code == 5 else "CAST(NULL AS FLOAT64)"
-    return (f"SELECT {code} m, dt, cl, {', '.join(DIMS)}, cc, kc, MAX(v) v, COUNT(*) n FROM ("
+    nexpr = "1" if code == 3 else "COUNT(*)"   # proposta: 1 evento por cliente+dia (regra do CRM)
+    return (f"SELECT {code} m, dt, cl, {', '.join(DIMS)}, cc, kc, MAX(v) v, {nexpr} n FROM ("
             f"SELECT DATE(Data) dt, {ent_s} cl, {', '.join(dims)}, CAST(CodigoCorretor AS STRING) cc, {kc} kc, {val} v "
             f"FROM `{V[v]}` WHERE DATE(Data) BETWEEN DATE '{desde}' AND CURRENT_DATE('America/Sao_Paulo') AND {cond}) "
             f"GROUP BY m, dt, cl, {', '.join(DIMS)}, cc, kc")
