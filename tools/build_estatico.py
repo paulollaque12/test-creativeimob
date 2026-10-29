@@ -20,13 +20,15 @@ window.__cuboLoader=async()=>{const r=await fetch("data.enc.json",{cache:"defaul
  for(;;){if(!pw)pw=await askPw(msg);try{const c=await dec(e,pw);try{sessionStorage.setItem("gpw",pw)}catch(_){}demoNote(c);return c}catch(_){pw=null;msg="Senha incorreta. Tente de novo.";try{sessionStorage.removeItem("gpw")}catch(_){}}}};'''
 marker='<script>\nconst DESDE='
 assert marker in live, 'marcador do script principal nao encontrado'
-def build(loader,out,titulo,demo=False):
+ICONES='<link rel="icon" href="favicon.ico?v=2" sizes="any">\n<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=2">\n<link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">\n'
+def build(loader,out,titulo,demo=False,icones=False):
     base=live0.replace(OLD,"function applyDflt(){const r={a:\"2026-09-01\",b:\"2026-09-30\",a1:\"2026-08-01\",b1:\"2026-08-31\"};") if demo else live0
     h=base.replace(marker,'<script>'+COMMON+loader+'</script>\n<script>'+shim+'</script>\n'+marker,1)
     h=re.sub(r'<!-- v[^>]*-->','<!-- '+titulo+' -->',h,count=1)
+    if icones and 'rel="icon"' not in h: h=h.replace('</head>',ICONES+'</head>',1)
     open(out,'w',encoding='utf-8').write(h);print(out,len(h))
 if a.artefato:
     assert a.senha,'--senha obrigatoria para o artefato'
     enc=open(a.enc).read().strip();build(LOAD_A%(enc,json.dumps(a.senha)),a.artefato,'ESTATICO demonstracao (mesmo codigo da versao ao vivo)',True)
 if a.site:
-    build(LOAD_B,a.site,'ESTATICO site Netlify (mesmo codigo da versao ao vivo)')
+    build(LOAD_B,a.site,'ESTATICO site Netlify (mesmo codigo da versao ao vivo)',icones=True)
