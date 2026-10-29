@@ -130,8 +130,21 @@ function qIns(q){const out=[],NM={0:"leads",1:"oportunidade",2:"visitas",3:"prop
    [["loja",lj],["equipe",eq],["corretor",co],["tot",""]].forEach(([kk,n])=>{const key=NM[k]+"\u0001"+kk+"\u0001"+n,o=mult(mp,key,()=>({s:new Set(),v:new Map()}));o.s.add(r[2]);if(k===5){const x=o.v.get(r[2]);if(x===undefined||r[17]>x)o.v.set(r[2],r[17])}})}
   mp.forEach((o,key)=>{const [m,kk,n]=key.split("\u0001");let v=0;o.v.forEach(x=>v+=x);out.push([nm,m,kk,n,o.s.size,v])})});return out}
 
+/* 14. Jornada (coorte por data de entrada do lead): leads filtrados por loja/equipe/corretor/veiculo; eventos (m1..m5) de qualquer linha do cubo, a partir da entrada */
+function qJor(q){const [a,b]=range(q),F=filters(q),d0=new Map();
+ for(const r of C.X){if(r[0]!==0||r[2]<0||r[1]<a||r[1]>b||!okF(r,F))continue;const o=d0.get(r[2]);if(o===undefined||r[1]<o)d0.set(r[2],r[1])}
+ const ev=new Map();
+ for(const r of C.X){const k=r[0];if(k<1||k>5||r[2]<0)continue;const s=d0.get(r[2]);if(s===undefined||r[1]<s)continue;const key=r[2]*8+k,o=ev.get(key);if(o===undefined||r[1]<o)ev.set(key,r[1])}
+ const per=new Map();ev.forEach((d,key)=>{const c=Math.floor(key/8),k=key%8;mult(per,c,()=>[]).push([d,k])});
+ const NM=["","Oportunidade","Visita","Proposta","Fechamento","Venda"],tr=new Map(),st=new Map();
+ per.forEach((L,c)=>{L.sort((x,y)=>x[0]-y[0]||x[1]-y[1]);const s=d0.get(c);let p="Lead";L.forEach(([d,k],i)=>{const n=NM[k],key=(i+1)+"|"+p+"|"+n;tr.set(key,(tr.get(key)||0)+1);mult(st,k,()=>[]).push(d-s);p=n})});
+ const out=[];tr.forEach((n,key)=>{const [rn,x,y]=key.split("|");out.push(["tr",+rn,x,y,n,null])});
+ st.forEach((v,k)=>{v.sort((x,y)=>x-y);out.push(["st",k,NM[k],"",v.length,v[Math.floor((v.length-1)/2)]])});
+ out.push(["tot",0,"Lead","",d0.size,null]);return out}
+
 function route(q){
  if(q.startsWith("/*ins*/"))return qIns(q);
+ if(q.includes("SELECT 'tr' k,rn,p a,s b"))return qJor(q);
  if(q.includes("'vend_pl'"))return qProd1(q);
  if(q.includes("'bai' k,bairro a"))return qProd2(q);
  if(q.includes("'leads' m,COUNT(DISTINCT c.CodigoCliente) u,COUNT(*) t FROM p JOIN"))return qFunil(q);
