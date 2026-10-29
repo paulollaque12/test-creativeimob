@@ -11,7 +11,7 @@ o.innerHTML=`<style>
 #lgx svg{position:absolute;left:0;right:0;bottom:0;width:100%;height:44%}
 #lgx .lgb{transform-box:fill-box;transform-origin:bottom;transform:scaleY(0);animation:lgu 1.2s cubic-bezier(.2,.7,.2,1) forwards}
 #lgx .lgs{position:absolute;top:0;bottom:0;width:30%;left:0;background:linear-gradient(100deg,transparent,rgba(255,255,255,.07),transparent);animation:lgh 9s 3s infinite}
-#lgx .lgr{position:relative;display:flex;flex-direction:column;justify-content:center;padding:0 12%}
+#lgx .lgr{position:relative;display:flex;flex-direction:column;justify-content:center;padding:0 max(28px,calc((100% - 380px)/2))}
 #lgx h3{font:600 34px Sora,system-ui,sans-serif;margin:0 0 6px}
 #lgx .lgp{margin:0 0 28px;color:#6b7090;font-size:14px;line-height:1.5}
 #lgx label{font-size:12px;font-weight:600;color:#6b7090;margin-bottom:6px;display:block}
@@ -25,7 +25,7 @@ o.innerHTML=`<style>
 @keyframes lgu{from{transform:scaleY(0)}to{transform:scaleY(1)}}
 @keyframes lgf{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @keyframes lgh{0%,70%{transform:translateX(-120%)}100%{transform:translateX(220%)}}
-@media(max-width:820px){#lgx{grid-template-columns:1fr;grid-template-rows:42% 1fr}#lgx .lgl{width:165px;margin-left:-82px;top:18%}#lgx svg{height:40%}#lgx .lgr{justify-content:flex-start;padding:44px 28px 80px}}
+@media(max-width:820px){#lgx{grid-template-columns:1fr;grid-template-rows:42% 1fr}#lgx .lgl{width:165px;margin-left:-82px;top:18%}#lgx svg{height:40%}#lgx .lgr{justify-content:flex-start;padding:44px max(28px,calc((100% - 380px)/2)) 80px}}
 @media(prefers-reduced-motion:reduce){#lgx *{animation-duration:.01s!important;animation-delay:0s!important}}
 </style>
 <div class="lgv"><div class="lgl"></div><svg viewBox="0 0 640 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true">${b}</svg><div class="lgs"></div></div>
