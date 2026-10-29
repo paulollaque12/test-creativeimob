@@ -5,7 +5,7 @@ O Power BI é a fonte da verdade; nenhum número vale como oficial sem bater com
 
 ## Onde está cada coisa
 - **Ao vivo** (artefato Claude; consulta o BigQuery a cada abertura): https://claude.ai/artifact/8bfHMow3YsAM91dieAhULi
-- **Espelho público** (GitHub Pages, senha): https://paulollaque12.github.io/test-creativeimob/ (branch main, pasta `/docs`).
+- **Espelho público** (GitHub Pages, senha): https://gralha.creativeimob.app (domínio próprio; o link antigo github.io redireciona) (branch main, pasta `/docs`).
   É o MESMO HTML do ao vivo + `tools/shim.js` + cubo criptografado `docs/data.enc.json` (AES-GCM, PBKDF2-SHA256 250k, zlib). **A senha nunca fica no repositório.**
 - `fonte/dashboard-gralha-funil.html`: cópia do HTML ao vivo (fonte do espelho). Sempre copiar do artefato publicado antes de reconstruir.
 - `tools/`: `gerar_dados.py` (métricas `METR` e SQL do cubo), `atualizar.py` (`sql`, `montar`), `build_estatico.py`, `shim.js`, `build_geo.py` + `geo_osm.sql` + `pdgeo.json` (limites OSM), `requirements.txt`.
