@@ -236,8 +236,8 @@ o.innerHTML=`<style>
 </style>
 <div class="lgv"><div class="lgl"></div><svg viewBox="0 0 640 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true">${b}</svg><div class="lgs"></div></div>
 <form id="pwf" class="lgr"><h3>Bem-vindo</h3><p class="lgp">Digite a senha para acessar o dashboard.</p>${msg&&msg!=="Digite a senha para abrir."?`<div class="lge" role="alert">${msg}</div>`:""}<label for="pw">Senha</label><input id="pw" type="password" autocomplete="current-password"><button type="submit">Entrar</button><div class="lgf"><img src="apple-touch-icon.png" alt="">CREATIVEIMOB</div></form>`;
-document.body.appendChild(o);document.getElementById("pw").focus();
-document.getElementById("pwf").onsubmit=e=>{e.preventDefault();const v=document.getElementById("pw").value;o.remove();ok(v)}})}
+const pv=document.documentElement.style.overflow;document.documentElement.style.overflow="hidden";document.body.appendChild(o);document.getElementById("pw").focus();
+document.getElementById("pwf").onsubmit=e=>{e.preventDefault();const v=document.getElementById("pw").value;o.remove();document.documentElement.style.overflow=pv;ok(v)}})}
 
 window.__cuboLoader=async()=>{const r=await fetch("data.enc.json",{cache:"default"});if(!r.ok)throw new Error("Dados indisponíveis (HTTP "+r.status+")");const e=await r.json();let pw=null,msg="";try{pw=sessionStorage.getItem("gpw")}catch(_){}
  for(;;){if(!pw)pw=await askPw(msg);try{const c=await dec(e,pw);try{sessionStorage.setItem("gpw",pw)}catch(_){}demoNote(c);return c}catch(_){pw=null;msg="Senha incorreta. Tente de novo.";try{sessionStorage.removeItem("gpw")}catch(_){}}}};</script>

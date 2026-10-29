@@ -30,5 +30,5 @@ o.innerHTML=`<style>
 </style>
 <div class="lgv"><div class="lgl"></div><svg viewBox="0 0 640 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true">${b}</svg><div class="lgs"></div></div>
 <form id="pwf" class="lgr"><h3>Bem-vindo</h3><p class="lgp">Digite a senha para acessar o dashboard.</p>${msg&&msg!=="Digite a senha para abrir."?`<div class="lge" role="alert">${msg}</div>`:""}<label for="pw">Senha</label><input id="pw" type="password" autocomplete="current-password"><button type="submit">Entrar</button><div class="lgf"><img src="apple-touch-icon.png" alt="">CREATIVEIMOB</div></form>`;
-document.body.appendChild(o);document.getElementById("pw").focus();
-document.getElementById("pwf").onsubmit=e=>{e.preventDefault();const v=document.getElementById("pw").value;o.remove();ok(v)}})}
+const pv=document.documentElement.style.overflow;document.documentElement.style.overflow="hidden";document.body.appendChild(o);document.getElementById("pw").focus();
+document.getElementById("pwf").onsubmit=e=>{e.preventDefault();const v=document.getElementById("pw").value;o.remove();document.documentElement.style.overflow=pv;ok(v)}})}
