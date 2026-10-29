@@ -42,6 +42,8 @@ h1{font:600 clamp(26px,3.6vw,36px)/1.15 Sora,system-ui,sans-serif;margin:14px 0 
 .cv span{grid-column:2;justify-self:center;font-size:12px;color:var(--mut);font-weight:500}
 .cv span::before{content:"\2193\00a0"}
 .foot{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+/* pilulas de conversao centralizadas no funil, sem contar a coluna de totais (150px + 18px de espaco) */
+#fn .foot{justify-content:center}@media(min-width:821px){#fn .foot{padding-right:168px}}
 .pill{border:1px solid var(--line);border-radius:999px;padding:5px 14px;font-size:12px;color:var(--mut)}.pill b{color:var(--ink);font-weight:600;margin-left:4px}
 .seg{display:inline-flex;background:var(--tr);border-radius:999px;padding:3px}.seg button{border:0;background:transparent;font:inherit;font-weight:600;font-size:12px;color:var(--mut);padding:5px 14px;border-radius:999px;cursor:pointer}.seg button[aria-pressed=true]{background:var(--sf);color:var(--nv);box-shadow:var(--sh)}
 .ev{display:grid;grid-template-columns:minmax(0,1fr) 190px;gap:26px;padding-bottom:6px}.mt{font:600 12px Manrope;color:var(--mut);margin:2px 0 8px}
