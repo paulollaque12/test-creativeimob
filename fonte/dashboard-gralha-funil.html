@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Dashboard Performance CRM</title><!-- v2026-10-28d evolucao: guia no hover + datas dd/mm -->
+<title>Dashboard Performance CRM</title><!-- v2026-10-28e dimensoes em uma linha -->
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#f4f5f9;--hv:#e9ebf4;--sf:#fff;--ink:#1b2142;--mut:#7b819a;--line:#e6e8f0;--br:#8a1f33;--nv:#2f3f80;--tr:#eef0f6;--pos:#1f7a46;--posb:#e7f4ec;--neg:#b3342a;--negb:#fbeaea;--sh:0 1px 2px rgba(27,33,66,.04),0 10px 28px rgba(27,33,66,.06);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -63,6 +63,8 @@ h1{font:600 clamp(26px,3.6vw,36px)/1.15 Sora,system-ui,sans-serif;margin:14px 0 
 .lg div{display:flex;align-items:center;gap:9px;padding:4px 0;font-size:13px;border-bottom:1px solid var(--line)}.lg i{width:10px;height:10px;border-radius:3px;flex:none}.lg b{margin-left:auto;font-weight:600;white-space:nowrap}.lg small{color:var(--mut);font-weight:500;margin-left:4px}
 .ct{font:600 15px/1.3 Sora,system-ui,sans-serif;text-align:center;margin-bottom:8px;color:var(--nv)}.dtw{max-height:330px;overflow:auto;border:1px solid var(--line);border-radius:12px}table.st{width:100%;border-collapse:collapse;font-size:13px}.st th{position:sticky;top:0;background:var(--tr);font-size:11px;font-weight:600;color:var(--mut);padding:10px 12px;text-align:left;border-bottom:1px solid var(--line)}.st td{padding:9px 12px;border-bottom:1px solid var(--line)}.st .n{text-align:right;white-space:nowrap}.st th.n{text-align:right}.st i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:8px}.st tfoot td{position:sticky;bottom:0;background:var(--tr);font-weight:700;border-bottom:0}
 .tip{position:absolute;display:none;pointer-events:none;background:var(--ink);color:var(--sf);padding:7px 11px;border-radius:9px;font-size:12px;line-height:1.4;z-index:6;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+/* Desempenho por dimensao: botoes de dimensao em UMA linha (rolagem horizontal se a tela for estreita) */
+#dch{flex-wrap:nowrap;gap:5px;overflow-x:auto;scrollbar-width:thin;padding-bottom:2px}#dch button{flex:1 1 auto;white-space:nowrap;font-size:12px;padding:9px 6px}
 td{transition:background .12s}.vt tbody tr:hover td,.dt tbody tr:hover td,.st tbody tr:hover td,.st tbody tr.on td,.cl tr:hover td{background:var(--hv)}
 [hidden]{display:none!important}.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:-6px 0 20px}.tabs button{font:inherit;font-weight:600;font-size:14px;border:0;background:none;color:var(--mut);padding:10px 18px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}.tabs button[aria-selected=true]{color:var(--br);border-bottom-color:var(--br)}
 .fbar{padding:16px 18px;margin-bottom:18px}.fb{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) auto;gap:12px;align-items:end}.fb label{display:block;font-size:11px;font-weight:600;color:var(--mut);margin-bottom:5px}.fb select{width:100%;font:inherit;font-size:13px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--sf);color:var(--ink)}.fb button{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--sf);color:var(--br);border-radius:10px;padding:9px 14px;cursor:pointer}
