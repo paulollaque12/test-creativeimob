@@ -134,7 +134,7 @@ function qIns(q){const out=[],NM={0:"leads",1:"oportunidade",2:"visitas",3:"prop
 function qJor(q){const [a,b]=range(q),F=filters(q),d0=new Map();
  for(const r of C.X){if(r[0]!==0||r[2]<0||r[1]<a||r[1]>b||!okF(r,F))continue;const o=d0.get(r[2]);if(o===undefined||r[1]<o)d0.set(r[2],r[1])}
  const ev=new Map();
- for(const r of C.X){const k=r[0];if(k<1||k>5||r[2]<0)continue;const s=d0.get(r[2]);if(s===undefined||r[1]<s)continue;const key=r[2]*8+k,o=ev.get(key);if(o===undefined||r[1]<o)ev.set(key,r[1])}
+ for(const r of C.X){const k=r[0];if(k<1||k>5)continue;const cl=k===5?r[16]:r[2];if(cl<0)continue;const s=d0.get(cl);if(s===undefined||r[1]<s)continue;const key=cl*8+k,o=ev.get(key);if(o===undefined||r[1]<o)ev.set(key,r[1])}
  const per=new Map();ev.forEach((d,key)=>{const c=Math.floor(key/8),k=key%8;mult(per,c,()=>[]).push([d,k])});
  const NM=["","Oportunidade","Visita","Proposta","Fechamento","Venda"],tr=new Map(),st=new Map();
  per.forEach((L,c)=>{L.sort((x,y)=>x[0]-y[0]||x[1]-y[1]);const s=d0.get(c);let p="Lead";L.forEach(([d,k],i)=>{const n=NM[k],key=(i+1)+"|"+p+"|"+n;tr.set(key,(tr.get(key)||0)+1);mult(st,k,()=>[]).push(d-s);p=n})});
