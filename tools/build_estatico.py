@@ -17,8 +17,22 @@ function demoNote(c){try{const d=c.ultimo.split("-").reverse().join("/"),n=docum
 LOAD_A='window.__DEMO=true;const ENC=%s;window.__cuboLoader=async()=>{const c=await dec(ENC,%s);demoNote(c);return c};'
 import os
 LOAD_B=open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'login_ui.js'),encoding='utf-8').read()+r'''
-window.__cuboLoader=async()=>{const r=await fetch("data.enc.json",{cache:"default"});if(!r.ok)throw new Error("Dados indisponíveis (HTTP "+r.status+")");const e=await r.json();let pw=null,msg="";try{pw=sessionStorage.getItem("gpw")}catch(_){}
- for(;;){if(!pw)pw=await askPw(msg);try{const c=await dec(e,pw);try{sessionStorage.setItem("gpw",pw)}catch(_){}demoNote(c);return c}catch(_){pw=null;msg="Senha incorreta. Tente de novo.";try{sessionStorage.removeItem("gpw")}catch(_){}}}};'''
+const EQ=[["equipe-1","Equipe 1"],["equipe-bope","Equipe Bope"],["equipe-champions","Equipe Champions"],["equipe-elite","Equipe Elite"],["equipe-evolucao","Equipe Evolução"],["equipe-exupery","Equipe Exupéry"],["equipe-iron","Equipe Iron"],["equipe-magnitude","Equipe Magnitude"],["equipe-meta","Equipe Meta"],["equipe-nexo","Equipe Nexo"],["equipe-sky","Equipe Sky"],["equipe-supreme","Equipe Supreme"],["equipe-synergia","Equipe Synergia"],["equipe-vertice","Equipe Vértice"],["equipe-aguias","Equipe Águias"]];
+const nrm=s=>(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]/g,"");
+const findEq=u=>{const n=nrm(u);return n?EQ.find(([s])=>nrm(s)===n||nrm(s).replace(/^equipe/,"")===n):null};
+function teamMode(nome){const hide=e=>e&&e.style.setProperty("display","none","important");
+ document.querySelectorAll(".tabs button").forEach(b=>{if(b.dataset.tab!=="overview"&&b.dataset.tab!=="cmp")hide(b)});
+ ["f-loja","f-equipe","f-veiculo","c1-loja","c1-equipe","c2-loja","c2-equipe"].forEach(i=>{const e=document.getElementById(i);hide(e&&e.closest("div"))});
+ const h=document.querySelector("h1");if(h)h.insertAdjacentHTML("beforeend",' <span style="color:var(--br);font-weight:600">· '+nome+'</span>');document.title="Dashboard "+nome}
+window.__cuboLoader=async()=>{const get=k=>{try{return sessionStorage.getItem(k)}catch(_){return null}},set=(k,v)=>{try{sessionStorage.setItem(k,v)}catch(_){}},del=k=>{try{sessionStorage.removeItem(k)}catch(_){}},
+ fj=async u=>{const r=await fetch(u,{cache:"default"});if(!r.ok)throw new Error("Dados indisponíveis (HTTP "+r.status+")");return r.json()};
+ const sq=get("gpw-eq");if(sq){try{const o=JSON.parse(sq),q=EQ.find(x=>x[0]===o.s),c=await dec(await fj("equipes/"+o.s+"/data.enc.json"),o.pw);teamMode(q[1]);demoNote(c);return c}catch(_){del("gpw-eq")}}
+ const sg=get("gpw");if(sg){try{const c=await dec(await fj("data.enc.json"),sg);demoNote(c);return c}catch(_){del("gpw")}}
+ let msg="";
+ for(;;){const {u,pw}=await askPw(msg),q=findEq(u),adm=nrm(u)==="gralhaimoveis";msg="Usuário ou senha incorretos.";
+  if(!adm&&!q)continue;
+  let e;try{e=await fj(adm?"data.enc.json":"equipes/"+q[0]+"/data.enc.json")}catch(_){msg="Não foi possível carregar os dados. Tente de novo.";continue}
+  try{const c=await dec(e,pw);if(adm)set("gpw",pw);else{set("gpw-eq",JSON.stringify({s:q[0],pw}));teamMode(q[1])}demoNote(c);return c}catch(_){}}};'''
 marker='<script>\nconst DESDE='
 assert marker in live, 'marcador do script principal nao encontrado'
 ICONES='<link rel="icon" href="favicon.ico?v=2" sizes="any">\n<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=2">\n<link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">\n'
