@@ -15,11 +15,15 @@ Página: `docs/index.html` = `fonte/dashboard-gralha-funil.html` (o dashboard ao
    (DESDE = a data impressa no passo 2). Deve imprimir contagens para as 8 métricas (0..7); se faltar alguma, parar sem publicar.
 5. `python tools/build_estatico.py fonte/dashboard-gralha-funil.html --site docs/index.html --enc docs/data.enc.json`
 6. Conferir: `ultimo` do cubo = `ULTIMO`, número de linhas próximo ao anterior (não pode cair mais que ~2%).
-7. `git add docs && git commit -m "dados ate <ULTIMO>" && git push origin main`.
-   Se o push falhar, não insistir em loop: relatar o erro.
+7. Equipes (login único): `DASH_SENHA=<senha> EQUIPES_MESTRE=<segredo> python3 -I tools/fatiar_equipes.py` -> grava `docs/equipes/<slug>/data.enc.json` (15 arquivos, cifrados com a senha de cada equipe; confere sozinho `ultimo` = último dia do cubo e que a senha abre o arquivo). Não gera HTML: a equipe abre o MESMO `docs/index.html` em "modo equipe". Conferir que são 15 pastas e nenhum `index.html` dentro de `docs/equipes`.
+8. `git add docs && git commit -m "dados ate <ULTIMO>" && git push origin main` (cubo + equipes no mesmo commit).
+   Se o push falhar, não insistir em loop: relatar o erro. Se o passo 7 falhar, não publicar parcial.
 
 ## Quando mudar o dashboard
 Edite `fonte/dashboard-gralha-funil.html` (cópia do HTML ao vivo) e rode o passo 5. Se mudar alguma consulta SQL do HTML, atualize também `tools/shim.js` (roteador das consultas) e `tools/gerar_dados.py` (definição das métricas do cubo).
 
 ## Métricas do cubo (m)
 0 leads (capturados, DATE(Data)); 1 oportunidade (EtapaAcaoId 9/5/1, Assunto fora de Negócio ganho/perdido); 2 visita (histórico, LOWER(Assunto)='visita' E Statusvisita='Finalizado'); 3 proposta (histórico, LOWER(Assunto)='proposta'; n=1 por cliente+dia); 4 fechamento (EtapaAcaoId 8/4/12 + mesmo filtro); 5 vendas (Assunto Negócio ganho / Negocio Ganho via API, entidade = CodigoNegocio, v = valornegocio_dn); 6 qualquer evento em dados (corretores ativos); 7 qualquer evento no histórico.
+
+## Login único (usuário + senha)
+Gerencial: usuário `gralha-imoveis`. Equipe: usuário = nome da equipe em minúsculas sem espaço/acento (`equipe1`, `equipebope`, `equipeevolucao`...); senha = `<slug>-<token>` (HMAC do slug com `EQUIPES_MESTRE`). O modo equipe (`teamMode` em `tools/build_estatico.py`) mostra só Overview + Comparativo e só o filtro Corretor. Segredos só no prompt da rotina; nunca em arquivo/commit.
