@@ -139,7 +139,7 @@ function qJor(q){const [a,b]=range(q),F=filters(q),d0=new Map();
  const NM=["","Oportunidade","Visita","Proposta","Fechamento","Venda"],tr=new Map(),st=new Map();
  per.forEach((L,c)=>{L.sort((x,y)=>x[0]-y[0]||x[1]-y[1]);const s=d0.get(c);let p="Lead";L.forEach(([d,k],i)=>{const n=NM[k],key=(i+1)+"|"+p+"|"+n;tr.set(key,(tr.get(key)||0)+1);mult(st,k,()=>[]).push(d-s);p=n})});
  const out=[];tr.forEach((n,key)=>{const [rn,x,y]=key.split("|");out.push(["tr",+rn,x,y,n,null])});
- st.forEach((v,k)=>{v.sort((x,y)=>x-y);out.push(["st",k,NM[k],"",v.length,v[Math.floor((v.length-1)/2)]])});
+ st.forEach((v,k)=>{out.push(["st",k,NM[k],"",v.length,Math.round(v.reduce((x,y)=>x+y,0)/v.length*10)/10])});
  out.push(["tot",0,"Lead","",d0.size,null]);return out}
 
 function route(q){

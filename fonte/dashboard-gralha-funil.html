@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Dashboard Performance CRM</title><!-- v2026-10-28q jornada: texto Vendas centralizado na copa -->
+<title>Dashboard Performance CRM</title><!-- v2026-11-07a jornada: média (em vez de mediana) de dias até cada etapa -->
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#f4f5f9;--hv:#e9ebf4;--sf:#fff;--ink:#1b2142;--mut:#7b819a;--line:#e6e8f0;--br:#8a1f33;--nv:#2f3f80;--tr:#eef0f6;--pos:#1f7a46;--posb:#e7f4ec;--neg:#b3342a;--negb:#fbeaea;--sh:0 1px 2px rgba(27,33,66,.04),0 10px 28px rgba(27,33,66,.06);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -646,10 +646,10 @@ e AS (SELECT CAST(CodigoCliente AS STRING) c,1 o,'Oportunidade' s,DATE(Data) d F
 f AS (SELECT l.c,l.d0,e.o,e.s,MIN(e.d) d FROM l JOIN e ON e.c=l.c AND e.d>=l.d0 GROUP BY 1,2,3,4),
 r AS (SELECT c,s,o,d,d0,ROW_NUMBER() OVER(PARTITION BY c ORDER BY d,o) rn FROM f),
 t AS (SELECT rn,COALESCE(LAG(s) OVER(PARTITION BY c ORDER BY rn),'Lead') p,s,o,DATE_DIFF(d,d0,DAY) dd FROM r)
-SELECT 'tr' k,rn,p a,s b,COUNT(*) n,CAST(NULL AS INT64) med FROM t GROUP BY 2,3,4
-UNION ALL SELECT 'st',o,s,'',COUNT(*),APPROX_QUANTILES(dd,100)[OFFSET(50)] FROM t GROUP BY 2,3
+SELECT 'tr' k,rn,p a,s b,COUNT(*) n,CAST(NULL AS FLOAT64) med FROM t GROUP BY 2,3,4
+UNION ALL SELECT 'st',o,s,'',COUNT(*),ROUND(AVG(dd),1) FROM t GROUP BY 2,3
 UNION ALL SELECT 'tot',0,'Lead','',COUNT(*),NULL FROM l`}
-const jp=(n,t)=>t?(n/t*100).toFixed(1).replace(".",",")+"%":"–",jd=v=>v===null||v===undefined?"–":(v+(v===1?" dia":" dias"));
+const jp=(n,t)=>t?(n/t*100).toFixed(1).replace(".",",")+"%":"–",jd=v=>v===null||v===undefined?"–":(v.toLocaleString("pt-BR",{maximumFractionDigits:1})+(v===1?" dia":" dias"));
 function loadJ(){const a=$("a").value,b=$("b").value;
  if(!/^\d{4}-\d\d-\d\d$/.test(a)||!/^\d{4}-\d\d-\d\d$/.test(b)||a>b||a<DESDE){$("jrf").innerHTML='<div class="msg">'+(a<DESDE?"Os dados começam em 01/01/2026.":"Confira as datas.")+'</div>';$("jrk").innerHTML="";$("jrs").innerHTML="";return}
  if(unJ)unJ();$("jrf").innerHTML='<div class="msg">Consultando o BigQuery...</div>';
@@ -657,7 +657,7 @@ function loadJ(){const a=$("a").value,b=$("b").value;
   try{const J={tot:0,st:{},tr:[]};ev.result.payload.rows.forEach(w=>{const [k,rn,x,y,n,m]=w.f.map(c=>c.v);if(k==="tot")J.tot=+n;else if(k==="st")J.st[x]={n:+n,med:m===null?null:+m};else J.tr.push({rn:+rn,a:x,b:y,n:+n})});renderJ(J)}catch(e){$("jrf").innerHTML='<div class="msg"><b>Resposta inesperada</b>Recarregue a página para tentar de novo.</div>'}},{cache:{staleTime:3600000}})}
 function renderJ(J){const T=J.tot;if(!T){$("jrk").innerHTML="";$("jrs").innerHTML="";$("jrf").innerHTML='<div class="msg">Nenhum lead entrou no período e nos filtros escolhidos.</div>';return}
  const S=n=>J.st[n]||{n:0,med:null},v=S("Venda"),vi=S("Visita");
- $("jrk").innerHTML=[["Leads que entraram",f(T),"no período, clientes únicos"],["Chegaram à venda",f(v.n),jp(v.n,T)+" dos leads"],["Mediana até a venda",jd(v.med),"da entrada do lead à venda"],["Mediana até a visita",jd(vi.med),"da entrada do lead à visita"]].map(x=>`<div class="jk"><small>${x[0]}</small><b>${x[1]}</b><span>${x[2]}</span></div>`).join("");
+ $("jrk").innerHTML=[["Leads que entraram",f(T),"no período, clientes únicos"],["Chegaram à venda",f(v.n),jp(v.n,T)+" dos leads"],["Média até a venda",jd(v.med),"da entrada do lead à venda"],["Média até a visita",jd(vi.med),"da entrada do lead à visita"]].map(x=>`<div class="jk"><small>${x[0]}</small><b>${x[1]}</b><span>${x[2]}</span></div>`).join("");
  /* funil de jornada */
  const W=1000,Hh=390,cy=205,x0=96,x1=800,sw=(x1-x0)/5,hs=n=>Math.max(13,104*Math.sqrt(n/T)),pts=[[x0,104]];JST.forEach((s,i)=>pts.push([x0+sw*(i+.5),hs(S(s).n)]));pts.push([x1,pts[pts.length-1][1]]);
  const sm=sg=>{let d="M"+pts[0][0]+" "+(cy+sg*pts[0][1]);for(let i=1;i<pts.length;i++){const m=(pts[i-1][0]+pts[i][0])/2;d+=`C${m} ${cy+sg*pts[i-1][1]} ${m} ${cy+sg*pts[i][1]} ${pts[i][0]} ${cy+sg*pts[i][1]}`}return d},
@@ -676,7 +676,7 @@ function renderJ(J){const T=J.tot;if(!T){$("jrk").innerHTML="";$("jrs").innerHTM
   const ty0=up?ty:ty;
   g+=`<text x="${cx}" y="${ty0}" text-anchor="${al}" class="jrt" style="fill:${JCO[s]}">${s}</text><text x="${cx}" y="${ty0+17}" text-anchor="${al}" class="jrs1">${f(st.n)} · ${jp(st.n,T)} dos leads</text><text x="${cx}" y="${ty0+33}" text-anchor="${al}" class="jrs2">${jp(st.n,prevN(i))} da etapa anterior · mediana ${jd(st.med)}</text>`});
  g+=`<g transform="translate(${x1+16} ${cy-56}) scale(.86)" fill="#c9cde0"><path d="M22 12H6v10c0 11 8 19 20 21l2-7c-8-2-12-7-12-13z"/><path d="M68 12h16v10c0 11-8 19-20 21l-2-7c8-2 12-7 12-13z"/><path d="M22 6h46v22c0 14-9 24-23 26C31 52 22 42 22 28z"/><rect x="41" y="52" width="8" height="18"/><path d="M34 78l7-10h8l7 10z"/><rect x="30" y="78" width="30" height="14" rx="2"/></g><text x="${x1+55}" y="${cy+46}" class="jrs1" text-anchor="middle">Vendas</text><text x="${x1+55}" y="${cy+64}" class="jrs2" text-anchor="middle">${f(v.n)} (${jp(v.n,T)})</text>`;
- JST.forEach((s,i)=>{const st=S(s);g+=`<rect class="jrh" x="${x0+sw*i}" y="${cy-110}" width="${sw}" height="220" fill="#fff" fill-opacity="0" data-t="${s}|${f(st.n)} leads · ${jp(st.n,T)} dos leads|${jp(st.n,prevN(i))} da etapa anterior · mediana ${jd(st.med)} desde a entrada"/>`});g+=`<rect class="jrh" x="${x0-22}" y="${cy-110}" width="20" height="220" fill="#fff" fill-opacity="0" data-t="Leads que entraram|${f(T)} leads|clientes únicos no período"/>`;
+ JST.forEach((s,i)=>{const st=S(s);g+=`<rect class="jrh" x="${x0+sw*i}" y="${cy-110}" width="${sw}" height="220" fill="#fff" fill-opacity="0" data-t="${s}|${f(st.n)} leads · ${jp(st.n,T)} dos leads|${jp(st.n,prevN(i))} da etapa anterior · média ${jd(st.med)} desde a entrada"/>`});g+=`<rect class="jrh" x="${x0-22}" y="${cy-110}" width="20" height="220" fill="#fff" fill-opacity="0" data-t="Leads que entraram|${f(T)} leads|clientes únicos no período"/>`;
  g+=`<text x="${x0-18}" y="${cy+128}" class="jrs1" text-anchor="start">Leads que entraram</text><text x="${x0-18}" y="${cy+145}" class="jrs2" text-anchor="start">${f(T)}</text></svg>`;
  $("jrf").innerHTML=g+'<div id="jrtf" class="jrtip" hidden></div>';tipOn($("jrf"),$("jrtf"));
  renderJS(J)}
