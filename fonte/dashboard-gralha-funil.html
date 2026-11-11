@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Dashboard Performance CRM</title><!-- v2026-11-10h pipeimob: abas com roscas, colunas, jornada e barras 100% (ajustes) -->
+<title>Dashboard Performance CRM</title><!-- v2026-11-10i pipeimob: textos explicativos nos paineis -->
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#f4f5f9;--hv:#e9ebf4;--sf:#fff;--ink:#1b2142;--mut:#7b819a;--line:#e6e8f0;--br:#8a1f33;--nv:#2f3f80;--tr:#eef0f6;--pos:#1f7a46;--posb:#e7f4ec;--neg:#b3342a;--negb:#fbeaea;--sh:0 1px 2px rgba(27,33,66,.04),0 10px 28px rgba(27,33,66,.06);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -266,44 +266,44 @@ html,body{max-width:100%;overflow-x:hidden}
 <div class="panel fbar"><div class="fb pifb"><div><label for="pi-tipo">Tipo de venda</label><select id="pi-tipo"><option value="">Todos</option><option value="0">Terceiros</option><option value="1">Lançamentos</option></select></div><div><label for="pi-gestor">Gestor</label><select id="pi-gestor"><option value="">Todos</option></select></div><div><label for="pi-etapa">Etapa do contrato</label><select id="pi-etapa"><option value="">Todos</option></select></div><button class="clr" type="button" id="pi-clr">Limpar filtros</button></div></div>
 <div id="pist" class="cap" style="margin:0 0 12px">Carregando a PipeImob...</div>
 <div id="pit" class="tiles"></div>
-<div class="pig"><div class="panel"><div class="ph pi"><h2>Vendas por dia<i class="inf" tabindex="0" role="button" aria-describedby="inft-pim" aria-label="Como as vendas são contadas">i</i><span class="inft" id="inft-pim" role="tooltip"><span class="itx">Cada venda é um contrato da PipeImob, contado no dia em que o CCV (contrato de compra e venda) foi assinado. O gráfico mostra só as datas selecionadas; em períodos acima de 92 dias, as barras passam a ser semanas.</span><span class="itx">Lançamento é uma classificação estimada: vendedor pessoa jurídica com gestor de produto ou pagamento em parcelas mensais, anuais e nas chaves. A PipeImob ainda não envia esse campo.</span></span></h2><span>Data do CCV</span></div><div class="ch pich" id="pim" role="img" aria-label="Vendas por dia"></div><div class="pilg"><span><i style="background:var(--br)"></i>Terceiros</span><span><i style="background:var(--nv)"></i>Lançamentos</span></div></div>
-<div class="panel"><div class="ph"><h2>Por tipo e etapa</h2><span>Período selecionado</span></div><div id="pie"></div></div></div>
-<div class="pig"><div class="panel"><div class="ph"><h2>Prazo até o CCV</h2><span>Dias do envio à assinatura</span></div><div class="ch pich" id="pir" role="img" aria-label="Contratos por faixa de prazo entre envio e CCV"></div></div>
-<div class="panel"><div class="ph"><h2>Gestores</h2><span id="pigc"></span></div><div class="pigs" id="pig2"></div></div></div>
-<div class="panel" style="margin-top:18px"><div class="ph"><h2>Contratos do período</h2><span id="pin"></span></div><div class="pitw" id="pil"></div></div>
+<div class="pig"><div class="panel"><div class="ph pi"><h2>Vendas por dia<i class="inf" tabindex="0" role="button" aria-describedby="inft-pim" aria-label="Como as vendas são contadas">i</i><span class="inft" id="inft-pim" role="tooltip"><span class="itx">Cada venda é um contrato da PipeImob, contado no dia em que o CCV (contrato de compra e venda) foi assinado. O gráfico mostra só as datas selecionadas; em períodos acima de 92 dias, as barras passam a ser semanas.</span><span class="itx">Lançamento é uma classificação estimada: vendedor pessoa jurídica com gestor de produto ou pagamento em parcelas mensais, anuais e nas chaves. A PipeImob ainda não envia esse campo.</span></span></h2><span>Data do CCV</span></div><p class="bi">Contratos assinados (CCV) em cada dia do período, separados em terceiros e lançamentos. Passe o mouse para ver o valor.</p><div class="ch pich" id="pim" role="img" aria-label="Vendas por dia"></div><div class="pilg"><span><i style="background:var(--br)"></i>Terceiros</span><span><i style="background:var(--nv)"></i>Lançamentos</span></div></div>
+<div class="panel"><div class="ph"><h2>Por tipo e etapa</h2><span>Período selecionado</span></div><p class="bi">Quanto vendemos de cada tipo e em que etapa da esteira os contratos estão hoje, com os indicadores do período.</p><div id="pie"></div></div></div>
+<div class="pig"><div class="panel"><div class="ph"><h2>Prazo até o CCV</h2><span>Dias do envio à assinatura</span></div><p class="bi">Quantos dias se passam entre o envio da venda e a assinatura do CCV. Barras mais à direita são contratos mais lentos.</p><div class="ch pich" id="pir" role="img" aria-label="Contratos por faixa de prazo entre envio e CCV"></div></div>
+<div class="panel"><div class="ph"><h2>Gestores</h2><span id="pigc"></span></div><p class="bi">Ranking dos gestores por VGV nos contratos assinados no período.</p><div class="pigs" id="pig2"></div></div></div>
+<div class="panel" style="margin-top:18px"><div class="ph"><h2>Contratos do período</h2><span id="pin"></span></div><p class="bi">Contratos assinados nas datas selecionadas, do mais recente ao mais antigo.</p><div class="pitw" id="pil"></div></div>
 </section>
 <section id="panel-pipe-est" role="tabpanel" aria-labelledby="tab-pipe-est" hidden>
 <div class="cap" id="pxs-est" hidden>Os dados desta aba chegam na próxima atualização diária do site (06:52).</div>
 <div id="pxc-est" hidden>
 <div class="cap" id="pe-av" hidden style="margin:0 0 12px"></div>
 <div id="pe-t" class="tiles"></div>
-<div class="panel"><div class="ph"><h2>Jornada do contrato</h2><span>Quantos chegaram a cada marco</span></div><div id="pe-jr"></div></div>
-<div class="pig"><div class="panel"><div class="ph"><h2>Contratos por etapa</h2><span>Etapa atual</span></div><div class="ch pich" id="pe-et" role="img" aria-label="Contratos por etapa atual"></div></div>
-<div class="panel"><div class="ph"><h2>Contratos em aberto</h2><span>Idade desde o CCV</span></div><div id="pe-id"></div></div></div>
-<div class="panel" style="margin-top:18px"><div class="ph"><h2>Aguardando conclusão</h2><span id="pe-cn"></span></div><div class="pitw" id="pe-tb"></div></div>
+<div class="panel"><div class="ph"><h2>Jornada do contrato</h2><span>Quantos chegaram a cada marco</span></div><p class="bi">Dos contratos assinados no período, quantos já chegaram a cada marco depois do CCV e em quantos dias, em média.</p><div id="pe-jr"></div></div>
+<div class="pig"><div class="panel"><div class="ph"><h2>Contratos por etapa</h2><span>Etapa atual</span></div><p class="bi">Onde cada contrato está hoje na esteira da PipeImob, do Compromisso ao Relacionamento.</p><div class="ch pich" id="pe-et" role="img" aria-label="Contratos por etapa atual"></div></div>
+<div class="panel"><div class="ph"><h2>Contratos em aberto</h2><span>Idade desde o CCV</span></div><p class="bi">Contratos com a comissão ainda não paga, agrupados pelos dias passados desde o CCV.</p><div id="pe-id"></div></div></div>
+<div class="panel" style="margin-top:18px"><div class="ph"><h2>Aguardando conclusão</h2><span id="pe-cn"></span></div><p class="bi">Contratos ainda sem comissão paga, dos mais antigos aos mais recentes, com os marcos que já aconteceram.</p><div class="pitw" id="pe-tb"></div></div>
 </div></section>
 <section id="panel-pipe-com" role="tabpanel" aria-labelledby="tab-pipe-com" hidden>
 <div class="cap" id="pxs-com" hidden>Os dados desta aba chegam na próxima atualização diária do site (06:52).</div>
 <div id="pxc-com" hidden>
 <div id="pc-t" class="tiles"></div>
-<div class="pig"><div class="panel"><div class="ph"><h2>Recebimento por data do CCV</h2><span>Comissão recebida e a receber</span></div><div class="ch pich" id="pc-rc" role="img" aria-label="Comissão recebida e a receber por data do CCV"></div><div class="pilg"><span><i style="background:var(--br)"></i>Recebida</span><span><i style="background:var(--nv)"></i>A receber</span></div></div>
-<div class="panel"><div class="ph"><h2>Quem paga</h2><span>Contratos por pagador</span></div><div id="pc-qm"></div></div></div>
-<div class="pig eq"><div class="panel"><div class="ph"><h2>Prazo até o pagamento</h2><span>Dias do CCV à comissão paga</span></div><div class="ch pich" id="pc-ch" role="img" aria-label="Contratos por faixa de prazo até o pagamento"></div></div>
-<div class="panel"><div class="ph"><h2>Momento do pagamento</h2><span>Comissão combinada (VGC)</span></div><div class="ch pich" id="pc-mo" role="img" aria-label="Comissão por momento de pagamento"></div></div></div>
-<div class="panel" style="margin-top:18px"><div class="ph"><h2>Divisão da comissão por papel</h2><span>Participação no VGC do período</span></div><div id="pc-pp"></div></div>
-<div class="panel" style="margin-top:18px"><div class="ph"><h2>Comissões a receber</h2><span id="pc-cn"></span></div><div class="pitw" id="pc-tb"></div></div>
+<div class="pig"><div class="panel"><div class="ph"><h2>Recebimento por data do CCV</h2><span>Comissão recebida e a receber</span></div><p class="bi">Quanto da comissão de cada dia de CCV já foi recebida e quanto ainda falta receber.</p><div class="ch pich" id="pc-rc" role="img" aria-label="Comissão recebida e a receber por data do CCV"></div><div class="pilg"><span><i style="background:var(--br)"></i>Recebida</span><span><i style="background:var(--nv)"></i>A receber</span></div></div>
+<div class="panel"><div class="ph"><h2>Quem paga</h2><span>Contratos por pagador</span></div><p class="bi">Quem paga a comissão em cada contrato: vendedor, comprador ou outra composição.</p><div id="pc-qm"></div></div></div>
+<div class="pig eq"><div class="panel"><div class="ph"><h2>Prazo até o pagamento</h2><span>Dias do CCV à comissão paga</span></div><p class="bi">Em quantos dias, depois do CCV, a comissão foi paga. A barra azul mostra o que ainda está em aberto.</p><div class="ch pich" id="pc-ch" role="img" aria-label="Contratos por faixa de prazo até o pagamento"></div></div>
+<div class="panel"><div class="ph"><h2>Momento do pagamento</h2><span>Comissão combinada (VGC)</span></div><p class="bi">Em que momento da venda a comissão foi combinada para ser paga, somando o VGC de cada um.</p><div class="ch pich" id="pc-mo" role="img" aria-label="Comissão por momento de pagamento"></div></div></div>
+<div class="panel" style="margin-top:18px"><div class="ph"><h2>Divisão da comissão por papel</h2><span>Participação no VGC do período</span></div><p class="bi">Como o VGC do período se divide entre os papéis que participam da comissão (diretoria, imobiliária, gerente, corretor e outros).</p><div id="pc-pp"></div></div>
+<div class="panel" style="margin-top:18px"><div class="ph"><h2>Comissões a receber</h2><span id="pc-cn"></span></div><p class="bi">Contratos com comissão ainda não paga, ordenados pela data prevista, destacando os que já passaram do prazo.</p><div class="pitw" id="pc-tb"></div></div>
 </div></section>
 <section id="panel-pipe-ori" role="tabpanel" aria-labelledby="tab-pipe-ori" hidden>
 <div class="cap" id="pxs-ori" hidden>Os dados desta aba chegam na próxima atualização diária do site (06:52).</div>
 <div id="pxc-ori" hidden>
 <div id="po-t" class="tiles"></div>
-<div class="pig eq"><div class="panel"><div class="ph"><h2>Origem do comprador</h2><span>Quem trouxe o cliente</span></div><div id="po-mc"></div></div>
-<div class="panel"><div class="ph"><h2>Principais mídias</h2><span>Contratos por origem</span></div><div class="pigs" id="po-md"></div></div></div>
-<div class="pig eq"><div class="panel"><div class="ph"><h2>Faixa de valor</h2><span>Contratos por VGV</span></div><div class="ch pich" id="po-fv" role="img" aria-label="Contratos por faixa de valor"></div></div>
-<div class="panel"><div class="ph"><h2>Dias em estoque</h2><span>Da captação ao início da venda</span></div><div class="ch pich" id="po-es" role="img" aria-label="Contratos por faixa de dias em estoque"></div></div></div>
-<div class="pig eq"><div class="panel"><div class="ph"><h2>Bairros</h2><span>Mais vendidos</span></div><div class="pigs" id="po-bx"></div></div>
-<div class="panel"><div class="ph"><h2>Financiamento</h2><span id="po-fn"></span></div><div id="po-bc"></div></div></div>
-<div class="panel" style="margin-top:18px"><div class="ph"><h2>Perfil da carteira</h2><span>Participação nos contratos do período</span></div><div class="pipf"><div><div class="pish">ORIGEM DO VENDEDOR</div><div id="po-mv"></div></div><div><div class="pish">TIPO DE IMÓVEL</div><div id="po-ct"></div></div><div><div class="pish">CIDADE</div><div id="po-cd"></div></div></div></div>
+<div class="pig eq"><div class="panel"><div class="ph"><h2>Origem do comprador</h2><span>Quem trouxe o cliente</span></div><p class="bi">De onde veio o cliente que comprou: captado pela Gralha, trazido pelo corretor ou pela construtora.</p><div id="po-mc"></div></div>
+<div class="panel"><div class="ph"><h2>Principais mídias</h2><span>Contratos por origem</span></div><p class="bi">As origens mais frequentes, com a participação de cada uma nos contratos.</p><div class="pigs" id="po-md"></div></div></div>
+<div class="pig eq"><div class="panel"><div class="ph"><h2>Faixa de valor</h2><span>Contratos por VGV</span></div><p class="bi">Quantos contratos há em cada faixa de VGV. Mostra se a venda vem de poucos contratos grandes ou de muitos menores.</p><div class="ch pich" id="po-fv" role="img" aria-label="Contratos por faixa de valor"></div></div>
+<div class="panel"><div class="ph"><h2>Dias em estoque</h2><span>Da captação ao início da venda</span></div><p class="bi">Quanto tempo o imóvel ficou captado antes de a venda começar.</p><div class="ch pich" id="po-es" role="img" aria-label="Contratos por faixa de dias em estoque"></div></div></div>
+<div class="pig eq"><div class="panel"><div class="ph"><h2>Bairros</h2><span>Mais vendidos</span></div><p class="bi">Os bairros com mais contratos no período, com o VGV de cada um.</p><div class="pigs" id="po-bx"></div></div>
+<div class="panel"><div class="ph"><h2>Financiamento</h2><span id="po-fn"></span></div><p class="bi">Quantos contratos usaram financiamento e em qual banco.</p><div id="po-bc"></div></div></div>
+<div class="panel" style="margin-top:18px"><div class="ph"><h2>Perfil da carteira</h2><span>Participação nos contratos do período</span></div><p class="bi">Como os contratos se dividem por origem do vendedor, tipo de imóvel e cidade.</p><div class="pipf"><div><div class="pish">ORIGEM DO VENDEDOR</div><div id="po-mv"></div></div><div><div class="pish">TIPO DE IMÓVEL</div><div id="po-ct"></div></div><div><div class="pish">CIDADE</div><div id="po-cd"></div></div></div></div>
 </div></section>
 <section id="panel-daily" role="tabpanel" aria-labelledby="tab-daily" hidden>
 <div id="ytb"><div class="msg">Abra esta aba para carregar o Daily.</div></div>
