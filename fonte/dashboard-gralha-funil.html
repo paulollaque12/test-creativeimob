@@ -146,9 +146,15 @@ html,body{max-width:100%;overflow-x:hidden}
 .sbg.op .sbi{background:#6e1428;border-color:#6e1428}.sbg.op .sbi i{background:#fff}
 .sbh em{font-style:normal;margin-left:auto;font-size:10px;white-space:nowrap;font-weight:600;color:var(--mut);background:var(--tr);border-radius:20px;padding:2px 7px}
 .sbg.op .sbh em{display:none}
-.sbh .sbc{color:var(--mut);font-size:11px;margin-left:6px;transition:transform .15s}.sbg.op .sbh .sbc{margin-left:auto;transform:rotate(90deg)}
-.sbt{display:none;margin:4px 0 8px 22px;border-left:1.5px solid var(--line);padding-left:8px}.sbg.op .sbt{display:block}
-.sbx .tabs{flex-direction:column;gap:2px;border:0;margin:0;overflow:visible}
+.sbh .sbc{color:var(--mut);font-size:11px;margin-left:6px;transition:transform .3s cubic-bezier(.4,0,.2,1)}.sbg.op .sbh .sbc{margin-left:auto;transform:rotate(90deg)}
+.sbt{display:grid;grid-template-rows:0fr;margin:0 0 0 22px;border-left:1.5px solid var(--line);padding-left:8px;opacity:0;visibility:hidden;transition:grid-template-rows .32s cubic-bezier(.4,0,.2,1),margin .32s cubic-bezier(.4,0,.2,1),opacity .2s ease,visibility 0s .32s}
+.sbt>*{min-height:0;overflow:hidden}
+.sbg.op .sbt{grid-template-rows:1fr;margin:4px 0 8px 22px;opacity:1;visibility:visible;transition:grid-template-rows .32s cubic-bezier(.4,0,.2,1),margin .32s cubic-bezier(.4,0,.2,1),opacity .25s ease .04s,visibility 0s}
+@keyframes sbin{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.sbg.op .sbt .tabs button{animation:sbin .28s cubic-bezier(.2,.7,.3,1) backwards}
+.sbg.op .sbt .tabs button:nth-child(1){animation-delay:.05s}.sbg.op .sbt .tabs button:nth-child(2){animation-delay:.08s}.sbg.op .sbt .tabs button:nth-child(3){animation-delay:.11s}.sbg.op .sbt .tabs button:nth-child(4){animation-delay:.14s}.sbg.op .sbt .tabs button:nth-child(5){animation-delay:.17s}.sbg.op .sbt .tabs button:nth-child(6){animation-delay:.2s}.sbg.op .sbt .tabs button:nth-child(n+7){animation-delay:.23s}
+@media(prefers-reduced-motion:reduce){.sbt,.sbg.op .sbt{transition:none}.sbg.op .sbt .tabs button{animation:none}}
+.sbx .tabs{flex-direction:column;gap:2px;border:0;margin:0;overflow:visible}.sbt>.tabs{overflow:hidden}
 .sbx .tabs button{text-align:left;border:0;border-radius:8px;padding:7px 10px;margin:0;font-size:13px;font-weight:500;color:var(--ink);opacity:.82;display:flex;align-items:center;gap:6px;white-space:nowrap}
 .sbx .tabs button:hover{background:var(--hv);opacity:1}
 .sbx .tabs button[aria-selected=true]{background:#6e1428;color:#fff;font-weight:600;opacity:1;border:0}
