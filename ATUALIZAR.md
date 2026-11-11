@@ -13,6 +13,7 @@ Página: `docs/index.html` = `fonte/dashboard-gralha-funil.html` (o dashboard ao
    Rodar `q_ultimo.sql` também (resultado pequeno, inline): é a data do último dia da base (`ULTIMO`).
 4. `DASH_SENHA=<senha> python tools/atualizar.py montar --desde <DESDE> --ultimo <ULTIMO> --k <arquivo q_k> <arq q_m0> ... <arq q_m11>`
    (DESDE = a data impressa no passo 2). Deve imprimir contagens para as 8 métricas (0..7); se faltar alguma, parar sem publicar.
+4b. PipeImob: rodar `q_pipe.sql` (também salva em arquivo) e `DASH_SENHA=<senha> python tools/atualizar.py pipe <arquivo q_pipe>` -> grava os contratos (CCV) em `d["pipe"]` do cubo (aba PipeImob · Vendas). Para sem publicar se der erro ou se os contratos caírem mais de 10%.
 5. `python tools/build_estatico.py fonte/dashboard-gralha-funil.html --site docs/index.html --enc docs/data.enc.json`
 6. Conferir: `ultimo` do cubo = `ULTIMO`, número de linhas próximo ao anterior (não pode cair mais que ~2%).
 7. Equipes (login único): `DASH_SENHA=<senha> EQUIPES_MESTRE=<segredo> python3 -I tools/fatiar_equipes.py` -> grava `docs/equipes/<slug>/data.enc.json` (15 arquivos, cifrados com a senha de cada equipe; confere sozinho `ultimo` = último dia do cubo e que a senha abre o arquivo). Não gera HTML: a equipe abre o MESMO `docs/index.html` em "modo equipe". Conferir que são 15 pastas e nenhum `index.html` dentro de `docs/equipes`.

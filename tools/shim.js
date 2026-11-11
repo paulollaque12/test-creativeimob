@@ -142,7 +142,11 @@ function qJor(q){const [a,b]=range(q),F=filters(q),d0=new Map();
  st.forEach((v,k)=>{out.push(["st",k,NM[k],"",v.length,Math.round(v.reduce((x,y)=>x+y,0)/v.length*10)/10])});
  out.push(["tot",0,"Lead","",d0.size,null]);return out}
 
+/* PipeImob: contratos (CCV) gravados em C.pipe = [ccv,env,vgv,vgc,lanc,etapa,gestor,imovel] (sem filtro: a aba filtra no navegador) */
+function qPipe(){return (C.pipe||[]).map(r=>r.slice(0,8))}
+
 function route(q){
+ if(q.startsWith("/*pipe*/"))return qPipe();
  if(q.startsWith("/*ins*/"))return qIns(q);
  if(q.includes("SELECT 'tr' k,rn,p a,s b"))return qJor(q);
  if(q.includes("'vend_pl'"))return qProd1(q);

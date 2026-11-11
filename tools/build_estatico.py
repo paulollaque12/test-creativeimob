@@ -12,7 +12,7 @@ COMMON=r'''
 const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 async function dec(e,pw){const k=await crypto.subtle.deriveKey({name:"PBKDF2",salt:b64(e.salt),iterations:e.it,hash:"SHA-256"},await crypto.subtle.importKey("raw",new TextEncoder().encode(pw),"PBKDF2",false,["deriveKey"]),{name:"AES-GCM",length:256},false,["decrypt"]),
  buf=await crypto.subtle.decrypt({name:"AES-GCM",iv:b64(e.iv)},k,b64(e.ct));return JSON.parse(await new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream("deflate"))).text())}
-function demoNote(c){try{const d=c.ultimo.split("-").reverse().join("/"),n=document.createElement("div");n.className="note";n.style.cssText="margin:-14px 0 14px";n.textContent=window.__DEMO?"Versão de demonstração · dados gravados até "+d+" (a versão ao vivo consulta o BigQuery).":"Dados atualizados diariamente · último dia da base: "+d;const t=document.querySelector(".tabs");t.parentNode.insertBefore(n,t)}catch(_){}}
+function demoNote(c){try{const d=c.ultimo.split("-").reverse().join("/"),n=document.createElement("div");n.className="note";n.style.cssText="margin:4px 0 0";n.textContent=window.__DEMO?"Versão de demonstração · dados gravados até "+d+" (a versão ao vivo consulta o BigQuery).":"Dados atualizados diariamente · último dia da base: "+d;const t=document.querySelector("header h1");if(t)t.insertAdjacentElement("afterend",n);else{const x=document.querySelector(".tabs");x.parentNode.insertBefore(n,x)}}catch(_){}}
 '''
 LOAD_A='window.__DEMO=true;const ENC=%s;window.__cuboLoader=async()=>{const c=await dec(ENC,%s);demoNote(c);return c};'
 import os

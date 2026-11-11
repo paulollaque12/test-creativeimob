@@ -38,12 +38,38 @@ def sql_m(desde, m):
 def sql_k(desde):
     return "SELECT * FROM (" + g.sql_k(desde) + ") " + PAD_K
 
+# PipeImob (contratos de compra e venda): mesma consulta da aba ao vivo, gravada em d["pipe"]
+SQL_PIPE = ("SELECT * FROM (SELECT CAST(p.data_contrato AS STRING) ccv,CAST(p.data_inicio_venda AS STRING) env,"
+    "CAST(p.valor_contrato AS FLOAT64) vgv,CAST(p.total_comissao AS FLOAT64) vgc,"
+    "IF(EXISTS(SELECT 1 FROM `nitro_dados.pipeimob_negocio_comissionados` m WHERE m.imobiliaria_id=1 AND m.transacao_unique_id_pipeimob=p.transacao_unique_id_pipeimob AND m.comissionado_tipo_participacao LIKE '%Gestor de Produto%') "
+    "OR EXISTS(SELECT 1 FROM `nitro_dados.pipeimob_negocio_forma_pagamento` f WHERE f.imobiliaria_id=1 AND f.transacao_unique_id_pipeimob=p.transacao_unique_id_pipeimob AND f.forma_pagamento_nome IN ('Mensal','Anual','Chaves')),1,0) lanc,"
+    "IFNULL(p.etapa_atual,'') etapa,IFNULL(p.agente_gestor,'') gestor,IFNULL(p.codigo_imovel,'') imovel "
+    "FROM `nitro_dados.pipeimob_negocios` p WHERE p.imobiliaria_id=1 AND p.data_contrato IS NOT NULL) "
+    "UNION ALL SELECT 'pad',NULL,NULL,NULL,NULL,REPEAT('x',400000),NULL,NULL")
+
+def cmd_pipe(a):
+    senha = os.environ.get("DASH_SENHA")
+    assert senha, "defina DASH_SENHA"
+    d = decifrar(senha)
+    rows = []
+    for r in json.load(open(a.arquivo, encoding="utf-8"))["rows"]:
+        v = [c["v"] for c in r["f"]]
+        if v[0] == "pad": continue
+        rows.append([v[0], v[1] or "", float(v[2] or 0), float(v[3] or 0), int(v[4] or 0), v[5] or "", v[6] or "", v[7] or ""])
+    assert len(rows) > 50, f"poucos contratos da PipeImob ({len(rows)}): nao publicar"
+    antes = len(d.get("pipe", []))
+    assert len(rows) >= antes * 0.9, f"contratos caíram de {antes} para {len(rows)}: conferir antes de publicar"
+    rows.sort(key=lambda x: x[0]); d["pipe"] = rows
+    print("pipe: contratos", len(rows), "(antes", antes, ") ultimo CCV", rows[-1][0])
+    g.cifrar(d, senha, ENC)
+
 def cmd_sql(a):
     os.makedirs(a.dir, exist_ok=True)
     for m in range(12):
         open(os.path.join(a.dir, f"q_m{m}.sql"), "w").write(sql_m(a.desde, m))
     open(os.path.join(a.dir, "q_k.sql"), "w").write(sql_k(a.desde))
     open(os.path.join(a.dir, "q_ultimo.sql"), "w").write(g.SQL_L)
+    open(os.path.join(a.dir, "q_pipe.sql"), "w").write(SQL_PIPE)
     print("desde", a.desde, "->", a.dir, sorted(os.listdir(a.dir)))
 
 def decifrar(senha):
@@ -103,5 +129,6 @@ if __name__ == "__main__":
     s = sp.add_parser("sql"); s.add_argument("--desde", default=desde_padrao()); s.add_argument("--dir", default="/tmp/atu")
     m = sp.add_parser("montar"); m.add_argument("--desde", required=True); m.add_argument("--ultimo", required=True)
     m.add_argument("--k"); m.add_argument("--metricas", help="ex.: 8,9 (reconstroi so essas metricas)"); m.add_argument("arquivos", nargs="+")
+    pp = sp.add_parser("pipe"); pp.add_argument("arquivo")
     a = ap.parse_args()
-    cmd_sql(a) if a.c == "sql" else cmd_montar(a)
+    {"sql": cmd_sql, "montar": cmd_montar, "pipe": cmd_pipe}[a.c](a)
