@@ -39,13 +39,9 @@ def sql_k(desde):
     return "SELECT * FROM (" + g.sql_k(desde) + ") " + PAD_K
 
 # PipeImob (contratos de compra e venda): mesma consulta da aba ao vivo, gravada em d["pipe"]
-SQL_PIPE = ("SELECT * FROM (SELECT CAST(p.data_contrato AS STRING) ccv,CAST(p.data_inicio_venda AS STRING) env,"
-    "CAST(p.valor_contrato AS FLOAT64) vgv,CAST(p.total_comissao AS FLOAT64) vgc,"
-    "IF(EXISTS(SELECT 1 FROM `nitro_dados.pipeimob_negocio_comissionados` m WHERE m.imobiliaria_id=1 AND m.transacao_unique_id_pipeimob=p.transacao_unique_id_pipeimob AND m.comissionado_tipo_participacao LIKE '%Gestor de Produto%') "
-    "OR EXISTS(SELECT 1 FROM `nitro_dados.pipeimob_negocio_forma_pagamento` f WHERE f.imobiliaria_id=1 AND f.transacao_unique_id_pipeimob=p.transacao_unique_id_pipeimob AND f.forma_pagamento_nome IN ('Mensal','Anual','Chaves')),1,0) lanc,"
-    "IFNULL(p.etapa_atual,'') etapa,IFNULL(p.agente_gestor,'') gestor,IFNULL(p.codigo_imovel,'') imovel "
-    "FROM `nitro_dados.pipeimob_negocios` p WHERE p.imobiliaria_id=1 AND p.data_contrato IS NOT NULL) "
-    "UNION ALL SELECT 'pad',NULL,NULL,NULL,NULL,REPEAT('x',400000),NULL,NULL")
+SQL_PIPE = ("SELECT * FROM ("
+    "SELECT CAST(p.data_contrato AS STRING) ccv,CAST(p.data_inicio_venda AS STRING) env,CAST(p.valor_contrato AS FLOAT64) vgv,CAST(p.total_comissao AS FLOAT64) vgc,IF(EXISTS(SELECT 1 FROM `nitro_dados.pipeimob_negocio_comissionados` m WHERE m.imobiliaria_id=1 AND m.transacao_unique_id_pipeimob=p.transacao_unique_id_pipeimob AND m.comissionado_tipo_participacao LIKE '%Gestor de Produto%') OR EXISTS(SELECT 1 FROM `nitro_dados.pipeimob_negocio_forma_pagamento` f WHERE f.imobiliaria_id=1 AND f.transacao_unique_id_pipeimob=p.transacao_unique_id_pipeimob AND f.forma_pagamento_nome IN ('Mensal','Anual','Chaves')),1,0) lanc,IFNULL(p.etapa_atual,'') etapa,IFNULL(p.agente_gestor,'') gestor,IFNULL(p.codigo_imovel,'') imovel,IFNULL(CAST(p.data_titulo_definitivo AS STRING),'') tit,IFNULL(CAST(p.data_entrega_chaves_posse AS STRING),'') cha,IFNULL(CAST(p.data_pagamento_comissao AS STRING),'') cpg,IFNULL(CAST(p.data_pagamento_comissao_prevista AS STRING),'') cpv,IFNULL(CAST(p.data_registro_publico AS STRING),'') reg,IFNULL(p.comissao_quem_paga,'') quem,IFNULL(p.comissao_momento_pagamento,'') mom,IFNULL(p.midia_origem_compradores,'') mc,IFNULL(p.midia_origem_vendedores,'') mv,IF(p.financiamento,1,0) fin,IFNULL(p.financiamento_banco,'') banco,IFNULL(p.categoria_crm,'') cat,IFNULL(p.endereco_bairro,'') bai,IFNULL(p.endereco_cidade,'') cid,IFNULL(p.diasemestoque,-1) est,IFNULL(CAST(DATE(p.ingested_at) AS STRING),'') ing,IFNULL((SELECT STRING_AGG(CONCAT(IFNULL(x.comissionado_tipo_participacao,'?'),'~',CAST(ROUND(IFNULL(CAST(x.comissionado_valor AS FLOAT64),0)) AS STRING)),'|') FROM `nitro_dados.pipeimob_negocio_comissionados` x WHERE x.imobiliaria_id=1 AND x.transacao_unique_id_pipeimob=p.transacao_unique_id_pipeimob),'') pap FROM `nitro_dados.pipeimob_negocios` p WHERE p.imobiliaria_id=1 AND p.data_contrato IS NOT NULL"
+    ") UNION ALL SELECT 'pad',NULL,NULL,NULL,NULL,REPEAT('x',400000),NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL")
 
 def cmd_pipe(a):
     senha = os.environ.get("DASH_SENHA")
@@ -55,7 +51,11 @@ def cmd_pipe(a):
     for r in json.load(open(a.arquivo, encoding="utf-8"))["rows"]:
         v = [c["v"] for c in r["f"]]
         if v[0] == "pad": continue
-        rows.append([v[0], v[1] or "", float(v[2] or 0), float(v[3] or 0), int(v[4] or 0), v[5] or "", v[6] or "", v[7] or ""])
+        # 25 colunas: ccv,env,vgv,vgc,lanc,etapa,gestor,imovel,tit,cha,cpg,cpv,reg,quem,mom,mc,mv,fin,banco,cat,bai,cid,est,ing,pap
+        t = lambda x: x or ""
+        rows.append([v[0], t(v[1]), float(v[2] or 0), float(v[3] or 0), int(v[4] or 0), t(v[5]), t(v[6]), t(v[7]),
+                     t(v[8]), t(v[9]), t(v[10]), t(v[11]), t(v[12]), t(v[13]), t(v[14]), t(v[15]), t(v[16]),
+                     int(v[17] or 0), t(v[18]), t(v[19]), t(v[20]), t(v[21]), int(v[22] or -1), t(v[23]), t(v[24])])
     assert len(rows) > 50, f"poucos contratos da PipeImob ({len(rows)}): nao publicar"
     antes = len(d.get("pipe", []))
     assert len(rows) >= antes * 0.9, f"contratos caíram de {antes} para {len(rows)}: conferir antes de publicar"
