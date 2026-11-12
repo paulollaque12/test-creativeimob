@@ -173,6 +173,6 @@ function route(q){
 }
 window.__shimRoute=route;window.__shimPrep=prep;
 const ready=()=>window.__cuboLoader().then(c=>{prep(c);return c});
-window.claude={use:async()=>{const c=await ready();window.__cuboInfo=c;try{window.__chk&&window.__chk();if(c&&c.c2s){const h=document.getElementById("c2hide");h&&h.remove()}}catch(e){}return{invalidate:async()=>{},
+window.claude={use:async()=>{const c=await ready();window.__cuboInfo=c;try{window.__chk&&window.__chk();if(c&&c.c2s){const h=document.getElementById("c2hide");h&&h.remove();window.__cnt&&window.__cnt()}}catch(e){}return{invalidate:async()=>{},
  watchTool(s,t,a,h){setTimeout(()=>{try{const rows=route(a.query);h({type:"result",result:{payload:{rows:rows.map(r=>({f:r.map(v=>({v:v===null||v===undefined?null:String(v)}))}))},cache:null}})}catch(e){console.error(e);h({type:"error",error:{code:"tool_error",message:String(e&&e.message||e)}})}},0);return()=>{}}}}};
 })();
