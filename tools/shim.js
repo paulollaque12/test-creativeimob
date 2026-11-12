@@ -145,7 +145,11 @@ function qJor(q){const [a,b]=range(q),F=filters(q),d0=new Map();
 /* PipeImob: contratos (CCV) gravados em C.pipe = [ccv,env,vgv,vgc,lanc,etapa,gestor,imovel, tit,cha,cpg,cpv,reg,quem,mom,mc,mv,fin,banco,cat,bai,cid,est,ing,pap] (25 colunas; cubos antigos tem so as 8 primeiras) (sem filtro: a aba filtra no navegador) */
 function qPipe(){return (C.pipe||[]).map(r=>r.slice(0,25))}
 
+/* C2S: leads da Gralha gravados em C.c2s = [dt,hr,fonte,canal,tipo,equipe,corretor,st,fun,mot,rd,man,bai,cid,pre,cod,uni,ven,tg] (19 colunas; 1 linha por lead; a aba filtra no navegador) */
+function qC2s(){return (C.c2s||[]).map(r=>r.slice(0,19))}
+
 function route(q){
+ if(q.startsWith("/*c2s*/"))return qC2s();
  if(q.startsWith("/*pipe*/"))return qPipe();
  if(q.startsWith("/*ins*/"))return qIns(q);
  if(q.includes("SELECT 'tr' k,rn,p a,s b"))return qJor(q);

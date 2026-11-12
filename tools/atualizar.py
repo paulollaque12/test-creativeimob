@@ -63,6 +63,29 @@ def cmd_pipe(a):
     print("pipe: contratos", len(rows), "(antes", antes, ") ultimo CCV", rows[-1][0])
     g.cifrar(d, senha, ENC)
 
+# C2S (leads da Gralha, imobiliaria_id=1): mesma consulta da aba ao vivo, gravada em d["c2s"] (19 colunas, 1 linha por lead)
+SQL_C2S = ("SELECT * FROM (" + "SELECT CAST(DATE(a.created_at,'America/Sao_Paulo') AS STRING) dt,EXTRACT(HOUR FROM DATETIME(a.created_at,'America/Sao_Paulo')) hr,IFNULL(a.lead_source_name,'') fonte,IFNULL(a.channel_name,'') canal,IFNULL(d.negotiation_name,'') tipo,IFNULL(REGEXP_REPLACE(a.company_name,r'^Gralha Imóveis( \\| (Equipe )?)?',''),'') equipe,IFNULL(s.name,'') corretor,a.lead_status_id st,CASE a.funnel_status WHEN 'New lead' THEN 0 WHEN 'In attendance' THEN 1 WHEN 'Scheduled visit' THEN 2 WHEN 'Done visit' THEN 3 WHEN 'Created offer' THEN 4 ELSE 1 END fun,IFNULL(a.lost_reasons_name,'') mot,IFNULL(TIMESTAMP_DIFF(a.read_at,a.created_at,MINUTE),-1) rd,IF(a.created_by_id IS NOT NULL,1,0) man,IFNULL(p.neighbourhood,'') bai,IFNULL(p.city,'') cid,CAST(ROUND(IFNULL(CAST(p.price_float AS FLOAT64),0)) AS INT64) pre,IFNULL(IF(REGEXP_CONTAINS(TRIM(IFNULL(p.prop_ref,'')),r'^[0-]*$') OR TRIM(p.prop_ref)='1',REGEXP_EXTRACT(a.description,r'^\\[([^\\]]+)\\]'),TRIM(p.prop_ref)),'') cod,IF(ROW_NUMBER() OVER(PARTITION BY c.phone_global ORDER BY a.created_at)=1 OR c.phone_global IS NULL,1,0) uni,IF(a.done_details_done,1,0) ven,IFNULL((SELECT CASE MIN(CASE t.tag_name WHEN 'Quente - pronto para comprar' THEN 1 WHEN 'Morno - Em atendimento' THEN 2 WHEN 'Frio - cliente a trabalhar' THEN 3 WHEN 'Curioso - não compra' THEN 4 WHEN 'Telefone Inexistente' THEN 5 WHEN 'corretor de imoveis' THEN 6 END) WHEN 1 THEN 'Quente' WHEN 2 THEN 'Morno' WHEN 3 THEN 'Frio' WHEN 4 THEN 'Curioso' WHEN 5 THEN 'Telefone inexistente' WHEN 6 THEN 'Corretor' END FROM `nitro_dados.c2s_tags` t WHERE t.imobiliaria_id=1 AND t.lead_id=a.lead_id),'') tg FROM `nitro_dados.c2s_lead_attributes` a LEFT JOIN `nitro_dados.c2s_customer` c ON c.imobiliaria_id=1 AND c.lead_id=a.lead_id LEFT JOIN `nitro_dados.c2s_product` p ON p.imobiliaria_id=1 AND p.product_id=a.product_id LEFT JOIN `nitro_dados.c2s_real_estate_detail` d ON d.imobiliaria_id=1 AND d.product_id=a.product_id LEFT JOIN `nitro_dados.c2s_seller` s ON s.imobiliaria_id=1 AND s.seller_id=a.seller_id WHERE a.imobiliaria_id=1" + ") UNION ALL SELECT 'pad',NULL,REPEAT('x',400000),NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL")
+
+def cmd_c2s(a):
+    senha = os.environ.get("DASH_SENHA")
+    assert senha, "defina DASH_SENHA"
+    d = decifrar(senha)
+    rows = []
+    for r in json.load(open(a.arquivo, encoding="utf-8"))["rows"]:
+        v = [c["v"] for c in r["f"]]
+        if v[0] == "pad": continue
+        # 19 colunas: dt,hr,fonte,canal,tipo,equipe,corretor,st,fun,mot,rd,man,bai,cid,pre,cod,uni,ven,tg
+        t = lambda x: x or ""
+        rows.append([v[0], int(v[1] or 0), t(v[2]), t(v[3]), t(v[4]), t(v[5]), t(v[6]), int(v[7] or 0), int(v[8] or 0), t(v[9]),
+                     int(v[10] if v[10] not in (None, "") else -1), int(v[11] or 0), t(v[12]), t(v[13]), int(float(v[14] or 0)), t(v[15]),
+                     int(v[16] or 0), int(v[17] or 0), t(v[18])])
+    assert len(rows) > 1000, f"poucos leads do C2S ({len(rows)}): nao publicar"
+    antes = len(d.get("c2s", []))
+    assert len(rows) >= antes * 0.9, f"leads do C2S cairam de {antes} para {len(rows)}: conferir antes de publicar"
+    rows.sort(key=lambda x: (x[0], x[1])); d["c2s"] = rows
+    print("c2s: leads", len(rows), "(antes", antes, ") ultimo lead", rows[-1][0])
+    g.cifrar(d, senha, ENC)
+
 def cmd_sql(a):
     os.makedirs(a.dir, exist_ok=True)
     for m in range(12):
@@ -70,6 +93,7 @@ def cmd_sql(a):
     open(os.path.join(a.dir, "q_k.sql"), "w").write(sql_k(a.desde))
     open(os.path.join(a.dir, "q_ultimo.sql"), "w").write(g.SQL_L)
     open(os.path.join(a.dir, "q_pipe.sql"), "w").write(SQL_PIPE)
+    open(os.path.join(a.dir, "q_c2s.sql"), "w").write(SQL_C2S)
     print("desde", a.desde, "->", a.dir, sorted(os.listdir(a.dir)))
 
 def decifrar(senha):
@@ -130,5 +154,6 @@ if __name__ == "__main__":
     m = sp.add_parser("montar"); m.add_argument("--desde", required=True); m.add_argument("--ultimo", required=True)
     m.add_argument("--k"); m.add_argument("--metricas", help="ex.: 8,9 (reconstroi so essas metricas)"); m.add_argument("arquivos", nargs="+")
     pp = sp.add_parser("pipe"); pp.add_argument("arquivo")
+    pc = sp.add_parser("c2s"); pc.add_argument("arquivo")
     a = ap.parse_args()
-    {"sql": cmd_sql, "montar": cmd_montar, "pipe": cmd_pipe}[a.c](a)
+    {"sql": cmd_sql, "montar": cmd_montar, "pipe": cmd_pipe, "c2s": cmd_c2s}[a.c](a)
