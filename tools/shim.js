@@ -1,3 +1,4 @@
+(()=>{const st=document.createElement("style");st.id="c2hide";st.textContent="#sbg-c2s{display:none!important}";(document.head||document.documentElement).appendChild(st)})();
 /* ===== CAMADA ESTÁTICA: responde às consultas do dashboard ao vivo a partir do cubo gravado =====
    O restante da página é IDÊNTICO à versão ao vivo (BigQuery). Esta camada faz o papel do conector:
    claude.use("mcp").watchTool(servidor, ferramenta, {query}, handler) -> calcula a resposta no navegador.
@@ -172,6 +173,6 @@ function route(q){
 }
 window.__shimRoute=route;window.__shimPrep=prep;
 const ready=()=>window.__cuboLoader().then(c=>{prep(c);return c});
-window.claude={use:async()=>{const c=await ready();window.__cuboInfo=c;return{invalidate:async()=>{},
+window.claude={use:async()=>{const c=await ready();window.__cuboInfo=c;try{window.__chk&&window.__chk();if(c&&c.c2s){const h=document.getElementById("c2hide");h&&h.remove()}}catch(e){}return{invalidate:async()=>{},
  watchTool(s,t,a,h){setTimeout(()=>{try{const rows=route(a.query);h({type:"result",result:{payload:{rows:rows.map(r=>({f:r.map(v=>({v:v===null||v===undefined?null:String(v)}))}))},cache:null}})}catch(e){console.error(e);h({type:"error",error:{code:"tool_error",message:String(e&&e.message||e)}})}},0);return()=>{}}}}};
 })();

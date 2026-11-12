@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Dashboard Performance CRM</title><!-- v2026-11-11b pipeimob: tabelas ordenaveis ao clicar no cabecalho -->
+<title>Dashboard Performance CRM</title><!-- v2026-11-11c pipeimob: tabelas ordenaveis ao clicar no cabecalho -->
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#f4f5f9;--hv:#e9ebf4;--sf:#fff;--ink:#1b2142;--mut:#7b819a;--line:#e6e8f0;--br:#8a1f33;--nv:#2f3f80;--tr:#eef0f6;--pos:#1f7a46;--posb:#e7f4ec;--neg:#b3342a;--negb:#fbeaea;--sh:0 1px 2px rgba(27,33,66,.04),0 10px 28px rgba(27,33,66,.06);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -931,7 +931,7 @@ ap(lê());if(B)B.addEventListener("click",function(){var t=R.getAttribute("data-
  $("sbtg").onclick=()=>{sbx.classList.add("open");$("sbov").classList.add("open")};$("sbov").onclick=close;
  cnt();setTimeout(cnt,1500);
  /* sem dados da PipeImob (equipes): esconde o grupo */
- const chk=()=>{const c=window.__cuboInfo;if(c&&!c.pipe){$("sbg-pipe").hidden=true;$("sbg-pipe").querySelector("button[role=tab]").style.display="none"}if(c&&!c.c2s)$("sbg-c2s").hidden=true};setTimeout(chk,800);setTimeout(chk,4000);
+ const chk=()=>{const c=window.__cuboInfo;if(c&&!c.pipe){$("sbg-pipe").hidden=true;$("sbg-pipe").querySelector("button[role=tab]").style.display="none"}if(c&&!c.c2s)$("sbg-c2s").hidden=true};window.__chk=chk;chk();setTimeout(chk,800);setTimeout(chk,4000);
 })();
 
 /* ===== PipeImob · Vendas (CCV) ===== */
