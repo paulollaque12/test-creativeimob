@@ -236,6 +236,14 @@ html,body{max-width:100%;overflow-x:hidden}
 .prb{height:6px;background:var(--tr);border-radius:99px;overflow:hidden}.prb u{display:block;height:100%;border-radius:99px}
 .prr b{text-align:right;font-weight:600}.prr em{font-style:normal;text-align:right;color:var(--mut);font-size:12px}
 .prt{margin:10px 0 0;color:var(--mut);font-size:12px}
+.pifb.sg{grid-template-columns:minmax(0,340px) auto;justify-content:start}.pifb.sg>div:nth-child(1),.pifb.sg>div:nth-child(3){display:none}
+.pel{margin:0 0 6px}.per{display:grid;grid-template-columns:150px minmax(0,1fr) 36px;gap:14px;align-items:center;padding:11px 0;border-top:1px solid var(--line)}
+.per.hd{border-top:0;padding:6px 0 2px;font:600 10.5px Manrope,system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}.per.hd span:last-child{text-align:right}
+.pek b{display:block;font-size:13.5px;font-weight:600}.pek small{color:var(--mut);font-size:11.5px}
+.pebw{height:26px;background:var(--tr);border-radius:8px;overflow:hidden}.peb{display:flex;height:100%;gap:2px;min-width:6px}.peb i{display:block;min-width:3px}.peb i:first-child{border-radius:8px 0 0 8px}.peb i:last-child{border-radius:0 8px 8px 0}.peb i:only-child{border-radius:8px}
+.pen{text-align:right;font:600 15px Sora,system-ui,sans-serif}
+.peh{margin:14px 0 0;padding:12px 14px;border-radius:12px;background:var(--tr);color:var(--ink);font-size:13.5px;line-height:1.5}.peh:empty{display:none}
+@media(max-width:640px){.per.hd span:nth-child(2){display:none}.per{grid-template-columns:minmax(0,1fr) 30px;gap:6px 10px}.per .pebw{grid-column:1/-1;order:3}}
 /* ===== Overview Multi-platform ===== */
 .sbmp{margin:0 0 14px}
 .mpb{all:unset;box-sizing:border-box;width:100%;display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:12px;cursor:pointer;background:linear-gradient(135deg,#5a1022,#8a1f33 70%,#a8283f);color:#fff;font:600 13.5px/1.2 Manrope,system-ui,sans-serif;box-shadow:0 6px 16px rgba(110,20,40,.22)}
@@ -370,9 +378,8 @@ details.mpm ul{margin:0 0 14px;padding-left:18px;color:var(--mut);font-size:12.5
 <div id="pxc-est" hidden>
 <div class="cap" id="pe-av" hidden style="margin:0 0 12px"></div>
 <div id="pe-t" class="tiles"></div>
-<div class="panel"><div class="ph"><h2>Jornada do contrato</h2><span>Quantos chegaram a cada marco</span></div><p class="bi">Dos contratos assinados no período, quantos já chegaram a cada marco depois do CCV e em quantos dias, em média.</p><div id="pe-jr"></div></div>
-<div class="pig"><div class="panel"><div class="ph"><h2>Contratos por etapa</h2><span>Etapa atual</span></div><p class="bi">Onde cada contrato está hoje na esteira da PipeImob, do Compromisso ao Relacionamento.</p><div class="ch pich" id="pe-et" role="img" aria-label="Contratos por etapa atual"></div></div>
-<div class="panel"><div class="ph"><h2>Contratos em aberto</h2><span>Idade desde o CCV</span></div><p class="bi">Contratos com a comissão ainda não paga, agrupados pelos dias passados desde o CCV.</p><div id="pe-id"></div></div></div>
+<div class="panel"><div class="ph"><h2>Onde estão os contratos e há quanto tempo</h2><span>Etapa atual × idade desde o CCV</span></div><p class="bi">Cada linha é uma etapa da esteira, do Compromisso ao Relacionamento. As cores separam os contratos que já pagaram a comissão dos que seguem em aberto, e os em aberto pela idade desde o CCV: quanto mais escuro, mais antigo e mais urgente.</p><div id="pe-ew"></div><p class="peh" id="pe-hl"></p></div>
+<div class="panel" style="margin-top:18px"><div class="ph"><h2>Jornada do contrato</h2><span>Quantos chegaram a cada marco</span></div><p class="bi">Dos contratos assinados no período, quantos já chegaram a cada marco depois do CCV e em quantos dias, em média.</p><div id="pe-jr"></div></div>
 <div class="panel" style="margin-top:18px"><div class="ph"><h2>Aguardando conclusão</h2><span id="pe-cn"></span></div><p class="bi">Contratos ainda sem comissão paga, dos mais antigos aos mais recentes, com os marcos que já aconteceram.</p><div class="pitw" id="pe-tb"></div></div>
 </div></section>
 <section id="panel-pipe-com" role="tabpanel" aria-labelledby="tab-pipe-com" hidden>
@@ -1352,14 +1359,15 @@ function piX(cur,a,b){
  /* ESTEIRA */
  const old=cur.filter(r=>r.ing&&piDd(r.ing,hj)>10);$("pe-av").hidden=!old.length;
  if(old.length)$("pe-av").textContent=old.length+(old.length===1?" contrato tem":" contratos têm")+" a última sincronização da PipeImob há mais de 10 dias (a partir de "+br(old.map(r=>r.ing).sort()[0]).slice(0,5)+"): a etapa e as datas deles podem estar defasadas.";
- piTl("pe-t",[["Contratos",f(N),"<small>CCV no período</small>"],["Escritura",f(rt.length),`<small>${piPc(rt.length,N)} com título definitivo</small>`],["Chaves entregues",f(rk.length),`<small>${piPc(rk.length,N)} dos contratos</small>`],["Comissão paga",f(rp.length),`<small>${piPc(rp.length,N)} dos contratos</small>`],["Até a escritura",piFmD(dT),"<small>média após o CCV</small>"],["Até a comissão paga",piFmD(dP),"<small>média após o CCV</small>"]]);
+ const iaa=piMd(ab.map(r=>piDd(r.ccv,hj))),vo9=ab.filter(r=>piDd(r.ccv,hj)>90).length;piTl("pe-t",[["Contratos",f(N),"<small>CCV no período</small>"],["Comissão paga",f(rp.length),`<small>${piPc(rp.length,N)} dos contratos</small>`],["Em aberto",f(ab.length),`<small>${piPc(ab.length,N)} dos contratos</small>`],["Em aberto há +90 dias",f(vo9),"<small>desde o CCV</small>"],["Idade média em aberto",piFmD(iaa),"<small>desde o CCV</small>"],["Até a comissão paga",piFmD(dP),"<small>média após o CCV</small>"]]);
  const mk=[["Comissão paga",rp,r=>r.cpg],["Escritura",rt,r=>r.tit],["Chaves entregues",rk,r=>r.cha]].map(([k,L,fn])=>({k,n:L.length,d:piMd(L.map(r=>piDd(r.ccv,fn(r))))})).sort((x,y)=>(x.d==null)-(y.d==null)||x.d-y.d);
  const nd=[{k:"CCV assinado",n:N,s:dE==null?"":"Início da venda ao CCV: "+piFmD(dE)}].concat(mk.map(m=>({k:m.k,n:m.n,s:m.d==null?"Ainda sem registros":"Em média "+piFmD(m.d)+" após o CCV"})));
  $("pe-jr").innerHTML=N?`<div class="pijr">${nd.map((o,i)=>{const p=Math.round(o.n/N*100);return(i?'<span class="pijl"></span>':"")+`<div class="pijn" data-tip="${piTip(o.k,o.n,0,N)}"><div class="pijc" style="--p:${p}"><b>${p}%</b></div><strong>${o.k}</strong><small>${o.n} ${o.n===1?"contrato":"contratos"}</small><em>${o.s}</em></div>`}).join("")}</div>`:'<div class="msg"><b>Sem contratos</b>Nenhum CCV no período com esses filtros.</div>';
- const et=piGrp(cur,r=>r.etapa||"(sem etapa)",r=>r.vgv).sort((x,y)=>(PXO.indexOf(x.k)+1||99)-(PXO.indexOf(y.k)+1||99));
- piCol("pe-et",et.map(o=>({k:o.k,a:o.n,tip:colT(o.k,o.n,o.v,N)})));
- const ia=piBand(ab,r=>piDd(r.ccv,hj),[["Até 15 dias",0,16],["16 a 30 dias",16,31],["31 a 60 dias",31,61],["61 a 90 dias",61,91],["Mais de 90 dias",91,1e9]]);
- if(ab.length)piDonut("pe-id",ia.map(o=>({k:o.k,n:o.n,v:o.v})),ab.length,"em aberto");else $("pe-id").innerHTML='<div class="msg"><b>Nada em aberto</b>Todos os contratos do período já tiveram a comissão paga.</div>';
+ const BD=[["Até 30 dias",0,31,"#dba7b3"],["31 a 90 dias",31,91,"#b5546a"],["Mais de 90 dias",91,1e9,"var(--br)"]],PG="#aab4dc",EN=[...new Set(cur.map(r=>r.etapa||"(sem etapa)"))].sort((x,y)=>(PXO.indexOf(x)+1||99)-(PXO.indexOf(y)+1||99));
+ const ER=EN.map(k=>{const L=cur.filter(r=>(r.etapa||"(sem etapa)")===k),seg=[{l:"Comissão paga",c:PG,n:L.filter(r=>r.cpg).length}].concat(BD.map(([l,lo,hi,c])=>({l,c,n:L.filter(r=>!r.cpg&&piDd(r.ccv,hj)>=lo&&piDd(r.ccv,hj)<hi).length})));return{k,n:L.length,ab:L.filter(r=>!r.cpg).length,seg}}),mxe=Math.max(1,...ER.map(o=>o.n));
+ $("pe-ew").innerHTML=ER.length?`<div class="pirl pel">${[["Comissão paga",PG]].concat(BD.map(b=>[b[0]+" em aberto",b[3]])).map(([l,c])=>`<span><i style="background:${c}"></i>${l}</span>`).join("")}</div><div class="per hd"><span>Etapa atual</span><span>Distribuição dos contratos da etapa</span><span>Total</span></div>`+ER.map(o=>`<div class="per"><div class="pek"><b>${piEsc(o.k)}</b><small>${o.ab?o.ab+" em aberto":"tudo pago"}</small></div><div class="pebw"><div class="peb" style="width:${(o.n/mxe*100).toFixed(1)}%">${o.seg.filter(x=>x.n>0).map(x=>`<i style="flex:${x.n};background:${x.c}" data-tip="${piEsc(`<small>${o.k} · ${x.l}${x.l==="Comissão paga"?"":" em aberto"}</small><b>${x.n}</b> ${x.n===1?"contrato":"contratos"} · ${piPc(x.n,o.n)} da etapa`)}"></i>`).join("")}</div></div><b class="pen">${o.n}</b></div>`).join(""):'<div class="msg"><b>Sem contratos</b>Nenhum CCV no período com esses filtros.</div>';
+ const vo=ab.filter(r=>piDd(r.ccv,hj)>90),tp=[...vo.reduce((m,r)=>m.set(r.etapa||"(sem etapa)",(m.get(r.etapa||"(sem etapa)")||0)+1),new Map())].sort((x,y)=>y[1]-x[1])[0];
+ $("pe-hl").innerHTML=!N?"":ab.length?(vo.length?`<b>${vo.length}</b> ${vo.length===1?"contrato está":"contratos estão"} em aberto há mais de 90 dias${tp?`, a maioria em <b>${piEsc(tp[0])}</b> (${tp[1]})`:""}. Comece por eles.`:"Nenhum contrato está em aberto há mais de 90 dias."):"Todos os contratos do período já tiveram a comissão paga.";
  const pe=[...ab].sort((x,y)=>x.ccv.localeCompare(y.ccv));$("pe-cn").textContent=pe.length?sub(pe):"";
  piTb("pe-tb",[["Data do CCV"],["Imóvel"],["Gestor"],["Etapa"],["Dias desde o CCV",1],["Escritura",1],["Chaves",1],["Comissão prevista",1]],pe.map(r=>[br(r.ccv),piEsc(r.imovel||"-"),piEsc(piNm(r.gestor)),piEsc(r.etapa||"-"),piDd(r.ccv,hj),r.tit?br(r.tit):"—",r.cha?br(r.cha):"—",r.cpv?br(r.cpv):"—"]),["Nada pendente","Todos os contratos do período já tiveram a comissão paga."]);
  /* COMISSOES */
@@ -1394,7 +1402,7 @@ function piX(cur,a,b){
  piCol("po-es",eb.map(o=>({k:o.k,a:o.n,tip:colT(o.k.includes("dias")||o.k.includes("ano")?o.k:o.k+" dias",o.n,o.v,N)})));
  $("po-ct").innerHTML=piStack(piGrp(cur,r=>r.cat||"Não informado").sort((x,y)=>y.n-x.n),N);$("po-cd").innerHTML=piStack(piGrp(cur,r=>piCid(r.cid)).sort((x,y)=>y.n-x.n),N);
 }
-const pxFB=document.querySelector("#panel-pipe .fbar"),pxMove=id=>{const p=$(id);p.prepend($("pist"));p.prepend(pxFB)};
+const pxFB=document.querySelector("#panel-pipe .fbar"),pxMove=id=>{const p=$(id);p.prepend($("pist"));p.prepend(pxFB);pxFB.querySelector(".fb").classList.toggle("sg",id==="panel-pipe-est");if(id==="panel-pipe-est")["tipo","etapa"].forEach(k=>{PIF[k]="";$("pi-"+k).value=""})};
 $("tab-pipe").addEventListener("click",()=>pxMove("panel-pipe"));
 ["est","com","ori"].forEach(k=>$("tab-pipe-"+k).addEventListener("click",()=>{$("hctl").hidden=false;$("gfb").hidden=true;pxMove("panel-pipe-"+k);if(!piLoaded&&mcp){piLoaded=true;loadPI()}else renderPI()}));
 /* ===== C2S · Visão geral, Origem, Velocidade, Distribuição, Perda, Imóveis ===== */
