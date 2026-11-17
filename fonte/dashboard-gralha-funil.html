@@ -402,7 +402,7 @@ details.mpm ul{margin:0 0 14px;padding-left:18px;color:var(--mut);font-size:12.5
 <div class="cap" id="pxs-ori" hidden>Os dados desta aba chegam na próxima atualização diária do site (06:52).</div>
 <div id="pxc-ori" hidden>
 <div id="po-t" class="tiles"></div>
-<div class="panel"><div class="ph"><h2>De onde vem a venda</h2><span>VGV do período</span></div><p class="bi">Quem trouxe o cliente (à esquerda) e de onde veio o imóvel (à direita). A espessura de cada faixa é o VGV: mostra se a venda nasce da demanda da Gralha, da carteira do corretor ou da construtora.</p><div id="po-sk"></div></div>
+<div class="panel"><div class="ph"><h2>De onde vem a venda</h2><span>Canal do cliente × tipo de venda</span></div><p class="bi">Cada faixa liga o canal que trouxe o cliente ao tipo de venda fechada, com espessura proporcional ao VGV. Mostra qual canal alimenta as vendas de terceiros e qual alimenta os lançamentos.</p><div class="pirl" id="po-skl"></div><div id="po-sk"></div></div>
 <div class="panel" style="margin-top:18px"><div class="ph"><h2>O que vendemos</h2><span>Tipo de imóvel × faixa de valor</span></div><p class="bi">Cada linha é um tipo de imóvel. A cor mostra quantos contratos há em cada faixa de valor; nas colunas finais, o ticket e a rapidez de venda de cada tipo.</p><div id="po-mx"></div></div>
 <div class="panel" style="margin-top:18px"><div class="ph"><h2>Onde vendemos e como pagam</h2><span>Bairros por VGV</span></div><p class="bi">Cada bloco é um bairro, com o tamanho proporcional ao VGV. Quanto mais escura a cor, maior a parte dos contratos pagos com financiamento.</p><div class="pitr" id="po-tm" style="min-height:360px;margin-top:6px"></div><div class="pcl" id="po-cl"></div><div class="pirl" id="po-bk" style="margin:14px 0 0"></div></div>
 </div></section>
@@ -1158,11 +1158,18 @@ function piX(cur,a,b){
  /* ORIGEM E PERFIL */
  const fn=cur.filter(r=>r.fin),gR=cur.filter(r=>/^GRALHA/.test(r.mc)),esL=cur.filter(r=>r.est>=0),es=c2Med(esL.map(r=>r.est)),tkm=c2Med(cur.map(r=>r.vgv).filter(x=>x>0));
  piTl("po-t",[["Contratos",f(N),"<small>CCV no período</small>"],["VGV",piBRL(vg),"<small>valor dos contratos</small>"],["Ticket mediano",tkm==null?"-":piBRL(tkm),"<small>por contrato</small>"],["Financiados",piPc(fn.length,N),`<small>${sub(fn)}</small>`],["Demanda própria",piPc(gR.length,N),`<small>comprador via Gralha · ${sub(gR)}</small>`],["Dias em estoque",es==null?"-":Math.round(es),`<small>mediana · ${esL.length} de ${N} contratos</small>`]]);
- const LG={"Gralha":"#6e1428","Corretor":"#343f8a","Construtora":"#b8465e"},RC=["#6e1428","#8a1f33","#343f8a","#b8465e","#5a69a8","#9aa0b8"],lk=new Map();
- cur.forEach(r=>{const a=r.mc?piTitle(r.mc.split(" ")[0]):"Não informada",b2=r.mv?piTitle(r.mv):"Não informado",k=a+"\u0001"+b2;lk.set(k,(lk.get(k)||0)+r.vgv)});
- const ls=new Map(),rs=new Map();lk.forEach((v,k)=>{const[a,b2]=k.split("\u0001");ls.set(a,(ls.get(a)||0)+v);rs.set(b2,(rs.get(b2)||0)+v)});
- const SL=[...ls.entries()].sort((x,y)=>y[1]-x[1]).map(([k,n])=>({k,n,c:LG[k]||"#9aa0b8"})),DL=[...rs.entries()].sort((x,y)=>y[1]-x[1]).map(([k,n],i)=>({k,n,c:RC[i%6]}));
- piSankey("po-sk",SL,DL,[...lk.entries()].map(([k,v])=>{const[a,b2]=k.split("\u0001");return[SL.findIndex(o=>o.k===a),DL.findIndex(o=>o.k===b2),v]}),{fm:piBRL,un:"",of:"de quem trouxe o cliente",al:"Fluxo da origem do comprador até a origem do imóvel"});
+ const FAM={"Gralha":["#6e1428","#8a1f33","#a8364d","#c05b72","#d98a9b"],"Corretor":["#343f8a","#5a69a8","#7f8ccb"],"Construtora":["#b8465e","#d98a9b"]},fc={};
+ const mg=new Map();cur.forEach(r=>{const k=r.mc||"?",o=mg.get(k)||{k,v:0,n:0};o.v+=r.vgv;o.n++;mg.set(k,o)});
+ let cl=[...mg.values()].sort((x,y)=>y.v-x.v);const top8=cl.slice(0,8),rest8=cl.slice(8);
+ const nmc=top8.map(o=>piMc(o.k===""||o.k==="?"?"":o.k)),dupn=new Set(nmc.map(x=>x[0]).filter((x,i,a)=>a.indexOf(x)!==i));
+ const SL=top8.map((o,i)=>{const fam=o.k==="?"?"Outros":piTitle(o.k.split(" ")[0]),pal=FAM[fam]||["#9aa0b8"];fc[fam]=(fc[fam]||0);const c=pal[fc[fam]%pal.length];fc[fam]++;const nm=nmc[i][0];return{k:dupn.has(nm)?nm+" ("+fam+")":nm,n:o.v,c,key:o.k,fam}});
+ if(rest8.length)SL.push({k:"Outras origens",n:rest8.reduce((x,o)=>x+o.v,0),c:"#9aa0b8",key:"__r",fam:"Outros"});
+ const keyOf=r=>{const k=r.mc||"?";return top8.some(o=>o.k===k)?k:"__r"},TIP=[{k:"Terceiros",c:"#343f8a"},{k:"Lançamentos",c:"#6e1428"}],lk=new Map();
+ cur.forEach(r=>{const k=keyOf(r)+"\u0001"+(r.lanc?1:0);lk.set(k,(lk.get(k)||0)+r.vgv)});
+ const DL=TIP.map((o,d)=>({...o,n:[...lk.entries()].filter(([k])=>k.endsWith("\u0001"+d)).reduce((x,[,v])=>x+v,0)})).filter(o=>o.n>0),
+ LNK=[...lk.entries()].map(([k,v])=>{const[a,d]=k.split("\u0001");return[SL.findIndex(o=>o.key===a),DL.findIndex(o=>o.k===TIP[+d].k),v]}).filter(l=>l[0]>=0&&l[1]>=0);
+ piSankey("po-sk",SL,DL,LNK,{fm:piBRL,un:"",of:"do canal",al:"Fluxo do canal que trouxe o cliente até o tipo de venda"});
+ $("po-skl").innerHTML=["Gralha","Corretor","Construtora"].filter(f=>SL.some(o=>o.fam===f)).map(f=>`<span><i style="background:${FAM[f][0]}"></i>${f}</span>`).join("");
  const FV=[["Até 500 mil",0,5e5],["500 mil–1 Mi",5e5,1e6],["1–2 Mi",1e6,2e6],["2–5 Mi",2e6,5e6],["Acima de 5 Mi",5e6,1e12]],cg=piGrp(cur,r=>r.cat||"Não informado").sort((x,y)=>y.n-x.n),ct6=cg.slice(0,6).map(o=>o.k),cts=ct6.concat(cg.length>6?["Outros"]:[]);
  const MR=cts.map(k=>{const L=cur.filter(r=>k==="Outros"?!ct6.includes(r.cat||"Não informado"):(r.cat||"Não informado")===k);return{k,L,v:FV.map(([,lo,hi])=>L.filter(r=>r.vgv>=lo&&r.vgv<hi).length),t:c2Med(L.map(r=>r.vgv).filter(x=>x>0)),e:c2Med(L.filter(r=>r.est>=0).map(r=>r.est))}}),mxm=Math.max(1,...MR.flatMap(r=>r.v));
  $("po-mx").innerHTML=N?`<div class="pihmw"><table class="pihm pmx"><thead><tr><th></th><th class="pmh">Contratos</th>${FV.map(x=>`<th>${x[0]}</th>`).join("")}<th class="pmh">Ticket mediano</th><th class="pmh">Dias em estoque</th></tr></thead><tbody>${MR.map(r=>`<tr><th>${piEsc(r.k)}</th><td class="pmn">${r.L.length}<small>${piPc(r.L.length,N)}</small></td>${r.v.map((x,i)=>`<td${x?` style="background:rgba(110,20,40,${(.08+.82*Math.sqrt(x/mxm)).toFixed(2)});color:${x/mxm>.35?"#fff":"var(--ink)"}"`:""} data-tip="${piEsc(`<small>${r.k} · ${FV[i][0]}</small><b>${x}</b> ${x===1?"contrato":"contratos"}`)}">${x||"·"}</td>`).join("")}<td class="pmn">${r.t==null?"—":piBRL(r.t)}</td><td class="pmn">${r.e==null?"—":Math.round(r.e)+" dias"}</td></tr>`).join("")}</tbody></table></div>`:'<div class="msg"><b>Sem contratos</b>Nenhum CCV no período com esses filtros.</div>';
