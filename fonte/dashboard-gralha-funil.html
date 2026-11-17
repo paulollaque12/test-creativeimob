@@ -226,6 +226,16 @@ html,body{max-width:100%;overflow-x:hidden}
 .pig1.up{background:#f6e9ec;color:#6e1428}.pig1.dn{background:#e8ebf6;color:var(--nv)}
 [id^=panel-c2s] .pitw{max-height:396px}
 
+.prz{display:flex;align-items:center;gap:32px;flex-wrap:wrap;padding:6px 0 4px}
+.prw{position:relative;width:190px;flex:none;margin:0 auto}.prw svg{display:block;width:100%}
+.prc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.prc small{font:600 10px Manrope,system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+.prc b{font:600 40px/1.1 Sora,system-ui,sans-serif;color:var(--br);margin-top:2px}.prc span{color:var(--mut);font-size:12.5px}
+.prl{flex:1;min-width:230px}.prr{display:grid;grid-template-columns:10px 76px minmax(0,1fr) 34px 40px;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:13px}
+.prr:first-child{border-top:0}.prr i{width:10px;height:10px;border-radius:3px}
+.prb{height:6px;background:var(--tr);border-radius:99px;overflow:hidden}.prb u{display:block;height:100%;border-radius:99px}
+.prr b{text-align:right;font-weight:600}.prr em{font-style:normal;text-align:right;color:var(--mut);font-size:12px}
+.prt{margin:10px 0 0;color:var(--mut);font-size:12px}
 /* ===== Overview Multi-platform ===== */
 .sbmp{margin:0 0 14px}
 .mpb{all:unset;box-sizing:border-box;width:100%;display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:12px;cursor:pointer;background:linear-gradient(135deg,#5a1022,#8a1f33 70%,#a8283f);color:#fff;font:600 13.5px/1.2 Manrope,system-ui,sans-serif;box-shadow:0 6px 16px rgba(110,20,40,.22)}
@@ -348,7 +358,7 @@ details.mpm ul{margin:0 0 14px;padding-left:18px;color:var(--mut);font-size:12.5
 <div id="pit" class="tiles"></div>
 <div class="pig"><div class="panel"><div class="ph pi"><h2>Vendas por dia<i class="inf" tabindex="0" role="button" aria-describedby="inft-pim" aria-label="Como as vendas são contadas">i</i><span class="inft" id="inft-pim" role="tooltip"><span class="itx">Cada venda é um contrato da PipeImob, contado no dia em que o CCV (contrato de compra e venda) foi assinado. O gráfico mostra só as datas selecionadas; em períodos acima de 92 dias, as barras passam a ser semanas.</span><span class="itx">Lançamento é uma classificação estimada: vendedor pessoa jurídica com gestor de produto ou pagamento em parcelas mensais, anuais e nas chaves. A PipeImob ainda não envia esse campo.</span></span></h2><span>Data do CCV</span></div><p class="bi">Contratos assinados (CCV) em cada dia do período, separados em terceiros e lançamentos. Passe o mouse para ver o valor.</p><div class="ch pich" id="pim" role="img" aria-label="Vendas por dia"></div><div class="pilg"><span><i style="background:var(--br)"></i>Terceiros</span><span><i style="background:var(--nv)"></i>Lançamentos</span></div></div>
 <div class="panel"><div class="ph"><h2>Por tipo e etapa</h2><span>Período selecionado</span></div><p class="bi">Quanto vendemos de cada tipo e em que etapa da esteira os contratos estão hoje, com os indicadores do período.</p><div id="pie"></div></div></div>
-<div class="pig"><div class="panel"><div class="ph"><h2>Prazo até o CCV</h2><span>Dias do envio à assinatura</span></div><p class="bi">Quantos dias se passam entre o envio da venda e a assinatura do CCV. Barras mais à direita são contratos mais lentos.</p><div class="ch pich" id="pir" role="img" aria-label="Contratos por faixa de prazo entre envio e CCV"></div></div>
+<div class="pig"><div class="panel"><div class="ph"><h2>Prazo até o CCV</h2><span>Dias do envio à assinatura</span></div><p class="bi">Quantos dias se passam entre o envio da venda e a assinatura do CCV. Fatias de prazo maiores são contratos mais lentos.</p><div id="pir" role="img" aria-label="Contratos por faixa de prazo entre envio e CCV"></div></div>
 <div class="panel"><div class="ph"><h2>Gestores</h2><span id="pigc"></span></div><p class="bi">Ranking dos gestores por VGV nos contratos assinados no período.</p><div class="pigs" id="pig2"></div></div></div>
 <div class="panel" style="margin-top:18px"><div class="ph"><h2>Contratos do período</h2><span id="pin"></span></div><p class="bi">Contratos assinados nas datas selecionadas, do mais recente ao mais antigo.</p><div class="pitw" id="pil"></div></div>
 </section>
@@ -1035,11 +1045,12 @@ function renderPI(){if(!PI)return;piUn="contrato";const a=$("a").value,b=$("b").
  $("pim").innerHTML=h;
  /* prazo do envio ao CCV: contratos por faixa de dias */
  const FX=[["0–5",0,5],["6–10",6,10],["11–15",11,15],["16–20",16,20],["21–30",21,30],["30+",31,1e9]],fg=FX.map(([k,x,y])=>({k,n:0,v:0}));
- cur.filter(r=>r.env).forEach(r=>{const d=Math.max(0,Math.round((P(r.ccv)-P(r.env))/864e5)),q=FX.findIndex(([,x,y])=>d>=x&&d<=y);if(q>=0){fg[q].n++;fg[q].v+=r.vgv}});
- const nz=fg.reduce((x,o)=>x+o.n,0),mxp=Math.max(1,...fg.map(o=>o.n)),stp=[1,2,5,10,20,25,50,100].find(x=>mxp/x<=4)||200,topp=stp*Math.ceil(mxp/stp);
- let g2="";for(let y=0;y<=topp;y+=stp)g2+=`<div class="gl" style="bottom:${y/topp*100}%"><span>${y}</span></div>`;
- g2+='<div class="bars">'+fg.map((o,i)=>{const hh=o.n/topp*100;return `<div class="bc${i<1?" el":i>=fg.length-1?" er":""}" style="--h:${hh}%"><span class="bv">${o.n||""}</span><div class="bb" style="height:${hh}%"></div><span class="bx">${o.k}</span><span class="btip"><small>${o.k} dias</small><b>${o.n}</b> ${o.n===1?"contrato":"contratos"}${o.n?` · ${piBRL(o.v)}<br><small>${Math.round(o.n/nz*100)}% dos contratos</small>`:""}</span></div>`}).join("")+"</div>";
- $("pir").innerHTML=nz?g2:'<div class="msg"><b>Sem contratos no período</b>Nenhum CCV com data de envio entre as datas selecionadas.</div>';
+ const dz=[];cur.filter(r=>r.env).forEach(r=>{const d=Math.max(0,Math.round((P(r.ccv)-P(r.env))/864e5));dz.push(d);const q=FX.findIndex(([,x,y])=>d>=x&&d<=y);if(q>=0){fg[q].n++;fg[q].v+=r.vgv}});
+ const nz=fg.reduce((x,o)=>x+o.n,0);
+ if(!nz)$("pir").innerHTML='<div class="msg"><b>Sem contratos no período</b>Nenhum CCV com data de envio entre as datas selecionadas.</div>';else{
+  const RP=["#6e1428","#8a1f33","#a8465a","#c4788a","#dba7b3","#ecd0d6"],R=70,C=2*Math.PI*R,md=dz.length?dz.reduce((x,y)=>x+y,0)/dz.length:null,mxs=Math.max(...fg.map(o=>o.n));let off=0;
+  const sg=fg.map((o,i)=>{if(!o.n)return"";const L=o.n/nz*C,d=Math.max(.6,L-2.2),t=`<circle cx="90" cy="90" r="${R}" fill="none" stroke="${RP[i]}" stroke-width="15" stroke-dasharray="${d.toFixed(2)} ${(C-d).toFixed(2)}" stroke-dashoffset="${(-off-1.1).toFixed(2)}" transform="rotate(-90 90 90)" data-tip="${piEsc(`<small>${FX[i][0]} dias</small><b>${o.n}</b> ${o.n===1?"contrato":"contratos"} · ${piBRL(o.v)}<br><small>${piPc(o.n,nz)} dos contratos</small>`)}"/>`;off+=L;return t}).join("");
+  $("pir").innerHTML=`<div class="prz"><div class="prw"><svg viewBox="0 0 180 180"><circle cx="90" cy="90" r="${R}" fill="none" stroke="var(--tr)" stroke-width="15"/>${sg}</svg><div class="prc"><small>prazo médio</small><b>${md==null?"-":Math.round(md)}</b><span>${md===1?"dia":"dias"}</span></div></div><div class="prl">${fg.map((o,i)=>`<div class="prr" data-tip="${piEsc(`<small>${FX[i][0]} dias</small><b>${o.n}</b> ${o.n===1?"contrato":"contratos"} · ${piBRL(o.v)}`)}"><i style="background:${RP[i]}"></i><span>${FX[i][0]} dias</span><div class="prb"><u style="width:${(o.n/mxs*100).toFixed(1)}%;background:${RP[i]}"></u></div><b>${o.n}</b><em>${piPc(o.n,nz)}</em></div>`).join("")}<p class="prt">${nz} ${nz===1?"contrato":"contratos"} no período</p></div></div>`}
  /* gestores */
  const gm={};cur.forEach(r=>{const o=gm[r.gestor]=gm[r.gestor]||{n:0,v:0};o.n++;o.v+=r.vgv});const gl=Object.entries(gm).sort((x,y)=>y[1].v-x[1].v||y[1].n-x[1].n),gmx=Math.max(1,...gl.map(x=>x[1].v));
  $("pigc").textContent=gl.length?gl.length+(gl.length===1?" gestor":" gestores"):"";
