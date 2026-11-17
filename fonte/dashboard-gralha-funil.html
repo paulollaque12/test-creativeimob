@@ -226,7 +226,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .pig1.up{background:#f6e9ec;color:#6e1428}.pig1.dn{background:#e8ebf6;color:var(--nv)}
 [id^=panel-c2s] .pitw{max-height:396px}
 
-.pzp{display:flex;flex-direction:column}.pzp #pir{flex:1;display:flex;align-items:center}.pzp #pir .prz{width:100%}
+.pzp{display:flex;flex-direction:column}.pzp #pir,.pzp #pc-qm{flex:1;display:flex;align-items:center}.pzp #pc-qm>*{width:100%}.pzp #pir .prz{width:100%}
 .prz{display:flex;align-items:center;gap:32px;flex-wrap:wrap;padding:6px 0 4px}
 .prw{position:relative;width:190px;flex:none;margin:0 auto}.prw svg{display:block;width:100%}
 .prc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
@@ -240,6 +240,8 @@ html,body{max-width:100%;overflow-x:hidden}
 .pifb.sg{grid-template-columns:minmax(0,340px) auto;justify-content:start}.pifb.sg>div:nth-child(1),.pifb.sg>div:nth-child(3){display:none}
 .pel{margin:0 0 6px}.per{display:grid;grid-template-columns:150px minmax(0,1fr) 36px;gap:14px;align-items:center;padding:11px 0;border-top:1px solid var(--line)}
 .pcr{display:grid;grid-template-columns:100px minmax(0,1fr) 110px;gap:14px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}.pcr.hd{border-top:0;padding:6px 0 2px;font:600 10.5px Manrope,system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}.pcr.hd span:last-child,.pcr>b{text-align:right}.pcr>b{font:600 13.5px Sora,system-ui,sans-serif}.pcr>span:first-child{font-size:13px;font-weight:600}.pcr .pebw{height:24px}.pcg{position:relative;max-width:260px;margin:4px auto 14px}.pcg svg{display:block;width:100%}.pcgc{position:absolute;left:0;right:0;bottom:2px;text-align:center}.pcgc b{font:600 30px/1 Sora,system-ui,sans-serif;color:var(--br)}.pcgc small{display:block;color:var(--mut);font-size:12px;margin-top:2px}
+.pwf{display:flex;align-items:stretch;gap:10px;height:300px;padding:30px 0 0;position:relative}.pwc{flex:1;min-width:0;display:flex;flex-direction:column}.pwa{flex:1;position:relative}.pwb{position:absolute;left:14%;right:14%;border-radius:8px;background:linear-gradient(180deg,#9c2a40,#6e1428);min-height:3px}.pwc.t .pwb{background:linear-gradient(180deg,#4a5aa8,#2f3f80)}.pwv{position:absolute;left:-10%;right:-10%;text-align:center;font:600 13px Sora,system-ui,sans-serif;color:var(--ink);transform:translateY(-130%);white-space:nowrap}.pwc.t .pwv{color:var(--nv)}.pwl{position:absolute;top:100%;left:0;right:0}.pwk{text-align:center;padding-top:10px;font-size:12.5px;line-height:1.3;font-weight:600;overflow:hidden;text-overflow:ellipsis}.pwk em{display:block;font-style:normal;font-weight:500;color:var(--mut);font-size:11.5px;margin-top:2px}.pwn{position:absolute;left:86%;width:28%;border-top:1px dashed var(--line);z-index:0}.pwa{border-bottom:1px solid var(--line)}.pwx{height:64px;flex:none}
+@media(max-width:700px){.pwf{gap:4px}.pwk{font-size:11px}.pwv{font-size:11px}}
 .pihl{margin-top:14px;padding:12px 14px;background:var(--tr);border-radius:10px;font-size:13.5px;line-height:1.5}.pihl:empty{display:none}
 @media(max-width:640px){.pcr{grid-template-columns:70px minmax(0,1fr);gap:4px 10px}.pcr>b{grid-column:2}.pcr.hd span:nth-child(2){display:none}}
 .per.hd{border-top:0;padding:6px 0 2px;font:600 10.5px Manrope,system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}.per.hd span:last-child{text-align:right}
@@ -388,8 +390,8 @@ details.mpm ul{margin:0 0 14px;padding-left:18px;color:var(--mut);font-size:12.5
 <div id="pxc-com" hidden>
 <div id="pc-t" class="tiles"></div>
 <div class="pig eq"><div class="panel"><div class="ph"><h2>Recebimento por data do CCV</h2><span>Comissão recebida e a receber</span></div><p class="bi">Quanto da comissão de cada dia de CCV já foi recebida e quanto ainda falta receber.</p><div class="ch pich" id="pc-rc" role="img" aria-label="Comissão recebida e a receber por data do CCV"></div><div class="pilg"><span><i style="background:var(--br)"></i>Recebida</span><span><i style="background:var(--nv)"></i>A receber</span></div></div>
-<div class="panel"><div class="ph"><h2>Evolução da comissão</h2><span>Acumulado em R$</span></div><p class="bi">Comissão gerada e comissão já recebida ao longo do período. A distância entre as linhas é o que ainda está na rua.</p><div class="ch pich" id="pc-gg" role="img" aria-label="Evolução acumulada da comissão total e recebida"></div><div class="pilg"><span><i style="background:var(--br)"></i>Comissão gerada</span><span><i style="background:var(--nv)"></i>Recebida</span></div></div></div>
-<div class="panel" style="margin-top:18px"><div class="ph"><h2>De quem vem e para quem vai</h2><span>Comissão do período (VGC)</span></div><p class="bi">Quem paga a comissão (à esquerda) e como ela se divide entre os papéis que recebem (à direita). A espessura de cada faixa é o valor em R$.</p><div id="pc-pp"></div></div>
+<div class="panel pzp"><div class="ph"><h2>Quem paga</h2><span>Contratos por pagador</span></div><p class="bi">Quem paga a comissão em cada contrato: vendedor, comprador ou outra composição.</p><div id="pc-qm"></div></div></div>
+<div class="panel" style="margin-top:18px"><div class="ph"><h2>Divisão da comissão por papel</h2><span>Participação no VGC do período</span></div><p class="bi">Do total de comissão do período, quanto fica com cada papel. Cada degrau é a parte de um papel; a soma fecha o total.</p><div id="pc-pp"></div></div>
 <div class="panel" style="margin-top:18px"><div class="ph"><h2>Comissões a receber</h2><span id="pc-cn"></span></div><p class="bi">Contratos com comissão ainda não paga: as atrasadas primeiro, depois as que vencem antes. A coluna "Quem paga" diz a quem cobrar.</p><div class="pihl" id="pc-hl" style="margin:0 0 14px"></div><div class="pitw" id="pc-tb"></div></div>
 </div></section>
 <section id="panel-pipe-ori" role="tabpanel" aria-labelledby="tab-pipe-ori" hidden>
@@ -1105,6 +1107,11 @@ function piDonut(id,items,big,small){items=items.filter(o=>o.n>0);const tot=item
  const R=46,C=2*Math.PI*R,gp=items.length>1?1.6:0;let off=0;
  const sg=items.map((o,i)=>{const L=o.n/tot*C,d=Math.max(.5,L-gp),s=`<circle cx="60" cy="60" r="${R}" fill="none" stroke="${PXC[i%8]}" stroke-width="15" stroke-dasharray="${d.toFixed(2)} ${(C-d).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 60 60)" data-tip="${piTip(o.k,o.n,o.v,tot)}"/>`;off+=L;return s}).join("");
  $(id).innerHTML=`<div class="pidn"><div class="pidw"><svg viewBox="0 0 120 120">${sg}</svg><div class="pidc"><b>${big}</b><small>${small}</small></div></div><div class="pidl">${items.map((o,i)=>`<div class="pidr"><i style="background:${PXC[i%8]}"></i><span>${piEsc(o.k)}</span><b>${piN(o.n)}</b><em>${piPc(o.n,tot)}</em></div>`).join("")}</div></div>`}
+/* cascata: total e degraus por papel */
+function piWf(id,items,tot){items=items.filter(o=>o.n>0);if(!tot||!items.length)return piEmp(id,"Sem dados");
+ let rem=tot;const cols=[`<div class="pwc t" data-tip="${piEsc(`<small>Comissão total</small><b>${piBRL(tot)}</b>`)}"><div class="pwa"><div class="pwb" style="bottom:0;height:100%"><span class="pwv" style="top:0">${piBRL(tot)}</span></div></div><div class="pwx"><div class="pwk">Comissão total<em>100%</em></div></div></div>`];
+ items.forEach((o,i)=>{const hi=rem/tot*100,lo=(rem-o.n)/tot*100;rem-=o.n;cols.push(`<div class="pwc" data-tip="${piEsc(`<small>${o.k}</small><b>${piBRL(o.n)}</b> · ${piPc(o.n,tot)} da comissão`)}"><div class="pwa"><div class="pwb" style="bottom:${lo.toFixed(2)}%;height:${(hi-lo).toFixed(2)}%"><span class="pwv" style="top:0">${piBRL(o.n)}</span></div></div><div class="pwx"><div class="pwk">${piEsc(o.k)}<em>${piPc(o.n,tot)}</em></div></div></div>`)});
+ $(id).innerHTML=`<div class="pwf">${cols.join("")}</div>`}
 /* barra 100% com legenda; x = texto de valor opcional */
 function piStack(items,tot){items=items.filter(o=>o.n>0);if(!tot||!items.length)return`<div class="msg"><b>Sem dados</b>Nenhum ${piUn} com essas datas e filtros.</div>`;
  return `<div class="pisb">${items.map((o,i)=>`<span style="flex:${o.n};background:${PXC[i%8]}" data-tip="${piEsc(`<small>${o.k}</small><b>${o.x||piN(o.n)}</b> · ${piPc(o.n,tot)}`)}"></span>`).join("")}</div><div class="pisl">${items.map((o,i)=>`<div><i style="background:${PXC[i%8]}"></i><span>${piEsc(o.k)}</span><b>${o.x||piN(o.n)}</b><em>${piPc(o.n,tot)}</em></div>`).join("")}</div>`}
@@ -1138,16 +1145,13 @@ function piX(cur,a,b){
  const n=Math.round((P(b)-P(a))/864e5)+1,gr=n>92?"semana":"dia",bk=bks(a,b,gr),wk=d=>iso(ad(P(d),-((P(d).getUTCDay()+6)%7))),ix=new Map(bk.map((k,i)=>[k,i])),mu=a.slice(0,7)!==b.slice(0,7),ag=bk.map(k=>({k,r:0,p:0,nr:0,np:0}));
  cur.forEach(r=>{const o=ag[ix.get(gr==="dia"?r.ccv:wk(r.ccv))];if(o){if(r.cpg){o.r+=r.vgc;o.nr++}else{o.p+=r.vgc;o.np++}}});
  piCol("pc-rc",ag.map(o=>({k:lb(o.k,gr,mu),a:o.r,b:o.p,tip:`<small>${tlb(o.k,gr)}</small><b>${piBRL(o.r+o.p)}</b> de comissão<br><small>${piBRL(o.r)} recebida (${o.nr}) · ${piBRL(o.p)} a receber (${o.np})</small>`})),{money:1});
- let acR=0,acT=0;const cs=ag.map(o=>{acR+=o.r;acT+=o.r+o.p;return[acT,acR]});
- piLine("pc-gg",ag.map(o=>lb(o.k,gr,mu)),[{n:"de comissão gerada",c:"#6e1428",area:1,v:cs.map(x=>x[0])},{n:"recebida",c:"#2f3f80",v:cs.map(x=>x[1])}],{fmt:piBRL,tl:ag.map(o=>tlb(o.k,gr))});
+ piDonut("pc-qm",piGrp(cur,r=>piQuem(r.quem),r=>r.vgc).sort((x,y)=>y.n-x.n),N,"contratos");
  $("pc-hl").innerHTML=!N?"":at.length?`<b>${piBRL(S(at,"vgc"))}</b> em <b>${at.length}</b> ${at.length===1?"contrato passou":"contratos passaram"} da data prevista de pagamento. Comece a cobrança por eles na tabela abaixo.`:ab.length?"Nenhuma comissão passou da data prevista de pagamento.":"Toda a comissão do período já foi recebida.";
  const pm=new Map();cur.forEach(r=>(r.pap||"").split("|").forEach(s=>{const i=s.lastIndexOf("~");if(i>0){const k=s.slice(0,i),v=+s.slice(i+1)||0;pm.set(k,(pm.get(k)||0)+v)}}));
  const pl=[...pm.entries()].sort((x,y)=>y[1]-x[1]),pt=pl.reduce((x,y)=>x+y[1],0);
- const PG4=k=>/Imobili/i.test(k)?"Imobiliária":/Gerente/i.test(k)?"Gerência":/Diretoria|CSO|Pr[eê]mio/i.test(k)?"Diretoria e CSO":/Corretor|Agenciador/i.test(k)?"Corretores e agenciadores":"Outros",QC={"Vendedor":"#6e1428","Comprador":"#343f8a","Outra composição":"#b8465e"},DC={"Imobiliária":"#6e1428","Gerência":"#8a1f33","Diretoria e CSO":"#b8465e","Corretores e agenciadores":"#343f8a","Outros":"#9aa0b8"},fl=new Map();
- cur.forEach(r=>{const q=piQuem(r.quem);(r.pap||"").split("|").forEach(s=>{const i=s.lastIndexOf("~");if(i>0){const g=PG4(s.slice(0,i)==="?"?"":s.slice(0,i)),v=+s.slice(i+1)||0;if(v>0)fl.set(q+"\u0001"+g,(fl.get(q+"\u0001"+g)||0)+v)}})});
- const sq=new Map(),dq=new Map();fl.forEach((v,k)=>{const[q,g]=k.split("\u0001");sq.set(q,(sq.get(q)||0)+v);dq.set(g,(dq.get(g)||0)+v)});
- const SL=[...sq.entries()].sort((x,y)=>y[1]-x[1]).map(([k,n])=>({k,n,c:QC[k]||"#9aa0b8"})),DL=[...dq.entries()].sort((x,y)=>y[1]-x[1]).map(([k,n])=>({k,n,c:DC[k]||"#9aa0b8"}));
- piSankey("pc-pp",SL,DL,[...fl.entries()].map(([k,v])=>{const[q,g]=k.split("\u0001");return[SL.findIndex(o=>o.k===q),DL.findIndex(o=>o.k===g),v]}),{fm:piBRL,un:"",of:"de quem paga",al:"Fluxo da comissão de quem paga até os papéis que recebem"});
+ const pm2=new Map();cur.forEach(r=>(r.pap||"").split("|").forEach(t=>{const i=t.lastIndexOf("~");if(i>0){const k=t.slice(0,i),v=+t.slice(i+1)||0;pm2.set(k,(pm2.get(k)||0)+v)}}));
+ const pl2=[...pm2.entries()].sort((x,y)=>y[1]-x[1]).map(([k,v])=>({k:k==="?"?"Sem papel":k,n:v})),pt2=pl2.reduce((x,o)=>x+o.n,0),tp2=pl2.slice(0,6),rs2=pl2.slice(6).reduce((x,o)=>x+o.n,0);
+ piWf("pc-pp",rs2>0?tp2.concat([{k:"Demais papéis",n:rs2}]):tp2,pt2);
  const ordc=r=>!r.cpv?2e6:r.cpv<hj?-piDd(r.cpv,hj):1e6+(+r.cpv.replace(/-/g,"")),pr=[...ab].sort((x,y)=>ordc(x)-ordc(y));$("pc-cn").textContent=pr.length?sub(pr)+" · "+piBRL(S(pr,"vgc")):"";
  piTb("pc-tb",[["Data do CCV"],["Imóvel"],["Gestor"],["Quem paga"],["VGC",1],["Previsão de pagamento",1],["Situação"]],pr.map(r=>[br(r.ccv),piEsc(r.imovel||"-"),piEsc(piNm(r.gestor)),piEsc(piQuem(r.quem)),brl(r.vgc),r.cpv?br(r.cpv):"—",!r.cpv?"Sem previsão":r.cpv<hj?`<span class="pitag l">Atrasada ${piDd(r.cpv,hj)} d</span>`:'<span class="pitag t">No prazo</span>']),["Nada a receber","Todas as comissões do período já foram pagas."]);
  /* ORIGEM E PERFIL */
