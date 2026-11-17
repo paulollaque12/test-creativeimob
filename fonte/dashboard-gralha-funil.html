@@ -1160,11 +1160,12 @@ function piX(cur,a,b){
  piTl("po-t",[["Contratos",f(N),"<small>CCV no período</small>"],["VGV",piBRL(vg),"<small>valor dos contratos</small>"],["Ticket mediano",tkm==null?"-":piBRL(tkm),"<small>por contrato</small>"],["Financiados",piPc(fn.length,N),`<small>${sub(fn)}</small>`],["Demanda própria",piPc(gR.length,N),`<small>comprador via Gralha · ${sub(gR)}</small>`],["Dias em estoque",es==null?"-":Math.round(es),`<small>mediana · ${esL.length} de ${N} contratos</small>`]]);
  const FAM={"Gralha":["#6e1428","#8a1f33","#a8364d","#c05b72","#d98a9b"],"Corretor":["#343f8a","#5a69a8","#7f8ccb"],"Construtora":["#b8465e","#d98a9b"]},fc={};
  const mg=new Map();cur.forEach(r=>{const k=r.mc||"?",o=mg.get(k)||{k,v:0,n:0};o.v+=r.vgv;o.n++;mg.set(k,o)});
- let cl=[...mg.values()].sort((x,y)=>y.v-x.v);const top8=cl.slice(0,8),rest8=cl.slice(8);
- const nmc=top8.map(o=>piMc(o.k===""||o.k==="?"?"":o.k)),dupn=new Set(nmc.map(x=>x[0]).filter((x,i,a)=>a.indexOf(x)!==i));
- const SL=top8.map((o,i)=>{const fam=o.k==="?"?"Outros":piTitle(o.k.split(" ")[0]),pal=FAM[fam]||["#9aa0b8"];fc[fam]=(fc[fam]||0);const c=pal[fc[fam]%pal.length];fc[fam]++;const nm=nmc[i][0];return{k:dupn.has(nm)?nm+" ("+fam+")":nm,n:o.v,c,key:o.k,fam}});
- if(rest8.length)SL.push({k:"Outras origens",n:rest8.reduce((x,o)=>x+o.v,0),c:"#9aa0b8",key:"__r",fam:"Outros"});
- const keyOf=r=>{const k=r.mc||"?";return top8.some(o=>o.k===k)?k:"__r"},TIP=[{k:"Terceiros",c:"#343f8a"},{k:"Lançamentos",c:"#6e1428"}],lk=new Map();
+ const cl=[...mg.values()].filter(o=>o.k!=="?").sort((x,y)=>y.v-x.v),nI=mg.get("?"),top8=cl.slice(0,8),rest8=cl.slice(8);
+ const nmc=top8.map(o=>piMc(o.k)),dupn=new Set(nmc.map(x=>x[0]).filter((x,i,a)=>a.indexOf(x)!==i));
+ const SL=top8.map((o,i)=>{const fam=piTitle(o.k.split(" ")[0]),pal=FAM[fam]||["#9aa0b8"];fc[fam]=(fc[fam]||0);const c=pal[fc[fam]%pal.length];fc[fam]++;const nm=nmc[i][0];return{k:dupn.has(nm)?nm+" ("+fam+")":nm,n:o.v,c,key:o.k,fam}});
+ if(rest8.length)SL.push({k:"Outras origens",n:rest8.reduce((x,o)=>x+o.v,0),c:"#c3c7d8",key:"__r",fam:"Outros"});
+ if(nI&&nI.v>0)SL.push({k:"Não informada",n:nI.v,c:"#9aa0b8",key:"?",fam:"Outros"});
+ const keyOf=r=>{const k=r.mc||"?";return k==="?"||top8.some(o=>o.k===k)?k:"__r"},TIP=[{k:"Terceiros",c:"#343f8a"},{k:"Lançamentos",c:"#6e1428"}],lk=new Map();
  cur.forEach(r=>{const k=keyOf(r)+"\u0001"+(r.lanc?1:0);lk.set(k,(lk.get(k)||0)+r.vgv)});
  const DL=TIP.map((o,d)=>({...o,n:[...lk.entries()].filter(([k])=>k.endsWith("\u0001"+d)).reduce((x,[,v])=>x+v,0)})).filter(o=>o.n>0),
  LNK=[...lk.entries()].map(([k,v])=>{const[a,d]=k.split("\u0001");return[SL.findIndex(o=>o.key===a),DL.findIndex(o=>o.k===TIP[+d].k),v]}).filter(l=>l[0]>=0&&l[1]>=0);
