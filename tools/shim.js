@@ -1,4 +1,4 @@
-(()=>{const st=document.createElement("style");st.id="c2hide";st.textContent="#sbg-c2s{display:none!important}";(document.head||document.documentElement).appendChild(st)})();
+(()=>{const st=document.createElement("style");st.id="c2hide";st.textContent="#sbg-c2s,#sbmp{display:none!important}";(document.head||document.documentElement).appendChild(st)})();
 /* ===== CAMADA ESTÁTICA: responde às consultas do dashboard ao vivo a partir do cubo gravado =====
    O restante da página é IDÊNTICO à versão ao vivo (BigQuery). Esta camada faz o papel do conector:
    claude.use("mcp").watchTool(servidor, ferramenta, {query}, handler) -> calcula a resposta no navegador.
@@ -149,7 +149,12 @@ function qPipe(){return (C.pipe||[]).map(r=>r.slice(0,25))}
 /* C2S: leads da Gralha gravados em C.c2s = [dt,hr,fonte,canal,tipo,equipe,corretor,st,fun,mot,rd,man,bai,cid,pre,cod,uni,ven,tg] (19 colunas; 1 linha por lead; a aba filtra no navegador) */
 function qC2s(){return (C.c2s||[]).map(r=>r.slice(0,19))}
 
+/* Overview Multi-platform: C.mp = {p:[[dt,fonte,rd,m,v,p,g,c]],v:[[dt,origem,vgv,c2s,fonte,dias,ccv]]} -> devolve linhas [k,g,json] empacotadas, como a consulta ao vivo */
+function qMp(){const M=C.mp||{p:[],v:[]},out=[],K={p:["d","f","r","m","v","p","g","c","e"],v:["d","o","m","c","f","a","x","e"]};
+ ["p","v"].forEach(k=>{const A=M[k]||[];for(let i=0;i<A.length;i+=25)out.push([k,String(i/25),A.slice(i,i+25).map(r=>{const o={};K[k].forEach((n,j)=>o[n]=r[j]);return JSON.stringify(o)}).join(",")])});return out}
+
 function route(q){
+ if(q.startsWith("/*mp*/"))return qMp();
  if(q.startsWith("/*c2s*/"))return qC2s();
  if(q.startsWith("/*pipe*/"))return qPipe();
  if(q.startsWith("/*ins*/"))return qIns(q);
@@ -173,6 +178,6 @@ function route(q){
 }
 window.__shimRoute=route;window.__shimPrep=prep;
 const ready=()=>window.__cuboLoader().then(c=>{prep(c);return c});
-window.claude={use:async()=>{const c=await ready();window.__cuboInfo=c;try{window.__chk&&window.__chk();if(c&&c.c2s){const h=document.getElementById("c2hide");h&&h.remove();window.__cnt&&window.__cnt()}}catch(e){}return{invalidate:async()=>{},
+window.claude={use:async()=>{const c=await ready();window.__cuboInfo=c;try{window.__chk&&window.__chk();if(c){const h=document.getElementById("c2hide");if(h){const hide=[c.c2s?"":"#sbg-c2s",c.mp?"":"#sbmp"].filter(Boolean).join(",");if(hide)h.textContent=hide+"{display:none!important}";else h.remove()}window.__cnt&&window.__cnt()}}catch(e){}return{invalidate:async()=>{},
  watchTool(s,t,a,h){setTimeout(()=>{try{const rows=route(a.query);h({type:"result",result:{payload:{rows:rows.map(r=>({f:r.map(v=>({v:v===null||v===undefined?null:String(v)}))}))},cache:null}})}catch(e){console.error(e);h({type:"error",error:{code:"tool_error",message:String(e&&e.message||e)}})}},0);return()=>{}}}}};
 })();
