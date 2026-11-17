@@ -245,7 +245,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .pqw{width:100%;display:flex;flex-direction:column;gap:22px}.pqh{display:flex;justify-content:space-between;align-items:baseline}.pqh span{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}.pqh i{width:10px;height:10px;border-radius:3px;display:inline-block}.pqh b{font:600 24px Sora,system-ui,sans-serif;color:var(--ink)}.pqb{height:10px;background:var(--tr);border-radius:6px;overflow:hidden;margin:8px 0 10px}.pqb i{display:block;height:100%;border-radius:6px}.pqs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;font-size:11.5px;color:var(--mut)}.pqs b{display:block;font:600 13.5px Sora,system-ui,sans-serif;color:var(--ink);margin-bottom:1px}
 @media(max-width:700px){.pqs{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .pmx td.pmn{background:transparent;color:var(--ink);font-weight:600;min-width:90px;white-space:nowrap}.pmx th.pmh{color:var(--mut)}.pmx td.pmn small{display:block;font-weight:500;color:var(--mut);font-size:10.5px}
-.pcl{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:11.5px;color:var(--mut)}.pcl i{display:block;flex:0 0 160px;height:8px;border-radius:5px;background:linear-gradient(90deg,#c9677c,#4a0d1a)}
+.psh{display:flex;justify-content:space-between;font:600 10.5px Manrope,system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);padding:0 4px;margin-top:2px}.pcl{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:11.5px;color:var(--mut)}.pcl i{display:block;flex:0 0 160px;height:8px;border-radius:5px;background:linear-gradient(90deg,#c9677c,#4a0d1a)}
 .pihl{margin-top:14px;padding:12px 14px;background:var(--tr);border-radius:10px;font-size:13.5px;line-height:1.5}.pihl:empty{display:none}
 @media(max-width:640px){.pcr{grid-template-columns:70px minmax(0,1fr);gap:4px 10px}.pcr>b{grid-column:2}.pcr.hd span:nth-child(2){display:none}}
 .per.hd{border-top:0;padding:6px 0 2px;font:600 10.5px Manrope,system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}.per.hd span:last-child{text-align:right}
@@ -402,7 +402,7 @@ details.mpm ul{margin:0 0 14px;padding-left:18px;color:var(--mut);font-size:12.5
 <div class="cap" id="pxs-ori" hidden>Os dados desta aba chegam na próxima atualização diária do site (06:52).</div>
 <div id="pxc-ori" hidden>
 <div id="po-t" class="tiles"></div>
-<div class="panel"><div class="ph"><h2>De onde vem a venda</h2><span>Canal do cliente × tipo de venda</span></div><p class="bi">Cada faixa liga o canal que trouxe o cliente ao tipo de venda fechada, com espessura proporcional ao VGV. Mostra qual canal alimenta as vendas de terceiros e qual alimenta os lançamentos.</p><div class="pirl" id="po-skl"></div><div id="po-sk"></div></div>
+<div class="panel"><div class="ph"><h2>De onde vem a venda</h2><span>Origem do comprador × origem do vendedor</span></div><p class="bi">Cada faixa liga o canal que trouxe o comprador à origem do vendedor (de onde veio o imóvel), com espessura proporcional ao VGV. Mostra qual canal alimenta cada tipo de carteira.</p><div class="pirl" id="po-skl"></div><div class="psh"><span>Origem do comprador</span><span>Origem do vendedor</span></div><div id="po-sk"></div></div>
 <div class="panel" style="margin-top:18px"><div class="ph"><h2>O que vendemos</h2><span>Tipo de imóvel × faixa de valor</span></div><p class="bi">Cada linha é um tipo de imóvel. A cor mostra quantos contratos há em cada faixa de valor; nas colunas finais, o ticket e a rapidez de venda de cada tipo.</p><div id="po-mx"></div></div>
 <div class="panel" style="margin-top:18px"><div class="ph"><h2>Onde vendemos e como pagam</h2><span>Bairros por VGV</span></div><p class="bi">Cada bloco é um bairro, com o tamanho proporcional ao VGV. Quanto mais escura a cor, maior a parte dos contratos pagos com financiamento.</p><div class="pitr" id="po-tm" style="min-height:360px;margin-top:6px"></div><div class="pcl" id="po-cl"></div><div class="pirl" id="po-bk" style="margin:14px 0 0"></div></div>
 </div></section>
@@ -1165,11 +1165,11 @@ function piX(cur,a,b){
  const SL=top8.map((o,i)=>{const fam=piTitle(o.k.split(" ")[0]),pal=FAM[fam]||["#9aa0b8"];fc[fam]=(fc[fam]||0);const c=pal[fc[fam]%pal.length];fc[fam]++;const nm=nmc[i][0];return{k:dupn.has(nm)?nm+" ("+fam+")":nm,n:o.v,c,key:o.k,fam}});
  if(rest8.length)SL.push({k:"Outras origens",n:rest8.reduce((x,o)=>x+o.v,0),c:"#c3c7d8",key:"__r",fam:"Outros"});
  if(nI&&nI.v>0)SL.push({k:"Não informada",n:nI.v,c:"#9aa0b8",key:"?",fam:"Outros"});
- const keyOf=r=>{const k=r.mc||"?";return k==="?"||top8.some(o=>o.k===k)?k:"__r"},TIP=[{k:"Terceiros",c:"#343f8a"},{k:"Lançamentos",c:"#6e1428"}],lk=new Map();
- cur.forEach(r=>{const k=keyOf(r)+"\u0001"+(r.lanc?1:0);lk.set(k,(lk.get(k)||0)+r.vgv)});
- const DL=TIP.map((o,d)=>({...o,n:[...lk.entries()].filter(([k])=>k.endsWith("\u0001"+d)).reduce((x,[,v])=>x+v,0)})).filter(o=>o.n>0),
- LNK=[...lk.entries()].map(([k,v])=>{const[a,d]=k.split("\u0001");return[SL.findIndex(o=>o.key===a),DL.findIndex(o=>o.k===TIP[+d].k),v]}).filter(l=>l[0]>=0&&l[1]>=0);
- piSankey("po-sk",SL,DL,LNK,{fm:piBRL,un:"",of:"do canal",al:"Fluxo do canal que trouxe o cliente até o tipo de venda"});
+ const keyOf=r=>{const k=r.mc||"?";return k==="?"||top8.some(o=>o.k===k)?k:"__r"},vk=r=>r.mv?piTitle(r.mv):"Não informada",lk=new Map(),rv=new Map();
+ cur.forEach(r=>{const k=keyOf(r)+"\u0001"+vk(r);lk.set(k,(lk.get(k)||0)+r.vgv);rv.set(vk(r),(rv.get(vk(r))||0)+r.vgv)});
+ const RC2=["#6e1428","#343f8a","#8a1f33","#5a69a8","#b8465e"],DL=[...rv.entries()].filter(([,v])=>v>0).sort((x,y)=>(x[0]==="Não informada")-(y[0]==="Não informada")||y[1]-x[1]).map(([k,n],i)=>({k,n,c:k==="Não informada"?"#9aa0b8":RC2[i%5]})),
+ LNK=[...lk.entries()].map(([k,v])=>{const[a,d]=k.split("\u0001");return[SL.findIndex(o=>o.key===a),DL.findIndex(o=>o.k===d),v]}).filter(l=>l[0]>=0&&l[1]>=0);
+ piSankey("po-sk",SL,DL,LNK,{fm:piBRL,un:"",of:"do canal",al:"Fluxo da origem do comprador até a origem do vendedor"});
  $("po-skl").innerHTML=["Gralha","Corretor","Construtora"].filter(f=>SL.some(o=>o.fam===f)).map(f=>`<span><i style="background:${FAM[f][0]}"></i>${f}</span>`).join("");
  const FV=[["Até 500 mil",0,5e5],["500 mil–1 Mi",5e5,1e6],["1–2 Mi",1e6,2e6],["2–5 Mi",2e6,5e6],["Acima de 5 Mi",5e6,1e12]],cg=piGrp(cur,r=>r.cat||"Não informado").sort((x,y)=>y.n-x.n),ct6=cg.slice(0,6).map(o=>o.k),cts=ct6.concat(cg.length>6?["Outros"]:[]);
  const MR=cts.map(k=>{const L=cur.filter(r=>k==="Outros"?!ct6.includes(r.cat||"Não informado"):(r.cat||"Não informado")===k);return{k,L,v:FV.map(([,lo,hi])=>L.filter(r=>r.vgv>=lo&&r.vgv<hi).length),t:c2Med(L.map(r=>r.vgv).filter(x=>x>0)),e:c2Med(L.filter(r=>r.est>=0).map(r=>r.est))}}),mxm=Math.max(1,...MR.flatMap(r=>r.v));
