@@ -150,7 +150,7 @@ function qPipe(){return (C.pipe||[]).map(r=>r.slice(0,26))}
 function qC2s(){return (C.c2s||[]).map(r=>r.slice(0,19))}
 
 /* Overview Multi-platform: C.mp = {p:[[dt,fonte,rd,m,v,p,g,c]],v:[[dt,origem,vgv,c2s,fonte,dias,ccv]]} -> devolve linhas [k,g,json] empacotadas, como a consulta ao vivo */
-function qMp(){const M=C.mp||{p:[],v:[]},out=[],K={p:["d","f","r","m","v","p","g","c","e"],v:["d","o","m","c","f","a","x","e"]};
+function qMp(){const M=C.mp||{p:[],v:[]},out=[],K={p:["d","f","r","m","v","p","g","c","e","k"],v:["d","o","m","c","f","a","x","e","k"]};
  ["p","v"].forEach(k=>{const A=M[k]||[];for(let i=0;i<A.length;i+=25)out.push([k,String(i/25),A.slice(i,i+25).map(r=>{const o={};K[k].forEach((n,j)=>o[n]=r[j]);return JSON.stringify(o)}).join(",")])});return out}
 
 function route(q){
