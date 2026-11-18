@@ -23,7 +23,7 @@ h1{font:600 clamp(26px,3.6vw,36px)/1.15 Sora,system-ui,sans-serif;margin:14px 0 
 #st{color:var(--mut);font-size:12px;margin:-14px 0 22px}
 .tiles{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-bottom:18px}@media(max-width:1000px){.tiles{grid-template-columns:repeat(3,1fr)}}
 .tile,.panel{background:var(--sf);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh)}
-.tile{padding:16px 14px;text-align:center}.tile small{color:var(--mut);font-size:12px;font-weight:500}
+.tile{padding:16px 14px;text-align:center;box-sizing:border-box;height:138px;display:flex;flex-direction:column;justify-content:center}.tile small{color:var(--mut);font-size:12px;font-weight:500}
 .tile b{display:block;font:600 22px/1.25 Sora,system-ui,sans-serif;margin:4px 0 6px}
 .panel{padding:8px 24px 22px}
 .ph{display:flex;justify-content:space-between;align-items:baseline;padding:16px 0 10px}
@@ -435,7 +435,7 @@ details.mpm ul{margin:0 0 14px;padding-left:18px;color:var(--mut);font-size:12.5
 </ul></details>
 </section>
 <section id="panel-c2s" role="tabpanel" aria-labelledby="tab-c2s" hidden>
-<div class="panel fbar" id="c2fb"><div class="fb pifb"><div><label for="c2-tipo">Tipo de negócio</label><select id="c2-tipo"><option value="">Todos</option></select></div><div><label for="c2-equipe">Equipe</label><select id="c2-equipe"><option value="">Todas</option></select></div><div><label for="c2-canal">Canal</label><select id="c2-canal"><option value="">Todos</option></select></div><div><label for="c2-fonte">Fonte</label><select id="c2-fonte"><option value="">Todas</option></select></div><button class="clr" type="button" id="c2-clr">Limpar filtros</button></div></div>
+<div class="panel fbar" id="c2fb"><div class="fb pifb"><div><label for="c2f-tipo">Tipo de negócio</label><select id="c2f-tipo"><option value="">Todos</option></select></div><div><label for="c2f-equipe">Equipe</label><select id="c2f-equipe"><option value="">Todas</option></select></div><div><label for="c2f-canal">Canal</label><select id="c2f-canal"><option value="">Todos</option></select></div><div><label for="c2f-fonte">Fonte</label><select id="c2f-fonte"><option value="">Todas</option></select></div><button class="clr" type="button" id="c2f-clr">Limpar filtros</button></div></div>
 <div id="c2st" class="cap" style="margin:0 0 12px">Carregando o C2S...</div>
 <div id="cv-t" class="tiles"></div>
 <div class="pig"><div class="panel"><div class="ph"><h2>Leads por dia</h2><span>Data de entrada</span></div><p class="bi">Leads que entraram no C2S em cada dia do período, divididos entre os que vieram por integração (portais, site, RD Station) e os cadastrados à mão. Passe o mouse para ver o valor.</p><div class="pirl"><span><i style="background:var(--br)"></i>Integração</span><span><i style="background:var(--nv)"></i>Cadastro manual</span></div><div class="ch pich" id="cv-dia" role="img" aria-label="Leads por dia"></div></div>
@@ -1498,8 +1498,8 @@ function loadC2(){if(!mcp)return;const K=["","-ori","-vel","-per","-imo"];K.forE
  unC2=mcp.watchTool(SV,TL,{projectId:PR,query:c2SQL()},ev=>{const er=t=>K.forEach(k=>{$("c2st"+k).hidden=false;$("c2st"+k).textContent=t});if(ev.type==="error"){er("Não foi possível carregar o C2S. Recarregue a página para tentar de novo.");return}
   try{const K19=["dt","hr","fonte","canal","tipo","equipe","corretor","st","fun","mot","rd","man","bai","cid","pre","cod","uni","ven","tg"],rw=[];ev.result.payload.rows.forEach(w=>{const v=w.f.map(c=>c.v);if(v.length===2&&typeof v[1]==="string"&&v[1][0]==="{")JSON.parse("["+v[1]+"]").forEach(o=>rw.push(K19.map(k=>o[k])));else rw.push(v)});C2=rw.map(v=>{return{dt:v[0],hr:+v[1]||0,fonte:c2Fnt(v[2]),canal:v[3]||"Não informado",tipo:c2Tp(v[4]),equipe:c2Eq(v[5]),cor:v[6]||"",st:+v[7],fun:+v[8]||0,mot:v[9]||"",rd:v[10]==null||v[10]===""?-1:+v[10],man:+v[11]||0,bai:v[12]||"",cid:v[13]||"",pre:+v[14]||0,cod:v[15]||"",uni:+v[16]||0,ven:+v[17]||0,tg:v[18]||""}});c2Fill();renderC2()}catch(e){er("Resposta inesperada do C2S.")}},{cache:{staleTime:3600000}})}
 function c2Fill(){const opt=(id,vals,all)=>{const e=$(id),cur=e.value;e.innerHTML=`<option value="">${all}</option>`+vals.map(v=>`<option value="${piEsc(v)}">${piEsc(v)}</option>`).join("");e.value=vals.includes(cur)?cur:""};
- opt("c2-tipo",C2TP.filter(t=>C2.some(r=>r.tipo===t)),"Todos");opt("c2-equipe",[...new Set(C2.map(r=>r.equipe))].sort((a,b)=>a.localeCompare(b,"pt-BR",{numeric:true})),"Todas");opt("c2-canal",[...new Set(C2.map(r=>r.canal))].sort(),"Todos");
- const fc=new Map();C2.forEach(r=>fc.set(r.fonte,(fc.get(r.fonte)||0)+1));opt("c2-fonte",[...fc.entries()].sort((a,b)=>b[1]-a[1]).map(x=>x[0]),"Todas")}
+ opt("c2f-tipo",C2TP.filter(t=>C2.some(r=>r.tipo===t)),"Todos");opt("c2f-equipe",[...new Set(C2.map(r=>r.equipe))].sort((a,b)=>a.localeCompare(b,"pt-BR",{numeric:true})),"Todas");opt("c2f-canal",[...new Set(C2.map(r=>r.canal))].sort(),"Todos");
+ const fc=new Map();C2.forEach(r=>fc.set(r.fonte,(fc.get(r.fonte)||0)+1));opt("c2f-fonte",[...fc.entries()].sort((a,b)=>b[1]-a[1]).map(x=>x[0]),"Todas")}
 function renderC2(){if(!C2)return;const a=$("a").value,b=$("b").value;if(!a||!b||a>b)return;piUn="lead";
  const n=Math.round((P(b)-P(a))/864e5)+1,pa=iso(ad(P(a),-n)),pb=iso(ad(P(a),-1));
  const ok=r=>(!C2F.tipo||r.tipo===C2F.tipo)&&(!C2F.equipe||r.equipe===C2F.equipe)&&(!C2F.canal||r.canal===C2F.canal)&&(!C2F.fonte||r.fonte===C2F.fonte);
@@ -1598,9 +1598,9 @@ function renderC2(){if(!C2)return;const a=$("a").value,b=$("b").value;if(!a||!b|
 }
 const c2FB=$("c2fb"),c2Move=id=>{const p=$(id);p.prepend($("c2st"+id.slice(9)));p.prepend(c2FB)};
 [["","c2s"],["-ori","c2s-ori"],["-vel","c2s-vel"],["-per","c2s-per"],["-imo","c2s-imo"]].forEach(([k,t])=>$("tab-"+t).addEventListener("click",()=>{$("hctl").hidden=false;$("gfb").hidden=true;c2Move("panel-"+t);if(!c2Loaded&&mcp){c2Loaded=true;loadC2()}else renderC2()}));
-const c2Set=(k,v)=>{C2F[k]=v;$("c2-"+k).value=v;renderC2()};
-["tipo","equipe","canal","fonte"].forEach(k=>$("c2-"+k).onchange=e=>{C2F[k]=e.target.value;renderC2()});
-$("c2-clr").onclick=()=>{["tipo","equipe","canal","fonte"].forEach(k=>{C2F[k]="";$("c2-"+k).value=""});renderC2()};
+const c2Set=(k,v)=>{C2F[k]=v;$("c2f-"+k).value=v;renderC2()};
+["tipo","equipe","canal","fonte"].forEach(k=>$("c2f-"+k).onchange=e=>{C2F[k]=e.target.value;renderC2()});
+$("c2f-clr").onclick=()=>{["tipo","equipe","canal","fonte"].forEach(k=>{C2F[k]="";$("c2f-"+k).value=""});renderC2()};
 document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-c2f]");if(!t||!C2)return;const k=t.getAttribute("data-c2t")||"fonte",v=t.getAttribute("data-c2f");c2Set(k,C2F[k]===v?"":v);window.scrollTo({top:0,behavior:"smooth"})});
 $("a").addEventListener("change",()=>{if(C2)renderC2()});$("b").addEventListener("change",()=>{if(C2)renderC2()});
 
