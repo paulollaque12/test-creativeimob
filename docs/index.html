@@ -303,6 +303,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .gfr,.gfc{display:grid;grid-template-columns:170px minmax(0,1fr) 120px;gap:18px;align-items:center}.gfr .nm{font:600 14px/1.25 Manrope,system-ui,sans-serif}.gfr .nm small{display:block;font:400 11.5px/1.3 Manrope,system-ui,sans-serif;color:var(--mut);margin-top:2px}.gfr .v{text-align:right}.gfr .v small{display:block;color:var(--mut);font-size:11px;margin-bottom:3px}
 .gfc{height:26px}.gfc span{grid-column:2;justify-self:center;font-size:12px;color:var(--mut);font-weight:500}.gfc span::before{content:"\2193\00a0"}
 @media(max-width:760px){.gfr,.gfc{grid-template-columns:minmax(0,1fr);gap:6px}.gfr .v{text-align:left;display:flex;gap:8px;align-items:center}.gfr .v small{margin:0}.gfc span{grid-column:1}.gfc{height:22px}}
+#cp-av.cpav{margin:0 0 12px;padding:10px 14px;border-radius:10px;border-left:3px solid var(--br);background:var(--tr);color:var(--ink);font-size:12.5px;line-height:1.5}#cp-av b{font-weight:600}
 table.pitb tr.tot td{font-weight:700;background:var(--tr)}.pig.eq>.panel:has(#mp-or){display:flex;flex-direction:column}#mp-or{flex:1;display:flex;flex-direction:column;justify-content:center}
 details.mpm{margin-top:18px;border:1px solid var(--line);border-radius:14px;background:var(--sf);padding:4px 18px}
 details.mpm summary{cursor:pointer;padding:12px 0;font:600 13.5px Manrope,system-ui,sans-serif;color:var(--mut)}
@@ -466,7 +467,7 @@ details.mpm ul{margin:0 0 14px;padding-left:18px;color:var(--mut);font-size:12.5
 <div class="panel" style="margin-top:18px"><div class="ph"><h2>Corretores</h2><span id="cl-n">Clique no título da coluna para ordenar</span></div><p class="bi">Rapidez de cada corretor: leads recebidos, mediana de abertura, percentual aberto em até 5 minutos e leads que nunca foram abertos. Só corretores com 10 leads ou mais.</p><div class="pitw" id="cl-tb"></div></div>
 </section>
 <section id="panel-c2s-per" role="tabpanel" aria-labelledby="tab-c2s-per" hidden>
-<div id="c2st-per" class="cap" style="margin:0 0 12px">Carregando o C2S...</div><p class="cap" style="margin:0 0 12px">Lead perdido é o lead arquivado no C2S. Esta aba mostra só os leads perdidos entre os que entraram no período.</p>
+<div id="c2st-per" class="cap" style="margin:0 0 12px">Carregando o C2S...</div><p class="cap" style="margin:0 0 12px">Lead perdido é o lead arquivado no C2S. Esta aba mostra só os leads perdidos entre os que entraram no período.</p><div id="cp-av" class="cpav" hidden></div>
 <div id="cp-t" class="tiles"></div>
 <div class="pig eq"><div class="panel"><div class="ph"><h2>Por que perdemos</h2><span>Clique para detalhar</span></div><p class="bi">Só leads perdidos com motivo registrado, sem a inatividade. Cada barra é uma família de motivos.</p><div id="cp-fm"></div></div>
 <div class="panel pbd pzp"><div class="ph"><h2 id="cp-bn">Família</h2><span id="cp-bs"></span></div><p class="bi" id="cp-bd"></p><div id="cp-bst"></div><div id="cp-mt" style="flex:1;display:flex;align-items:center"></div></div></div>
@@ -1566,6 +1567,7 @@ function renderC2(){if(!C2)return;const a=$("a").value,b=$("b").value;if(!a||!b|
  /* ---------- PERDA ---------- */
  const mot=arq.filter(r=>r.mot&&r.mot!=="inactive"),smt=arq.filter(r=>!r.mot),fch=cur.filter(r=>r.st===2||r.ven);
  const mfa=mot.map(r=>(C2FAM.find(x=>x.m.includes(r.mot))||{k:"Outros"}).k),nA=mfa.filter(k=>k==="Atendimento").length,nM=mfa.filter(k=>k==="Momento").length,nQ=mfa.filter(k=>k==="Qualidade do lead").length;
+ {const mx=C2.reduce((m,r)=>r.dt>m?r.dt:m,""),ini=mx?iso(ad(P(mx),-19)):"",av=$("cp-av");av.hidden=!(mx&&b>=ini);if(!av.hidden)av.innerHTML=`<b>Os últimos 20 dias ainda estão incompletos.</b> O C2S arquiva os leads parados só depois de cerca de 20 dias, então a perda dos leads que entraram a partir de ${ini.slice(8)}/${ini.slice(5,7)} aparece menor do que será. Compare esse trecho com cuidado.`}
  piTl("cp-t",[["Leads perdidos",c2N(arq.length),sub(c2Pc(arq.length,N)+" dos leads do período")],["Sem motivo registrado",c2Pc(ina.length,arq.length),sub("esfriaram por inatividade")],["Com motivo registrado",c2Pc(mot.length,arq.length),sub(c2Nl(mot.length,["lead","leads"]))],["Ligados ao atendimento",c2N(nA),sub(c2Pc(nA,mot.length)+" dos motivos registrados")],["Podem voltar",c2N(nM),sub("pesquisando ou sem pressa")],["Qualidade do lead",c2N(nQ),sub("inválido, duplicado, fora da região")]]);
  if(em){["cp-fm","cp-mt","cp-bst","cp-ob","cp-tb"].forEach(i=>$(i).innerHTML=ES);$("cp-bn").textContent="Família";$("cp-bs").textContent="";$("cp-bd").textContent="";$("cp-n").textContent=""}else{
  const famOf=r=>{const f=C2FAM.find(x=>x.m.includes(r.mot));return f?f.k:"Outros"},FN=C2FAM.map(f=>f.k),fc=Object.fromEntries(C2FAM.map(f=>[f.k,f.c])),mf=mot.map(r=>({...r,fam:famOf(r)})),nf=k=>mf.filter(r=>r.fam===k);
