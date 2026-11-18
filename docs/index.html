@@ -1675,7 +1675,7 @@ function renderMP(){if(!MPD)return;const a=$("a").value,b=$("b").value;if(!a||!b
 (function(){const mb=$("tab-mp"),pn=$("panel-mp");
  mb.addEventListener("click",()=>{document.querySelectorAll(".sbx .tabs button").forEach(x=>x.setAttribute("aria-selected","false"));document.querySelectorAll("[role=tabpanel]").forEach(p=>p.hidden=p!==pn);
   document.querySelectorAll(".sbg").forEach(g=>{g.classList.remove("op");g.querySelector(".sbh").setAttribute("aria-expanded","false")});mb.setAttribute("aria-selected","true");
-  $("crb").innerHTML='Overview Multi-platform <span>›</span> <b>Fluxo entre plataformas</b>';$("hctl").hidden=false;$("gfb").hidden=true;$("sbx").classList.remove("open");$("sbov").classList.remove("open");window.scrollTo({top:0});
+  $("crb").innerHTML='Overview <span>›</span> <b>Fluxo entre plataformas</b>';$("hctl").hidden=false;$("gfb").hidden=true;$("sbx").classList.remove("open");$("sbov").classList.remove("open");window.scrollTo({top:0});
   if(!mpLoaded&&mcp){mpLoaded=true;loadMP()}else if(MPD)renderMP()});
  document.querySelectorAll(".sbx .tabs button").forEach(b=>b.addEventListener("click",()=>mb.setAttribute("aria-selected","false")));
  ["eq","fonte"].forEach(k=>$("mp-"+k).onchange=e=>{MPF[k]=e.target.value;renderMP()});
