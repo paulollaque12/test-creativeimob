@@ -1150,7 +1150,7 @@ document.addEventListener("click",e=>{const th=e.target.closest("th");if(!th)ret
  else{const p=rows[0].parentNode;rows.sort(cmp).forEach(r=>p.appendChild(r))}
  hr.querySelectorAll("th").forEach(x=>x.removeAttribute("aria-sort"));th.setAttribute("aria-sort",d?"descending":"ascending")})})();
 (async()=>{try{mcp=await claude.use("mcp")}catch(e){mcp=null}
- if(!mcp){$("st").textContent="";$("fn").innerHTML='<div class="msg"><b>Abra pelo Claude</b>Esta página precisa do Claude para acessar o BigQuery.</div>';$("insg").innerHTML='<div class="msg" style="grid-column:1/-1"><b>Abra pelo Claude</b>Esta página precisa do Claude para acessar o BigQuery.</div>';return}loadOpts();load()})();
+ if(!mcp){$("st").textContent="";$("fn").innerHTML='<div class="msg"><b>Abra pelo Claude</b>Esta página precisa do Claude para acessar o BigQuery.</div>';$("insg").innerHTML='<div class="msg" style="grid-column:1/-1"><b>Abra pelo Claude</b>Esta página precisa do Claude para acessar o BigQuery.</div>';return}loadOpts();load();setTimeout(()=>{const m=$("tab-mp");if(m&&m.offsetParent)m.click()},0)})();
 /* ===== Aba Jornada (coorte por data de entrada do lead) ===== */
 let jLoaded=false,unJ=null;
 const JST=["Oportunidade","Visita","Proposta","Fechamento","Venda"],JCO={Lead:"#2f3f80",Oportunidade:"#3f4c92",Visita:"#5a4b94",Proposta:"#764a8a",Fechamento:"#8a3a6a",Venda:"#8a1f33"};
