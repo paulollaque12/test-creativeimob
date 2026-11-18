@@ -183,7 +183,11 @@ function ancoras(){
  for(let i=0;i<=mo;i++)meses[MESN[i]+" de "+y]={a:iso(monthStart(y,i)),b:iso(Math.min(monthEnd(y,i),ULT))};
  return{ultimo_dia:iso(ULT),dia_da_semana:["domingo","segunda","terça","quarta","quinta","sexta","sábado"][new Date(D0+ULT*864e5).getUTCDay()],inicio_dos_dados:iso(dIdx(2026,0,1)),
   semana_atual:{a:iso(ws),b:iso(ULT)},semana_passada:{a:iso(ws-7),b:iso(ws-1)},mes_atual:{a:iso(monthStart(y,mo)),b:iso(ULT)},mes_passado:{a:iso(monthStart(py,pm)),b:iso(monthEnd(py,pm))},ano_ate_agora:{a:iso(monthStart(y,0)),b:iso(ULT)},meses}}
-function listas(){const u=k=>(C.dict[k]||[]).filter(Boolean);return{equipes:u("equipe"),lojas:u("loja"),veiculos:u("veiculo"),tipologias:u("tipo")}}
+function listas(){const u=k=>(C.dict[k]||[]).filter(Boolean),L={equipes:u("equipe"),lojas:u("loja"),veiculos:u("veiculo"),tipologias:u("tipo")};
+ try{const X=dados2(),top=(a,f,n)=>{const m=new Map();a.forEach(r=>{const k=f(r);if(k)m.set(k,(m.get(k)||0)+1)});return[...m.entries()].sort((x,y)=>y[1]-x[1]).slice(0,n).map(x=>x[0])};
+  L.fontes_c2s=top(X.c2s,r=>r.f,60);L.canais_c2s=top(X.c2s,r=>r.ca,8);L.tipos_negocio=TP2;L.motivos_perda=top(X.c2s,r=>r.mo?(MOT2[r.mo]||r.mo):"",30);L.familias_motivo=FAM2.map(x=>x[0]);
+  L.etapas_pipeimob=top(X.pipe,r=>r.eta,8);L.categorias_pipeimob=top(X.pipe,r=>r.cat,12);L.gestores_pipeimob=top(X.pipe,r=>r.ges,40);L.quem_paga=top(X.pipe,r=>r.quem,6)}catch(_){}
+ return L}
 let RESTAM=null;
 const uid=()=>{try{let u=localStorage.getItem("ask_uid");if(!u||!/^[A-Za-z0-9_-]{8,40}$/.test(u)){u=Array.from(crypto.getRandomValues(new Uint8Array(16)),b=>b.toString(36).padStart(2,"0")).join("").slice(0,24);localStorage.setItem("ask_uid",u)}return u}catch(_){return""}};
 function restamNota(r){const n=RESTAM&&(RESTAM.usuario!=null?RESTAM.usuario:RESTAM.ip);if(n!=null&&n<=30)r.insertAdjacentHTML("beforeend",'<div class="amut">Restam '+n+(n===1?" pergunta":" perguntas")+" hoje.</div>")}
@@ -227,8 +231,154 @@ function v2ToSp(v){
   default:throw new Error("modo inválido")}
  return sp}
 
+/* ---------- motor 2: C2S, PipeImob e Overview (consulta estruturada v3) + explicações ---------- */
+const TC=t=>String(t||"").toLowerCase().replace(/(^|\s)\S/g,c=>c.toUpperCase());
+const f1=v=>(Math.round(v*10)/10).toLocaleString("pt-BR");
+const FM2={n:fmt,brl:fmtV,pct:v=>f1(v)+"%",min:v=>v>=120?f1(v/60)+" h":f1(v)+" min",dias:v=>f1(v)+" dias"};
+const MOT2={inactive:"Inatividade",z_others:"Outros motivos",return_delay:"Demora no retorno",just_researching:"Só pesquisando",invalid:"Contato inválido",partner_agent:"Corretor parceiro",bought_elsewhere:"Comprou em outro lugar",underprivileged:"Sem perfil de crédito",fail_to_contact:"Sem contato",not_ready_to_buy:"Sem pressa para comprar",other_seller:"Com outro corretor",missing_product:"Imóvel indisponível",duplicated:"Duplicado",sold:"Imóvel vendido",product_not_satisfy:"Imóvel não agradou",high_price:"Preço alto",ddd_far:"DDD distante",denied_file:"Ficha negada",bad_localization:"Localização",low_price:"Preço baixo",with_qualification:"Com perfil",without_qualification:"Sem perfil",service_problem:"Problema no atendimento",impossible_proposal:"Proposta inviável",low_evalutation:"Avaliação baixa",billed:"Faturado",busy:"Sem tempo",from_spreadsheet:"Planilha",sold_other:"Vendido"};
+const FAM2=[["Atendimento",["return_delay","fail_to_contact","service_problem"]],["Momento",["just_researching","not_ready_to_buy","busy"]],["Qualidade do lead",["invalid","partner_agent","duplicated","ddd_far","from_spreadsheet"]],["Concorrência",["bought_elsewhere","other_seller","sold_other"]],["Imóvel e perfil",["missing_product","sold","product_not_satisfy","high_price","low_price","bad_localization","underprivileged","denied_file","impossible_proposal","low_evalutation","with_qualification","without_qualification","disadvantageous_trade_car","problem_delivery_date","billed"]],["Outros",["z_others"]]];
+const FAMOF={};FAM2.forEach(([k,l])=>l.forEach(m=>FAMOF[m]=k));
+const ST2={0:"Novo",1:"Em negociação",2:"Negócio fechado",3:"Arquivado (perdido)",7:"Finalizado"},FUN2=["Novo lead","Em atendimento","Visita agendada","Visita realizada","Proposta criada"];
+const PXB2={ita_:"Itaú",banco_do_brasil:"Banco do Brasil",outros:"Outros bancos",cccpm:"Cooperativa","Caixa Econômica Federal":"Caixa"},PXM2={Ccv:"No CCV",Escrituracao:"Na escritura",Creditoaf:"No crédito AF",Sinal:"No sinal",Outros:"Outros"};
+const DOW2=["domingo","segunda","terça","quarta","quinta","sexta","sábado"],dd2=(a,b)=>Math.round((Date.parse(b)-Date.parse(a))/864e5);
+const fnt2=t=>{t=String(t||"").trim();return!t?"Não informada":/^Recep/i.test(t)?"Recepção":/^Meta Ads/i.test(t)?"Meta Ads":/^Importad/i.test(t)?"Planilha":t};
+const eq2=t=>{t=String(t||"").replace(/^[-\s]+/,"").trim();return!t?"Sem equipe":/^\d+$/.test(t)?"Equipe "+t:t};
+const mpe2=t=>{t=String(t||"");if(t.includes("|"))t=t.split("|").pop();t=t.trim();if(!t||/^gralha/i.test(t))return"Sem equipe";if(/^sdr$/i.test(t))return"SDR";return TC(t)};
+const TP2=["Compra","Lançamento","Aluguel","Captação","Indefinido"];
+let X2=null;
+function dados2(){if(X2)return X2;const M=C.mp||{p:[],v:[],l:[]};
+ X2={c2s:(C.c2s||[]).map(r=>({d:r[0],hr:+r[1]||0,f:fnt2(r[2]),ca:r[3]||"Não informado",tp:TP2.includes(r[4])?r[4]:"Indefinido",eq:eq2(r[5]),co:r[6]?TC(r[6]):"",st:+r[7],fu:+r[8]||0,mo:r[9]||"",rd:r[10]==null||r[10]===""?-1:+r[10],ma:+r[11]||0,ba:r[12]||"",ci:r[13]||"",pr:+r[14]||0,un:+r[16]||0,ve:+r[17]||0})),
+  pipe:(C.pipe||[]).map(r=>({d:r[0],ccv:r[0],vgv:+r[2]||0,vgc:+r[3]||0,lanc:+r[4],eta:r[5]||"",ges:r[6]?TC(r[6]):"",tit:r[8]||"",cha:r[9]||"",cpg:r[10]||"",quem:r[13]||"",mom:r[14]||"",fin:+r[17]||0,ban:r[18]||"",cat:r[19]||"",bai:r[20]||"",cid:r[21]||"",eq:r[25]||""})),
+  ovp:(M.p||[]).map(r=>({d:r[0],f:fnt2(r[1]),rd:+r[2],m:+r[3]||0,v:r[4]==null?-1:+r[4],p:r[5]==null?-1:+r[5],g:r[6]==null?-1:+r[6],c:+r[7]||0,e:mpe2(r[8]),k:r[9]?TC(r[9]):""})),
+  ovv:(M.v||[]).map(r=>({d:r[0],o:r[1]||"Não informada",m:+r[2]||0,c:+r[3]||0,f:fnt2(r[4]),x:+r[6]||0,e:mpe2(r[7]),k:r[8]?TC(r[8]):""})),
+  ovl:(M.l||[]).map(r=>({d:r[0],f:fnt2(r[1]),e:mpe2(r[3]),k:r[4]?TC(r[4]):""}))};
+ return X2}
+/* entidades por fonte de dados */
+const ENT2={
+ c2s:{fonte:r=>r.f,canal:r=>r.ca,tipo_negocio:r=>r.tp,equipe:r=>r.eq,corretor:r=>r.co||"(sem corretor)",motivo:r=>r.mo?(MOT2[r.mo]||r.mo):"(sem motivo)",familia_motivo:r=>r.mo?(FAMOF[r.mo]||"Outros"):"(sem motivo)",etapa_funil:r=>FUN2[r.fu]||"Novo lead",status:r=>ST2[r.st]||String(r.st),bairro:r=>r.ba||"(sem bairro)",cidade:r=>r.ci||"(sem cidade)"},
+ pipe:{gestor:r=>r.ges||"(sem gestor)",equipe:r=>r.eq||"(sem equipe)",etapa:r=>r.eta||"(sem etapa)",bairro:r=>r.bai||"(sem bairro)",cidade:r=>r.cid||"(sem cidade)",categoria:r=>r.cat||"(sem categoria)",quem_paga:r=>r.quem||"(não informado)",momento_pagamento:r=>PXM2[r.mom]||r.mom||"(não informado)",banco:r=>r.fin?(PXB2[r.ban]||r.ban||"Financiado (banco não informado)"):"Sem financiamento",lancamento:r=>r.lanc?"Lançamento":"Pronto/usado"},
+ ovp:{fonte:r=>r.f,equipe:r=>r.e,corretor:r=>r.k||"(sem corretor)"},
+ ovl:{fonte:r=>r.f,equipe:r=>r.e,corretor:r=>r.k||"(sem corretor)"},
+ ovv:{origem_venda:r=>r.o,fonte:r=>r.f,equipe:r=>r.e,corretor:r=>r.k||"(sem corretor)"}};
+const TEMPO2=["mes","semana","dia","dia_semana","hora"];
+const ENL2={fonte:"fonte",canal:"canal",tipo_negocio:"tipo de negócio",equipe:"equipe",corretor:"corretor",motivo:"motivo de perda",familia_motivo:"família de motivo",etapa_funil:"etapa do funil",status:"status",bairro:"bairro",cidade:"cidade",gestor:"gestor",etapa:"etapa da esteira",categoria:"categoria do imóvel",quem_paga:"quem paga a comissão",momento_pagamento:"momento do pagamento",banco:"financiamento (banco)",lancamento:"lançamento",origem_venda:"origem da venda",mes:"mês",semana:"semana",dia:"dia",dia_semana:"dia da semana",hora:"hora de entrada"};
+/* métricas: src, rótulo, formato, data de referência da linha (null = ignora), numerador, denominador (média/taxa) */
+const M2={};const mm=(k,src,lb,fm,d,n,m)=>M2[k]={k,src,lb,fm,d,n,m};
+const cd=r=>r.d;
+mm("c2s_leads","c2s","Leads captados no C2S","n",cd,r=>1);
+mm("c2s_pessoas","c2s","Pessoas únicas no C2S","n",cd,r=>r.un);
+mm("c2s_negociacao","c2s","Leads em negociação","n",cd,r=>r.st===1?1:0);
+mm("c2s_perdidos","c2s","Leads perdidos (arquivados)","n",cd,r=>r.st===3?1:0);
+mm("c2s_vendas","c2s","Vendas marcadas no C2S","n",cd,r=>r.ve);
+mm("c2s_nunca_abertos","c2s","Leads nunca abertos","n",cd,r=>r.rd<0?1:0);
+mm("c2s_abertos_5min","c2s","Leads abertos em até 5 minutos","n",cd,r=>r.rd>=0&&r.rd<=5?1:0);
+mm("c2s_manuais","c2s","Leads cadastrados à mão","n",cd,r=>r.ma);
+mm("c2s_abertura_media","c2s","Tempo médio até abrir o lead","min",r=>r.rd>=0?r.d:null,r=>r.rd,r=>1);
+mm("c2s_preco_medio","c2s","Preço médio do imóvel dos leads","brl",r=>r.pr>0?r.d:null,r=>r.pr,r=>1);
+mm("c2s_pct_perdidos","c2s","% de leads perdidos","pct",cd,r=>r.st===3?100:0,r=>1);
+mm("c2s_pct_abertos_5min","c2s","% de leads abertos em até 5 minutos","pct",cd,r=>r.rd>=0&&r.rd<=5?100:0,r=>1);
+mm("c2s_pct_nunca_abertos","c2s","% de leads nunca abertos","pct",cd,r=>r.rd<0?100:0,r=>1);
+mm("c2s_pct_negociacao","c2s","% de leads em negociação","pct",cd,r=>r.st===1?100:0,r=>1);
+mm("c2s_pct_vendas","c2s","% de leads com venda marcada","pct",cd,r=>r.ve?100:0,r=>1);
+mm("pipe_contratos","pipe","Contratos assinados (CCV)","n",r=>r.ccv,r=>1);
+mm("pipe_vgv","pipe","VGV dos contratos (CCV)","brl",r=>r.ccv,r=>r.vgv);
+mm("pipe_comissao","pipe","Comissão dos contratos","brl",r=>r.ccv,r=>r.vgc);
+mm("pipe_ticket_medio","pipe","Ticket médio dos contratos","brl",r=>r.ccv,r=>r.vgv,r=>1);
+mm("pipe_pct_financiado","pipe","% de contratos financiados","pct",r=>r.ccv,r=>r.fin?100:0,r=>1);
+mm("pipe_escrituras","pipe","Escrituras (título definitivo)","n",r=>r.tit,r=>1);
+mm("pipe_chaves","pipe","Entregas de chaves","n",r=>r.cha,r=>1);
+mm("pipe_comissao_paga_qtd","pipe","Comissões pagas (quantidade)","n",r=>r.cpg,r=>1);
+mm("pipe_comissao_paga_valor","pipe","Comissão paga (R$)","brl",r=>r.cpg,r=>r.vgc);
+mm("pipe_comissao_a_receber","pipe","Comissão a receber (contratos ainda sem pagamento, por data do CCV)","brl",r=>r.cpg?null:r.ccv,r=>r.vgc);
+mm("pipe_prazo_pagamento","pipe","Prazo médio do CCV até a comissão paga","dias",r=>r.cpg&&r.ccv?r.cpg:null,r=>dd2(r.ccv,r.cpg),r=>1);
+mm("pipe_prazo_escritura","pipe","Prazo médio do CCV até a escritura","dias",r=>r.tit&&r.ccv?r.tit:null,r=>dd2(r.ccv,r.tit),r=>1);
+mm("ov_leads_captados","ovl","Leads captados (Overview)","n",cd,r=>1);
+mm("ov_pessoas","ovp","Pessoas únicas que entraram no C2S","n",cd,r=>1);
+mm("ov_no_vista","ovp","Pessoas que apareceram no Vista","n",cd,r=>r.m);
+mm("ov_visitaram","ovp","Pessoas que visitaram","n",cd,r=>r.v>=0?1:0);
+mm("ov_propuseram","ovp","Pessoas que fizeram proposta","n",cd,r=>r.p>=0?1:0);
+mm("ov_compraram","ovp","Pessoas que compraram","n",cd,r=>r.g>=0?1:0);
+mm("ov_ccv","ovp","Pessoas com contrato assinado (CCV)","n",cd,r=>r.c);
+mm("ov_pct_compraram","ovp","% das pessoas que compraram","pct",cd,r=>r.g>=0?100:0,r=>1);
+mm("ov_vendas_vista","ovv","Vendas ganhas no Vista","n",cd,r=>1);
+mm("ov_vgv_vendas","ovv","VGV das vendas do Vista","brl",cd,r=>r.m);
+mm("ov_vendas_com_lead","ovv","Vendas com lead no C2S","n",cd,r=>r.c);
+const ADD2=m=>!m.m; /* soma/contagem: faz sentido % do total */
+function chave2(e,r,dt,src){
+ if(e==="mes")return dt.slice(0,7);if(e==="dia")return dt;
+ if(e==="semana"){const t=Date.parse(dt),w=(new Date(t).getUTCDay()+6)%7;return new Date(t-w*864e5).toISOString().slice(0,10)}
+ if(e==="dia_semana")return(new Date(Date.parse(dt)).getUTCDay()+6)%7;
+ if(e==="hora")return r.hr;
+ return ENT2[src][e](r)}
+const rotK=(e,k)=>{if(e==="mes")return k.slice(5)+"/"+k.slice(0,4);if(e==="dia")return k.slice(8)+"/"+k.slice(5,7);if(e==="semana")return"Sem. de "+k.slice(8)+"/"+k.slice(5,7);if(e==="dia_semana")return cap(DOW2[(k+1)%7]);if(e==="hora")return String(k).padStart(2,"0")+"h";return k};
+const cmpK=(e,x,y)=>TEMPO2.includes(e)?(x<y?-1:x>y?1:0):0;
+/* nomes existentes (para validar filtros): por fonte+entidade */
+const NM2={};function nomes2(src,e){const k=src+"|"+e;if(NM2[k])return NM2[k];const s=new Map();dados2()[src].forEach(r=>{const n=ENT2[src][e](r);if(n&&!s.has(norm(n)))s.set(norm(n),n)});return NM2[k]=[...s.entries()]}
+function resolver2(src,e,pedidos){const L=nomes2(src,e),ach=[],falt=[];
+ pedidos.forEach(p=>{const q=norm(p);if(!q)return;let m=L.filter(([n])=>n===q);if(!m.length)m=L.filter(([n])=>n.replace(/^equipe /,"")===q.replace(/^equipe /,""));
+  if(!m.length){const t=q.split(" ");m=L.filter(([n])=>t.every(w=>(" "+n+" ").includes(" "+w+" ")))}if(!m.length)m=L.filter(([n])=>n.includes(q));
+  if(m.length&&m.length<=6)m.forEach(([n,o])=>ach.push(o));else falt.push(p)});return{ach,falt}}
+function agg2(sp,a,b){const M=sp.M,rows=dados2()[M.src],E=sp.ent,per=new Map();let tn=0,tm=0;
+ const fk=Object.keys(sp.F);
+ for(const r of rows){const dt=M.d(r);if(!dt||dt<a||dt>b)continue;
+  let ok=true;for(const k of fk){if(!sp.F[k].has(ENT2[M.src][k](r))){ok=false;break}}if(!ok)continue;
+  const n=+M.n(r)||0,m=M.m?(+M.m(r)||0):0,k=E?chave2(E,r,dt,M.src):0;let o=per.get(k);if(!o){o={n:0,m:0};per.set(k,o)}o.n+=n;o.m+=m;tn+=n;tm+=m}
+ const val=o=>M.m?(o.m>0?o.n/o.m:null):o.n,map=new Map();per.forEach((o,k)=>{const v=val(o);if(v!=null)map.set(k,v)});return{map,total:val({n:tn,m:tm})}}
+function perio2(x,nmz){if(!x||!/^\d{4}-\d\d-\d\d$/.test(x.a||"")||!/^\d{4}-\d\d-\d\d$/.test(x.b||""))throw new Error("período inválido ("+nmz+")");let a=x.a,b=x.b;if(b<a)[a,b]=[b,a];return{a,b,rot:x.rotulo||(a.slice(8)+"/"+a.slice(5,7)+" a "+b.slice(8)+"/"+b.slice(5,7))}}
+function spec2(v){
+ if(v.nao_suportado)return{recusa:v.nao_suportado};
+ const M=M2[v.metrica];if(!M)throw new Error("métrica inválida");const src=M.src;
+ const ent=v.entidade||null;if(ent&&!TEMPO2.includes(ent)&&!ENT2[src][ent])return{recusa:"Não consigo mostrar "+M.lb.toLowerCase()+" por "+(ENL2[ent]||ent)+" (essa informação não existe para essa métrica)."};
+ if(ent==="hora"&&src!=="c2s")return{recusa:"A hora de entrada só existe para os leads do C2S."};
+ const per=perio2(v.periodo,"principal"),prev=v.comparar?perio2(v.comparar,"comparação"):null;
+ const F={},found=[],falt=[],ign=[];
+ Object.keys(v.filtros||{}).forEach(e=>{const L=v.filtros[e]||[];if(!L.length)return;if(!ENT2[src][e]){ign.push(ENL2[e]||e);return}const r=resolver2(src,e,L);r.ach.forEach(o=>{(F[e]=F[e]||new Set()).add(o);found.push(o)});falt.push(...r.falt.map(n=>(ENL2[e]||e)+" "+n))});
+ if(falt.length)return{recusa:"Não encontrei nos dados: "+falt.join(", ")+"."};
+ const sp={v2:true,M,src,ent,F,found,ign,per,prev,asc:v.ordem==="asc",top:v.top||10,min:v.minimo||0,modo:v.modo,dir:v.direcao||null,cj:v.conjunto||null,entendi:v.entendi||"",ia:true};
+ const needEnt=["ranking","contagem","lista","variacao","conjunto","serie"].includes(v.modo);
+ if(v.modo==="variacao"&&!ent){sp.modo="total"}
+ if(sp.modo==="serie"&&!ent)sp.ent="mes";
+ else if(needEnt&&sp.modo!=="total"&&!ent)return{recusa:"Essa pergunta precisa de uma dimensão (fonte, equipe, corretor, mês...). Diga por qual quer ver."};
+ if(["variacao","conjunto"].includes(sp.modo)&&!prev)throw new Error("faltou o período de comparação");
+ return sp}
+const brd=x=>x.slice(8)+"/"+x.slice(5,7)+"/"+x.slice(0,4);
+const hd2=p=>'<span class="ad">'+esc(p.rot)+"</span>";
+const dlt2=(sp,c,p)=>{if(c==null||p==null)return"—";const F=sp.M.fm,d=c-p,s=d>0?"+":"";if(F==="pct")return s+f1(d)+" p.p.";const base=p>0?" · "+s+Math.round(d/p*100)+"%":"";return s+FM2[F](d)+base};
+function chips2(sp){const c=[];if(sp.ia)c.push("IA");c.push(sp.M.lb);if(sp.ent)c.push("por "+ENL2[sp.ent]);c.push(sp.per.rot+" ("+brd(sp.per.a)+" a "+brd(sp.per.b)+")");
+ if(sp.prev)c.push("vs. "+sp.prev.rot+" ("+brd(sp.prev.a)+" a "+brd(sp.prev.b)+")");sp.found.forEach(n=>c.push("filtro: "+n));
+ return'<div class="achips">Entendi assim: '+c.map(x=>"<span>"+esc(x)+"</span>").join("")+"</div>"+(sp.entendi?'<div class="amut">'+esc(sp.entendi)+"</div>":"")+(sp.ign.length?'<div class="amut">Ignorei o filtro de '+esc(sp.ign.join(", "))+": ele não existe para essa métrica.</div>":"")}
+function resp2(sp){
+ const M=sp.M,F=M.fm,fv=v=>v==null?"—":FM2[F](v),A=agg2(sp,sp.per.a,sp.per.b),B=sp.prev?agg2(sp,sp.prev.a,sp.prev.b):null,E=sp.ent,lb=/^[A-ZÀ-Ú][a-zà-ú]/.test(M.lb)?M.lb[0].toLowerCase()+M.lb.slice(1):M.lb,pl=(w,n)=>n===1?w:(/[rz]$/.test(w)?w+"es":w+"s");
+ const nome=k=>rotK(E,k),tab=(cols,rows)=>'<div class="atw"><table class="at"><thead><tr>'+cols.map(c=>"<th>"+c+"</th>").join("")+"</tr></thead><tbody>"+rows.map(r=>"<tr>"+r.map((c,i)=>"<td"+(i&&/^[+-]/.test(String(c))&&/·|p\.p\./.test(String(c))?(/^\+/.test(String(c))?' class="pos"':' class="neg"'):"")+">"+c+"</td>").join("")+"</tr>").join("")+"</tbody></table></div>";
+ let h="";
+ if(sp.modo==="total"||!E){const big=fv(A.total);h='<div class="abig">'+esc(big)+'</div><div class="asub">'+esc(M.lb)+" "+esc(sp.per.rot.startsWith("últ")||/^[0-9]/.test(sp.per.rot)?"· "+sp.per.rot:"· "+sp.per.rot)+"</div>";
+  if(B)h+='<div class="asub">Período de comparação ('+esc(sp.prev.rot)+"): "+esc(fv(B.total))+" · variação "+esc(dlt2(sp,A.total,B.total))+"</div>";
+  return chips2(sp)+h}
+ const ks=[...A.map.keys()];
+ if(sp.modo==="serie"){ks.sort((x,y)=>cmpK(E,x,y));const mx=Math.max(...ks.map(k=>A.map.get(k)),0)||1;
+  if(!ks.length)return chips2(sp)+'<div class="asub">Sem dados nesse período.</div>';
+  h='<div class="asub">'+esc(M.lb)+" por "+esc(ENL2[E])+": total "+esc(fv(A.total))+".</div>"+tab([cap(ENL2[E]),hd2(sp.per)+" "+esc(M.lb),""],ks.map(k=>[esc(nome(k)),fv(A.map.get(k)),'<div style="height:8px;border-radius:4px;background:var(--br);opacity:.75;width:'+Math.max(2,Math.round(A.map.get(k)/mx*160))+'px"></div>']));return chips2(sp)+h}
+ if(sp.modo==="ranking"){let rs=ks.map(k=>({k,v:A.map.get(k)}));if(sp.min)rs=rs.filter(r=>r.v>=sp.min);rs.sort((x,y)=>sp.asc?x.v-y.v:y.v-x.v);const sh=rs.slice(0,sp.top||10),add=ADD2(M)&&A.total>0;
+  if(!rs.length)return chips2(sp)+'<div class="asub">Sem dados nesse período.</div>';
+  const t1=sh[0],fr=esc(M.lb)+" · "+esc(sp.per.rot)+": <b>"+esc(nome(t1.k))+"</b> "+(sp.asc?"tem o menor valor":"lidera")+" ("+esc(fv(t1.v))+")"+(sh.length>1?"; depois "+sh.slice(1,3).map(r=>esc(nome(r.k))+" ("+esc(fv(r.v))+")").join(" e ")+".":".");
+  h='<div class="abig">'+esc(nome(t1.k))+'</div><div class="asub">'+fr+"</div>"+tab([cap(ENL2[E]),hd2(sp.per)+" "+esc(M.lb)].concat(add?["% do total"]:[]),sh.map(r=>[esc(nome(r.k)),fv(r.v)].concat(add?[f1(r.v/A.total*100)+"%"]:[])));
+  if(rs.length>sh.length)h+='<div class="amut">e mais '+(rs.length-sh.length)+" na lista. Total: "+esc(fv(A.total))+".</div>";else h+='<div class="amut">Total: '+esc(fv(A.total))+".</div>";return chips2(sp)+h}
+ if(sp.modo==="contagem"||sp.modo==="lista"){const ls=ks.filter(k=>A.map.get(k)>=(sp.min||(F==="pct"?0:1))||F==="pct").sort((x,y)=>A.map.get(y)-A.map.get(x)),n=ls.length;
+  const fr=n?"<b>"+fmt(n)+"</b> "+pl(ENL2[E],n)+" com "+lb+" "+emp(sp.per.rot)+".":"Nenhum registro com "+lb+" "+emp(sp.per.rot)+".";
+  h='<div class="abig">'+fmt(n)+'</div><div class="asub">'+fr+"</div>";if(sp.modo==="lista"&&n)h+=tab([cap(ENL2[E]),hd2(sp.per)],ls.slice(0,25).map(k=>[esc(nome(k)),fv(A.map.get(k))]))+(n>25?'<div class="amut">e mais '+(n-25)+".</div>":"");return chips2(sp)+h}
+ /* variação e conjunto */
+ const all=new Set([...A.map.keys(),...(B?B.map.keys():[])]);let rs=[...all].map(k=>({k,c:A.map.get(k)||0,p:B.map.get(k)||0}));
+ if(sp.modo==="conjunto"){const cj=sp.cj||"so_no_periodo";rs=rs.filter(r=>cj==="em_ambos"?r.c>0&&r.p>0:cj==="so_na_comparacao"?r.p>0&&!(r.c>0):r.c>0&&!(r.p>0));rs.sort((x,y)=>(cj==="so_na_comparacao"?y.p-x.p:y.c-x.c));
+  const n=rs.length;h='<div class="abig">'+fmt(n)+'</div><div class="asub">'+esc(cj==="em_ambos"?"com "+lb+" nos dois períodos.":cj==="so_na_comparacao"?"com "+lb+" só em "+sp.prev.rot+".":"com "+lb+" só em "+sp.per.rot+".")+"</div>"+(n?tab([cap(ENL2[E]),hd2(sp.per),hd2(sp.prev)],rs.slice(0,25).map(r=>[esc(nome(r.k)),fv(r.c),fv(r.p)])):"");return chips2(sp)+h}
+ if(sp.dir==="aumentou")rs=rs.filter(r=>r.c>r.p);else if(sp.dir==="diminuiu")rs=rs.filter(r=>r.c<r.p);
+ rs.sort((x,y)=>sp.dir==="diminuiu"?(x.c-x.p)-(y.c-y.p):(y.c-y.p)-(x.c-x.p));
+ h='<div class="abig">'+(sp.dir?fmt(rs.length):esc(fv(A.total)))+'</div><div class="asub">'+(sp.dir?cap(pl(ENL2[E],rs.length))+" que "+(sp.dir==="aumentou"?(rs.length===1?"aumentou":"aumentaram"):(rs.length===1?"diminuiu":"diminuíram"))+" "+lb+" em "+esc(sp.per.rot)+" vs. "+esc(sp.prev.rot)+".":esc(M.lb)+": "+esc(sp.per.rot)+" vs. "+esc(sp.prev.rot)+" ("+esc(dlt2(sp,A.total,B.total))+").")+"</div>"
+  +(rs.length?tab([cap(ENL2[E]),hd2(sp.per),hd2(sp.prev),"Variação"],rs.slice(0,25).map(r=>[esc(nome(r.k)),fv(r.c),fv(r.p),esc(dlt2(sp,r.c,r.p))])):"");return chips2(sp)+h}
+const nl=t=>esc(t).replace(/\n{2,}/g,"</div><div class=\"asub\">").replace(/\n/g,"<br>");
+function respTexto(v){return '<div class="achips">Entendi assim: <span>IA</span><span>Explicação</span></div><div class="asub">'+nl(v.texto||"Não tenho essa informação documentada.")+'</div><div class="amut">Resposta baseada na documentação do projeto (definições e regras), não nos números do dashboard.</div>'}
+
 /* ---------- interface ---------- */
-const EX=["Quantos corretores aumentaram vendas nos últimos 7 dias?","Quais equipes mais venderam este mês?","Quantos agenciamentos tivemos em setembro?","Quais corretores diminuíram visitas esta semana?","Qual veículo trouxe mais vendas este ano?","Vendas da equipe Meta este mês vs. mês passado"];
+const EX=["Quantos leads captamos este mês?","Quais fontes mais trouxeram leads em outubro?","Quais os principais motivos de perda este ano?","Quantos contratos assinados (CCV) por mês este ano?","VGV por gestor em outubro","Quanto de comissão ainda está a receber?","Quais equipes mais venderam este mês?","Vendas da equipe Meta este mês vs. mês passado","O que é um lead perdido?","Como vocês contam uma venda?"];
 function css(){const s=document.createElement("style");s.textContent=`
 .iaw{color:var(--br);font-weight:800}
 #ask{margin:0;padding:16px 20px 18px}
@@ -251,7 +401,7 @@ function css(){const s=document.createElement("style");s.textContent=`
 function ui(){
  const root=document.getElementById("askroot"),nav=document.querySelector(".tabs");if(document.getElementById("ask")||(!root&&!nav))return;css();
  const d=document.createElement("div");d.id="ask";d.className="panel";
- d.innerHTML='<h2>'+esc(NAME).replace("IA",'<span class="iaw">IA</span>')+'<span class="beta">BETA</span></h2><p class="asb">O assistente de dados da CreativeImob. Pergunte em português sobre o funil, vendas, agenciamentos ou placas. A resposta é calculada nos dados do próprio dashboard e mostra como a pergunta foi entendida.</p><form id="askf" autocomplete="off"><input type="text" id="askq" aria-label="Pergunta" placeholder="Carregando dados..." disabled><button class="gh" type="submit" id="askb" disabled>Perguntar</button></form><div class="ex" id="askex"></div><div class="res" id="askr" hidden aria-live="polite"></div>';
+ d.innerHTML='<h2>'+esc(NAME).replace("IA",'<span class="iaw">IA</span>')+'<span class="beta">BETA</span></h2><p class="asb">O assistente de dados da CreativeImob. Pergunte em português sobre o Vista (funil, vendas, agenciamentos, placas), o C2S (leads, fontes, perdas), a PipeImob (contratos, comissões) e o Overview, ou sobre como lemos os dados (definições e regras). A resposta é calculada nos dados do próprio dashboard e mostra como a pergunta foi entendida.</p><form id="askf" autocomplete="off"><input type="text" id="askq" aria-label="Pergunta" placeholder="Carregando dados..." disabled><button class="gh" type="submit" id="askb" disabled>Perguntar</button></form><div class="ex" id="askex"></div><div class="res" id="askr" hidden aria-live="polite"></div>';
  if(root)root.appendChild(d);else nav.parentNode.insertBefore(d,nav);
  const tb=document.getElementById("tab-ask"),pn=document.getElementById("panel-ask"),G=i=>document.getElementById(i);
  if(tb&&pn){tb.addEventListener("click",()=>{document.querySelectorAll(".sbx .tabs button").forEach(x=>x.setAttribute("aria-selected","false"));const mp=G("tab-mp");if(mp)mp.setAttribute("aria-selected","false");
@@ -274,6 +424,10 @@ async function run(t){
    r.innerHTML='<div class="asub">Interpretando a pergunta...</div>';let v2;
    try{v2=await viaIA(t)}catch(e){if(meu!==seq)return;regras();r.insertAdjacentHTML("beforeend",'<div class="amut">Sem resposta da IA ('+esc(e.message||e)+"): usei a interpretação por regras.</div>");return}
    if(meu!==seq)return;
+   if(v2&&v2.modo==="explicacao"&&!v2.nao_suportado){r.innerHTML=respTexto(v2);restamNota(r);return}
+   if(v2&&M2[v2.metrica]){let s2;try{s2=spec2(v2)}catch(e){regras();r.insertAdjacentHTML("beforeend",'<div class="amut">A IA devolveu uma consulta inválida ('+esc(e.message)+"): usei a interpretação por regras.</div>");return}
+    if(s2.recusa){r.innerHTML='<div class="asub">'+esc(s2.recusa)+"</div>";return}
+    r.innerHTML=resp2(s2);restamNota(r);return}
    if(v2&&v2.comparar&&v2.entidade&&!["conjunto","variacao"].includes(v2.modo)&&/\b(nao|sem|nenhum\w*|nunca)\b/.test(norm(t))){v2.modo="conjunto";v2.conjunto=v2.conjunto||"so_no_periodo"}
    let sp;try{sp=v2ToSp(v2)}catch(e){regras();r.insertAdjacentHTML("beforeend",'<div class="amut">A IA devolveu uma consulta inválida ('+esc(e.message)+"): usei a interpretação por regras.</div>");return}
    if(sp.recusa){const rg=interpretar(t);if(rg&&rg.modo!=="nao_entendi"&&rg.ent&&ENT[rg.ent].im){mostrar(rg,r);return}r.innerHTML='<div class="asub">'+esc(sp.recusa)+"</div>";return}
