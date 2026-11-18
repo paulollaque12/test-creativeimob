@@ -36,14 +36,33 @@ window.__cuboLoader=async()=>{const get=k=>{try{return sessionStorage.getItem(k)
 marker='<script>\nconst DESDE='
 assert marker in live, 'marcador do script principal nao encontrado'
 ICONES='<link rel="icon" href="favicon.ico?v=2" sizes="any">\n<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=2">\n<link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">\n'
-def build(loader,out,titulo,demo=False,icones=False):
+
+def injeta_assistente(h):
+    """Assistente de dados (crIAtive): so no site estatico. Botao no menu lateral (escondido; so aparece se o cubo tiver askToken, ou seja, so no login gerencial),
+    painel e tools/ask.js. Sem tools/ask.js, nao muda nada."""
+    d=os.path.dirname(os.path.abspath(__file__));pj=os.path.join(d,'ask.js')
+    if not os.path.exists(pj): return h
+    rd=lambda n,pad: (open(os.path.join(d,n),encoding='utf-8').read().strip() if os.path.exists(os.path.join(d,n)) else pad)
+    nome=rd('nome.txt','Assistente');ep=rd('endpoint.txt','')
+    svg='<svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M12 2l1.9 5.6L19.5 9.5l-5.6 1.9L12 17l-1.9-5.6L4.5 9.5l5.6-1.9L12 2z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15z" opacity=".75"/></svg>'
+    btn='<button class="mpb mpa" id="tab-ask" type="button" role="tab" data-tab="ask" aria-selected="false" aria-controls="panel-ask" hidden>'+svg+'<span>'+nome.replace('IA','<span class="iaw">IA</span>')+'<small>Pergunte aos dados</small></span></button>'
+    css='<style>#tab-ask[hidden]{display:none}.mpa{margin-top:8px;background:linear-gradient(135deg,#232e66,#2f3f80 70%,#3a4c9a)}.mpa .iaw{color:#fff;font-weight:800}.mpa[aria-selected=true]{box-shadow:0 0 0 2px var(--sf),0 0 0 4px #2f3f80}</style>'
+    assert h.count('</button></nav><div class="sbcap">')==1,'menu lateral nao encontrado'
+    h=h.replace('</button></nav><div class="sbcap">','</button>'+btn+'</nav><div class="sbcap">',1)
+    assert h.count('<section id="panel-ins"')==1
+    h=h.replace('<section id="panel-ins"','<section id="panel-ask" role="tabpanel" aria-labelledby="tab-ask" hidden><div id="askroot"></div></section>\n<section id="panel-ins"',1)
+    js=open(pj,encoding='utf-8').read().replace('__ASK_ENDPOINT__',ep).replace('__ASK_NAME__',nome)
+    assert h.count('</body>')==1
+    return h.replace('</head>',css+'</head>',1).replace('</body>','<script>\n'+js+'\n</script>\n</body>')
+def build(loader,out,titulo,demo=False,icones=False,assistente=False):
     base=live0.replace(OLD,"function applyDflt(){const r={a:\"2026-09-01\",b:\"2026-09-30\",a1:\"2026-08-01\",b1:\"2026-08-31\"};") if demo else live0
     h=base.replace(marker,'<script>'+COMMON+loader+'</script>\n<script>'+shim+'</script>\n'+marker,1)
     h=re.sub(r'<!-- v[^>]*-->','<!-- '+titulo+' -->',h,count=1)
     if icones and 'rel="icon"' not in h: h=h.replace('</head>',ICONES+'</head>',1)
+    if assistente: h=injeta_assistente(h)
     open(out,'w',encoding='utf-8').write(h);print(out,len(h))
 if a.artefato:
     assert a.senha,'--senha obrigatoria para o artefato'
     enc=open(a.enc).read().strip();build(LOAD_A%(enc,json.dumps(a.senha)),a.artefato,'ESTATICO demonstracao (mesmo codigo da versao ao vivo)',True)
 if a.site:
-    build(LOAD_B,a.site,'ESTATICO site Netlify (mesmo codigo da versao ao vivo)',icones=True)
+    build(LOAD_B,a.site,'ESTATICO site Netlify (mesmo codigo da versao ao vivo)',icones=True,assistente=True)
