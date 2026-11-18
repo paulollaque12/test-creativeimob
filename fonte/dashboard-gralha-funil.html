@@ -1297,7 +1297,7 @@ function renderC2(){if(!C2)return;const a=$("a").value,b=$("b").value;if(!a||!b|
  piCol("cv-dia",ag.map(o=>({k:lb(o.k,gr,mu),a:o.a,b:o.b,tip:`<small>${tlb(o.k,gr)}</small><b>${o.a+o.b}</b> ${L1(o.a+o.b)}<br><small>${o.a} por integração · ${o.b} cadastro manual</small>`})));
  piWaffle("cv-tp",topN(cur,r=>r.tipo).map(o=>({k:o.k,n:o.n})),N);
  const sm=Math.max(1,...sw);$("cv-sem").innerHTML=piList(sw.map((v,i)=>({n:C2SEMF[i][0].toUpperCase()+C2SEMF[i].slice(1),s:i>=5?"Fim de semana":"Dia útil",v:c2N(v)+" · "+c2Pc(v,N),w:v/sm})),"Nenhum lead no período");
- $("cv-cn").innerHTML=piStack(topN(cur,r=>r.canal).map(o=>({k:o.k,n:o.n})),N);
+ piDonut("cv-cn",topN(cur,r=>r.canal).map(o=>({k:o.k,n:o.n})),c2N(N),N===1?"lead":"leads");
  const eqs=topN(cur,r=>r.equipe);piTb("cv-tb",[["Equipe"],["Leads",1],["% do total",1],["Abertos em até 5 min",1],["Abertura mediana",1],["Nunca abertos",1],["Em negociação",1],["Arquivados",1]],eqs.map(o=>[piEsc(o.k||"Sem equipe"),o.n,c2Pc(o.n,N),c2Pc(o.l.filter(r=>r.rd>=0&&r.rd<=5).length,o.n),c2Min(c2Abre(o.l)),c2Pc(o.l.filter(r=>r.rd<0).length,o.n),c2Pc(o.l.filter(r=>r.st===1).length,o.n),c2Pc(o.l.filter(r=>r.st===3).length,o.n)]),["Sem equipes","Nenhum lead no período."]);
  /* ---------- ORIGEM ---------- */
  const fs=topN(cur,r=>r.fonte),POR=/^(Grupo Zap|ImovelWeb|Chaves na Mão|OLX|Loft|Casa Mineira|Zap)/i,por=cur.filter(r=>POR.test(r.fonte)),rd=cur.filter(r=>/^RD Station/i.test(r.fonte)),rc=cur.filter(r=>r.fonte==="Recepção");
