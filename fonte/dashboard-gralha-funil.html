@@ -226,7 +226,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .pig1.up{background:#f6e9ec;color:#6e1428}.pig1.dn{background:#e8ebf6;color:var(--nv)}
 [id^=panel-c2s] .pitw{max-height:396px}
 
-.pzp{display:flex;flex-direction:column}.pzp #pir,.pzp #pc-qm{flex:1;display:flex;align-items:center}.pzp #pc-qm>*{width:100%}.pzp #pir .prz{width:100%}
+.pzp{display:flex;flex-direction:column}.pzp #pir,.pzp #pc-qm{flex:1;display:flex;align-items:center}.pzc #cv-cn{flex:1;display:flex;flex-direction:column;justify-content:center}.pzp #pc-qm>*{width:100%}.pzp #pir .prz{width:100%}
 .prz{display:flex;align-items:center;gap:32px;flex-wrap:wrap;padding:6px 0 4px}
 .prw{position:relative;width:190px;flex:none;margin:0 auto}.prw svg{display:block;width:100%}
 .prc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
@@ -437,12 +437,9 @@ details.mpm ul{margin:0 0 14px;padding-left:18px;color:var(--mut);font-size:12.5
 <div id="cv-t" class="tiles"></div><div class="pids" id="cv-d"></div>
 <div class="pig"><div class="panel"><div class="ph"><h2>Leads por dia</h2><span>Data de entrada</span></div><p class="bi">Leads que entraram no C2S em cada dia do período, divididos entre os que vieram por integração (portais, site, RD Station) e os cadastrados à mão. Passe o mouse para ver o valor.</p><div class="pirl"><span><i style="background:var(--br)"></i>Integração</span><span><i style="background:var(--nv)"></i>Cadastro manual</span></div><div class="ch pich" id="cv-dia" role="img" aria-label="Leads por dia"></div></div>
 <div class="panel"><div class="ph"><h2>A cada 100 leads</h2><span>Tipo de negócio</span></div><p class="bi">Cada quadradinho é 1 lead em cada 100: mostra o que o cliente quer fazer.</p><div id="cv-tp"></div></div></div>
-<div class="panel" style="margin-top:18px"><div class="ph"><h2>Calendário de entrada</h2><span>Últimas 40 semanas até a data final</span></div><p class="bi">Cada quadrado é um dia; quanto mais escuro, mais leads entraram. Dá para ver a rotina da semana e os dias fora da curva. Ignora o período do topo e respeita os filtros.</p><div id="cv-cal"></div></div>
-<div class="pig eq"><div class="panel"><div class="ph"><h2>Evolução mensal</h2><span>Histórico completo</span></div><p class="bi">Leads e pessoas diferentes por mês desde o início do uso do C2S. A diferença entre as duas linhas são os contatos repetidos.</p><div class="pirl" id="cv-lg"></div><div class="ch pich" id="cv-mes" role="img" aria-label="Leads por mês"></div></div>
-<div class="panel"><div class="ph"><h2>Dia da semana</h2><span>Período selecionado</span></div><p class="bi">Em quais dias da semana os leads mais chegam. Dá para ver o peso de cada dia, inclusive fim de semana.</p><div id="cv-sem"></div></div></div>
-<div class="pig eq"><div class="panel"><div class="ph"><h2>Canal de entrada</h2><span>Período selecionado</span></div><p class="bi">Por onde o cliente falou com a Gralha: internet, WhatsApp, telefone, rede social ou presencial.</p><div id="cv-cn"></div></div>
-<div class="panel"><div class="ph"><h2>Situação atual</h2><span>Período selecionado</span></div><p class="bi">Em que situação os leads que entraram no período estão hoje no C2S.</p><div id="cv-st"></div></div></div>
-<div class="panel" style="margin-top:18px"><div class="ph"><h2>Etapa mais avançada no C2S</h2><span>Leads do período</span></div><p class="bi">Até onde cada lead chegou dentro do C2S. A Gralha usa o C2S para distribuir os leads; o funil de vendas, de verdade, acontece no Vista (veja a aba Jornada).</p><div id="cv-fn"></div></div>
+<div class="pig eq"><div class="panel"><div class="ph"><h2>Dia da semana</h2><span>Período selecionado</span></div><p class="bi">Em quais dias da semana os leads mais chegam. Dá para ver o peso de cada dia, inclusive fim de semana.</p><div id="cv-sem"></div></div>
+<div class="panel pzp pzc"><div class="ph"><h2>Canal de entrada</h2><span>Período selecionado</span></div><p class="bi">Por onde o cliente falou com a Gralha: internet, WhatsApp, telefone, rede social ou presencial.</p><div id="cv-cn"></div></div></div>
+<div class="panel" style="margin-top:18px"><div class="ph"><h2>Resumo por equipe</h2><span>Período selecionado</span></div><p class="bi">Para cada equipe: quantos leads recebeu, com que rapidez os corretores abriram, quantos seguem em negociação e quantos já foram arquivados. Serve para ver quem recebe mais e quem atende melhor.</p><div class="pitw" id="cv-tb"></div></div>
 </section>
 <section id="panel-c2s-ori" role="tabpanel" aria-labelledby="tab-c2s-ori" hidden>
 <div id="c2st-ori" class="cap" style="margin:0 0 12px">Carregando o C2S...</div>
@@ -1299,15 +1296,9 @@ function renderC2(){if(!C2)return;const a=$("a").value,b=$("b").value;if(!a||!b|
  cur.forEach(r=>{const o=ag[ix.get(gr==="dia"?r.dt:wk(r.dt))];if(o){r.man?o.b++:o.a++}});
  piCol("cv-dia",ag.map(o=>({k:lb(o.k,gr,mu),a:o.a,b:o.b,tip:`<small>${tlb(o.k,gr)}</small><b>${o.a+o.b}</b> ${L1(o.a+o.b)}<br><small>${o.a} por integração · ${o.b} cadastro manual</small>`})));
  piWaffle("cv-tp",topN(cur,r=>r.tipo).map(o=>({k:o.k,n:o.n})),N);
- const cm=new Map();R.forEach(r=>cm.set(r.dt,(cm.get(r.dt)||0)+1));piCal("cv-cal",cm,b,40);
- const mu2=mb.map(()=>0),ml=mb.map(()=>0);R.forEach(r=>{const j=mi.get(r.dt.slice(0,7)+"-01");if(j!=null){ml[j]++;if(r.uni)mu2[j]++}});
- $("cv-lg").innerHTML='<span><i style="background:var(--br)"></i>Leads</span><span><i style="background:var(--nv)"></i>Pessoas únicas</span>';
- piLine("cv-mes",mLb,[{n:"leads",c:"#6e1428",v:ml,area:1},{n:"pessoas únicas",c:"#2f3f80",v:mu2}],{tl:mTl});
  const sm=Math.max(1,...sw);$("cv-sem").innerHTML=piList(sw.map((v,i)=>({n:C2SEMF[i][0].toUpperCase()+C2SEMF[i].slice(1),s:i>=5?"Fim de semana":"Dia útil",v:c2N(v)+" · "+c2Pc(v,N),w:v/sm})),"Nenhum lead no período");
  $("cv-cn").innerHTML=piStack(topN(cur,r=>r.canal).map(o=>({k:o.k,n:o.n})),N);
- $("cv-st").innerHTML=piStack(Object.entries(C2ST).map(([k,l])=>({k:l,n:cur.filter(r=>r.st===+k).length})).sort((x,y)=>y.n-x.n),N);
- const FN=[["Lead entrou",0],["Em atendimento",1],["Visita agendada",2],["Visita realizada",3],["Proposta criada",4]];
- $("cv-fn").innerHTML=N?`<div class="pijr">${FN.map(([k,m],i)=>{const q=cur.filter(r=>r.fun>=m).length,p=Math.round(q/N*100);return(i?'<span class="pijl"></span>':"")+`<div class="pijn" data-tip="${piEsc(`<small>${k}</small><b>${q}</b> ${L1(q)} · ${c2Pc(q,N)}`)}"><div class="pijc" style="--p:${p}"><b>${p}%</b></div><strong>${k}</strong><small>${c2Nl(q,["lead","leads"])}</small></div>`}).join("")}</div>`:ES;
+ const eqs=topN(cur,r=>r.equipe);piTb("cv-tb",[["Equipe"],["Leads",1],["% do total",1],["Abertos em até 5 min",1],["Abertura mediana",1],["Nunca abertos",1],["Em negociação",1],["Arquivados",1]],eqs.map(o=>[piEsc(o.k||"Sem equipe"),o.n,c2Pc(o.n,N),c2Pc(o.l.filter(r=>r.rd>=0&&r.rd<=5).length,o.n),c2Min(c2Abre(o.l)),c2Pc(o.l.filter(r=>r.rd<0).length,o.n),c2Pc(o.l.filter(r=>r.st===1).length,o.n),c2Pc(o.l.filter(r=>r.st===3).length,o.n)]),["Sem equipes","Nenhum lead no período."]);
  /* ---------- ORIGEM ---------- */
  const fs=topN(cur,r=>r.fonte),POR=/^(Grupo Zap|ImovelWeb|Chaves na Mão|OLX|Loft|Casa Mineira|Zap)/i,por=cur.filter(r=>POR.test(r.fonte)),rd=cur.filter(r=>/^RD Station/i.test(r.fonte)),rc=cur.filter(r=>r.fonte==="Recepção");
  piTl("co-t",[["Fontes ativas",c2N(fs.length),sub("diferentes no período")],["Maior fonte",fs.length?c2Pc(fs[0].n,N):"-",sub(fs.length?piEsc(fs[0].k):"")],["RD Station",c2Pc(rd.length,N),sub(c2Nl(rd.length,["lead","leads"]))],["Portais",c2Pc(por.length,N),sub("Zap, ImovelWeb, Chaves na Mão...")],["Recepção das lojas",c2Pc(rc.length,N),sub(c2Nl(rc.length,["lead","leads"]))],["Cadastro manual",c2Pc(man.length,N),sub(c2Nl(man.length,["lead","leads"]))]]);
