@@ -143,8 +143,8 @@ function qJor(q){const [a,b]=range(q),F=filters(q),d0=new Map();
  st.forEach((v,k)=>{out.push(["st",k,NM[k],"",v.length,Math.round(v.reduce((x,y)=>x+y,0)/v.length*10)/10])});
  out.push(["tot",0,"Lead","",d0.size,null]);return out}
 
-/* PipeImob: contratos (CCV) gravados em C.pipe = [ccv,env,vgv,vgc,lanc,etapa,gestor,imovel, tit,cha,cpg,cpv,reg,quem,mom,mc,mv,fin,banco,cat,bai,cid,est,ing,pap] (25 colunas; cubos antigos tem so as 8 primeiras) (sem filtro: a aba filtra no navegador) */
-function qPipe(){return (C.pipe||[]).map(r=>r.slice(0,25))}
+/* PipeImob: contratos (CCV) gravados em C.pipe = [ccv,env,vgv,vgc,lanc,etapa,gestor,imovel, tit,cha,cpg,cpv,reg,quem,mom,mc,mv,fin,banco,cat,bai,cid,est,ing,pap,eq] (26 colunas; cubos antigos tem so as 8 primeiras) (sem filtro: a aba filtra no navegador) */
+function qPipe(){return (C.pipe||[]).map(r=>r.slice(0,26))}
 
 /* C2S: leads da Gralha gravados em C.c2s = [dt,hr,fonte,canal,tipo,equipe,corretor,st,fun,mot,rd,man,bai,cid,pre,cod,uni,ven,tg] (19 colunas; 1 linha por lead; a aba filtra no navegador) */
 function qC2s(){return (C.c2s||[]).map(r=>r.slice(0,19))}
