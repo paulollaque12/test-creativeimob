@@ -221,7 +221,7 @@ html,body{max-width:100%;overflow-x:hidden}
 /* cartoes de equipe */
 .pitc{display:grid;grid-template-columns:repeat(auto-fill,minmax(188px,1fr));gap:12px}.pitk{border:1px solid var(--line);border-radius:14px;padding:12px 14px 13px;cursor:pointer;background:var(--sf);transition:border-color .12s,box-shadow .12s}.pitk:hover{border-color:var(--mut)}.pitk.on{border-color:var(--br);box-shadow:0 0 0 2px rgba(110,20,40,.15)}.pitk>div{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.pitk strong{font-size:13px;line-height:1.25;display:block}.pitk h4{margin:2px 0 0;font:600 24px/1.15 Sora,system-ui,sans-serif}.pitk small{display:block;color:var(--mut);font-size:11.5px;line-height:1.4;margin-top:3px}.pitg{flex:none;width:42px;height:42px;border-radius:50%;background:conic-gradient(var(--br) calc(var(--p)*1%),var(--tr) 0);display:grid;place-items:center}.pitg b{width:32px;height:32px;border-radius:50%;background:var(--sf);display:grid;place-items:center;font:600 10.5px Sora,system-ui,sans-serif}.pitm{display:flex;height:6px;border-radius:4px;overflow:hidden;gap:2px;margin-top:9px}.pitm i{display:block}
 /* sankey */
-.pisk{width:100%;height:auto;display:block}.pisk text{font:12px Inter,system-ui,sans-serif;fill:var(--ink)}.pisk text .s,.pisk text.s{fill:var(--mut);font-size:10.5px}.pisk path.fl{transition:opacity .12s}.pisk path.fl:hover{opacity:.7}
+.pisk{width:100%;height:auto;display:block}.pisk text{font:12px Inter,system-ui,sans-serif;fill:var(--ink)}.pisk text .s,.pisk text.s{fill:var(--mut);font-size:10.5px}#mp-sk .pisk text{font-size:14px}#mp-sk .pisk text .s,#mp-sk .pisk text.s{font-size:12.5px}.pisk path.fl{transition:opacity .12s}.pisk path.fl:hover{opacity:.7}
 /* variacao */
 .pig1.up{background:#f6e9ec;color:#6e1428}.pig1.dn{background:#e8ebf6;color:var(--nv)}
 [id^=panel-c2s] .pitw{max-height:396px}
@@ -304,6 +304,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .gfc{height:26px}.gfc span{grid-column:2;justify-self:center;font-size:12px;color:var(--mut);font-weight:500}.gfc span::before{content:"\2193\00a0"}
 @media(max-width:760px){.gfr,.gfc{grid-template-columns:minmax(0,1fr);gap:6px}.gfr .v{text-align:left;display:flex;gap:8px;align-items:center}.gfr .v small{margin:0}.gfc span{grid-column:1}.gfc{height:22px}}
 #cp-av.cpav{margin:0 0 12px;padding:10px 14px;border-radius:10px;border-left:3px solid var(--br);background:var(--tr);color:var(--ink);font-size:12.5px;line-height:1.5}#cp-av b{font-weight:600}
+.gfd svg{width:100%;height:auto;display:block}.gfm{display:none}@media(max-width:760px){.gfd{display:none}.gfm{display:block}}
 table.pitb tr.tot td{font-weight:700;background:var(--tr)}.pig.eq>.panel:has(#mp-or){display:flex;flex-direction:column}#mp-or{flex:1;display:flex;flex-direction:column;justify-content:center}
 details.mpm{margin-top:18px;border:1px solid var(--line);border-radius:14px;background:var(--sf);padding:4px 18px}
 details.mpm summary{cursor:pointer;padding:12px 0;font:600 13.5px Manrope,system-ui,sans-serif;color:var(--mut)}
@@ -1632,9 +1633,22 @@ function mpGf(a,b,pa,pb){const el=$("mp-gf");if(!el||!MPD)return;
  const hL=MPD.l.length>0,SRC=hL?MPD.l:MPD.p,pcn=(x,y)=>SRC.filter(r=>r.d>=x&&r.d<=y).length,n0=pcn(a,b),n1=pcn(pa,pb),hP=MPD.p.some(r=>r.d<=pb);
  const b1=blk("var(--nv)","C2S","Primeiro contato no período",row(hL?"Leads captados":"Capturados",hL?"Leads que entraram no C2S":"Pessoas únicas, por telefone",100,"var(--nv)",c2N(n0),hP?ch(dl(n0,n1)):ch(null)),"c2s");
  let b2;if(D&&D.atual){b2=blk("var(--br)","Vista","Funil atual do período",ST.map(([nm,sb,m],i)=>row(nm,sb,W[i],CO[i],f(u(m)),ch(dl(u(m),pu(m))),i?(u(ST[i-1][2])?Math.round(u(m)/u(ST[i-1][2])*100)+"%":"-"):undefined)).join(""),"vista")}else b2=blk("var(--br)","Vista","Funil atual do período",wait("Carregando o funil do Vista..."),"vista");
- let b3;if(PI){const cn=(k,x,y)=>PI.filter(r=>r[k]&&r[k]>=x&&r[k]<=y).length,hI=PI.some(r=>r.ccv<=pb),PS=[["Contrato assinado (CCV)","Contratos assinados no período","ccv"],["Escritura","Títulos definitivos no período","tit"],["Comissão paga","Comissões pagas no período","cpg"]],PW=[100,84,68],PC=["#9d3f55","#b5546a","#cc8496"];
+ let b3;if(PI){const cn=(k,x,y)=>PI.filter(r=>r[k]&&r[k]>=x&&r[k]<=y).length,hI=PI.some(r=>r.ccv<=pb),PS=[["Contrato assinado (CCV)","Contratos assinados no período","ccv"],["Escritura","Títulos definitivos no período","tit"],["Entrega de chaves","Chaves entregues no período","cha"]],PW=[100,84,68],PC=["#9d3f55","#b5546a","#cc8496"];
   b3=blk("#b5546a","PipeImob","Cada etapa pela sua data",PS.map(([nm,sb,k],i)=>{const x=cn(k,a,b);return row(nm,sb,PW[i],PC[i],f(x),hI?ch(dl(x,cn(k,pa,pb))):ch(null),i?"":undefined)}).join(""),"pipe")}else b3=blk("#b5546a","PipeImob","Cada etapa pela sua data",wait("Carregando a PipeImob..."),"pipe");
- el.innerHTML=b1+b2+b3}
+ /* funil em trapezios (desktop); a lista acima fica para o celular */
+ const dC=hP?dl(n0,n1):null,GR3=[["C2S","c2s","#2f3f80"],["Vista","vista","#6e1428"],["PipeImob","pipe","#b5546a"]],RW=[];
+ RW.push({g:0,nm:hL?"Leads captados":"Capturados",v:c2N(n0),d:dC,w:100});
+ if(D&&D.atual)ST.forEach(([nm,sb,m],i)=>RW.push({g:1,nm,v:f(u(m)),d:dl(u(m),pu(m)),w:W[i]}));
+ if(PI){const cn2=(k,x,y)=>PI.filter(r=>r[k]&&r[k]>=x&&r[k]<=y).length,hI2=PI.some(r=>r.ccv<=pb);[["Contrato assinado (CCV)","ccv",70],["Escritura","tit",59],["Entrega de chaves","cha",48]].forEach(([nm,k,w])=>{const x=cn2(k,a,b);RW.push({g:2,nm,v:f(x),d:hI2?dl(x,cn2(k,pa,pb)):null,w})})}
+ const SW=972,CX=520,MW=560,BH=36,GP=8,CG=14;let sy=8,pg=-1,pv2=null,sv="";const defs=GR3.map(([,,c],i)=>`<linearGradient id="gft${i}" x1="0" x2="1"><stop offset="0" stop-color="${c}" stop-opacity=".95"/><stop offset="1" stop-color="${c}" stop-opacity=".76"/></linearGradient>`).join("");
+ RW.forEach(r=>{const c=GR3[r.g][2];if(r.g!==pg){if(pg>=0){sy+=18;pv2=null}const lgi=document.querySelector("#sbg-"+GR3[r.g][1]+" .sbi i"),m=lgi&&lgi.getAttribute("style");sv+=`<foreignObject x="0" y="${sy+BH/2-10}" width="150" height="22"><div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;align-items:center;gap:7px;font:700 11px/1 Manrope,system-ui,sans-serif;letter-spacing:.1em;color:var(--mut);text-transform:uppercase;height:22px">${m?`<i class="gfl" style="${m};background:${c}"></i>`:`<i style="width:9px;height:9px;border-radius:3px;background:${c}"></i>`}${GR3[r.g][0]}</div></foreignObject>`;pg=r.g}
+  const wi=MW*r.w/100,x0=CX-wi/2;
+  if(pv2){const[pw,py]=pv2;sv+=`<path d="M${CX-pw/2},${py} L${CX+pw/2},${py} L${CX+wi/2},${sy} L${CX-wi/2},${sy} Z" fill="${c}" opacity=".14"/>`;if(r.cv)sv+=`<text x="${CX}" y="${(py+sy)/2+4}" text-anchor="middle" style="font:600 10.5px Manrope,system-ui,sans-serif;fill:var(--mut)">↓ ${r.cv}</text>`}
+  sv+=`<rect x="${x0}" y="${sy}" width="${wi}" height="${BH}" rx="10" fill="url(#gft${r.g})"/><text x="${CX}" y="${sy+BH/2+6}" text-anchor="middle" style="font:700 17px Sora,system-ui,sans-serif;fill:#fff">${r.v}</text><text x="${x0-14}" y="${sy+BH/2+4}" text-anchor="end" style="font:600 12.5px Manrope,system-ui,sans-serif;fill:var(--ink)">${piEsc(r.nm)}</text>`;
+  sv+=r.d==null?`<text x="${x0+wi+14}" y="${sy+BH/2+4}" style="font:500 11px Manrope,system-ui,sans-serif;fill:var(--mut)">sem base</text>`:`<text x="${x0+wi+14}" y="${sy+BH/2+4}" style="font:600 11.5px Manrope,system-ui,sans-serif;fill:${r.d>=0?"#1f7a4d":"#b3261e"}">${r.d>=0?"▲":"▼"} ${Math.abs(Math.round(r.d))}%</text>`;
+  pv2=[wi,sy+BH];sy+=BH+CG});
+ const svg=`<svg viewBox="0 0 ${SW} ${sy+4}" role="img" aria-label="Funil geral: leads captados no C2S, funil atual do Vista e etapas do PipeImob"><defs>${defs}</defs>${sv}</svg>`;
+ el.innerHTML=`<div class="gfd">${svg}</div><div class="gfm">${b1+b2+b3}</div>`}
 function renderMP(){if(!MPD)return;const a=$("a").value,b=$("b").value;if(!a||!b||a>b)return;piUn="venda";$("mpst").hidden=true;
  const n=Math.round((P(b)-P(a))/864e5)+1,pa=iso(ad(P(a),-n)),pb=iso(ad(P(a),-1)),PP=MPD.p,VV=MPD.v;
  const okP=r=>(!MPF.eq||r.e===MPF.eq)&&(!MPF.cor||r.k===MPF.cor),okV=r=>(!MPF.eq||r.e===MPF.eq)&&(!MPF.cor||r.k===MPF.cor);
@@ -1668,7 +1682,7 @@ function renderMP(){if(!MPD)return;const a=$("a").value,b=$("b").value;if(!a||!b
  const srcs=top6.map((o,i)=>({k:o.k,n:o.n,c:SC[i],l:o.l})).concat(rest.length?[{k:"Outras",n:rest.reduce((x,o)=>x+o.n,0),c:SC[6],l:rest.flatMap(o=>o.l)}]:[]);
  const DS=[["Comprou","#6e1428",r=>r.g>=0],["Propôs, não comprou","#b5546a",r=>r.g<0&&r.p>=0],["Visitou, sem proposta","#2f3f80",r=>r.g<0&&r.p<0&&r.v>=0],["No Vista, sem visita","#6f7fc4",r=>r.g<0&&r.p<0&&r.v<0&&r.m===1],["Fora do Vista","#8b8fa6",r=>r.m!==1]].map(([k,c,f])=>({k,c,f,n:0}));
  const lk=[];srcs.forEach((o,si)=>{DS.forEach((d,di)=>{const q=o.l.filter(d.f).length;if(q){lk.push([si,di,q]);d.n+=q}})});
- const dsx=DS.filter(d=>d.n>0);piSankey("mp-sk",srcs,dsx,lk.map(([si,di,q])=>[si,dsx.indexOf(DS[di]),q]),{W:960,xl:215,xr:595,H:200,gap:8,dgap:16});
+ const dsx=DS.filter(d=>d.n>0);piSankey("mp-sk",srcs,dsx,lk.map(([si,di,q])=>[si,dsx.indexOf(DS[di]),q]),{W:960,xl:235,xr:595,H:340,gap:10,dgap:22});
  /* origem das vendas */
  if(!ns)$("mp-or").innerHTML='<div class="msg"><b>Sem vendas</b>Nenhuma venda ganha entre as datas selecionadas com esses filtros.</div>';else piDonut("mp-or",GR.map(o=>({k:o.k,n:o.n})),c2N(ns),ns===1?"venda":"vendas");
  /* resumo */

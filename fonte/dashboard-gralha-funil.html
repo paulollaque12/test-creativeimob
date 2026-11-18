@@ -221,7 +221,7 @@ html,body{max-width:100%;overflow-x:hidden}
 /* cartoes de equipe */
 .pitc{display:grid;grid-template-columns:repeat(auto-fill,minmax(188px,1fr));gap:12px}.pitk{border:1px solid var(--line);border-radius:14px;padding:12px 14px 13px;cursor:pointer;background:var(--sf);transition:border-color .12s,box-shadow .12s}.pitk:hover{border-color:var(--mut)}.pitk.on{border-color:var(--br);box-shadow:0 0 0 2px rgba(110,20,40,.15)}.pitk>div{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.pitk strong{font-size:13px;line-height:1.25;display:block}.pitk h4{margin:2px 0 0;font:600 24px/1.15 Sora,system-ui,sans-serif}.pitk small{display:block;color:var(--mut);font-size:11.5px;line-height:1.4;margin-top:3px}.pitg{flex:none;width:42px;height:42px;border-radius:50%;background:conic-gradient(var(--br) calc(var(--p)*1%),var(--tr) 0);display:grid;place-items:center}.pitg b{width:32px;height:32px;border-radius:50%;background:var(--sf);display:grid;place-items:center;font:600 10.5px Sora,system-ui,sans-serif}.pitm{display:flex;height:6px;border-radius:4px;overflow:hidden;gap:2px;margin-top:9px}.pitm i{display:block}
 /* sankey */
-.pisk{width:100%;height:auto;display:block}.pisk text{font:12px Inter,system-ui,sans-serif;fill:var(--ink)}.pisk text .s,.pisk text.s{fill:var(--mut);font-size:10.5px}.pisk path.fl{transition:opacity .12s}.pisk path.fl:hover{opacity:.7}
+.pisk{width:100%;height:auto;display:block}.pisk text{font:12px Inter,system-ui,sans-serif;fill:var(--ink)}.pisk text .s,.pisk text.s{fill:var(--mut);font-size:10.5px}#mp-sk .pisk text{font-size:14px}#mp-sk .pisk text .s,#mp-sk .pisk text.s{font-size:12.5px}.pisk path.fl{transition:opacity .12s}.pisk path.fl:hover{opacity:.7}
 /* variacao */
 .pig1.up{background:#f6e9ec;color:#6e1428}.pig1.dn{background:#e8ebf6;color:var(--nv)}
 [id^=panel-c2s] .pitw{max-height:396px}
@@ -1439,7 +1439,7 @@ function renderMP(){if(!MPD)return;const a=$("a").value,b=$("b").value;if(!a||!b
  const srcs=top6.map((o,i)=>({k:o.k,n:o.n,c:SC[i],l:o.l})).concat(rest.length?[{k:"Outras",n:rest.reduce((x,o)=>x+o.n,0),c:SC[6],l:rest.flatMap(o=>o.l)}]:[]);
  const DS=[["Comprou","#6e1428",r=>r.g>=0],["Propôs, não comprou","#b5546a",r=>r.g<0&&r.p>=0],["Visitou, sem proposta","#2f3f80",r=>r.g<0&&r.p<0&&r.v>=0],["No Vista, sem visita","#6f7fc4",r=>r.g<0&&r.p<0&&r.v<0&&r.m===1],["Fora do Vista","#8b8fa6",r=>r.m!==1]].map(([k,c,f])=>({k,c,f,n:0}));
  const lk=[];srcs.forEach((o,si)=>{DS.forEach((d,di)=>{const q=o.l.filter(d.f).length;if(q){lk.push([si,di,q]);d.n+=q}})});
- const dsx=DS.filter(d=>d.n>0);piSankey("mp-sk",srcs,dsx,lk.map(([si,di,q])=>[si,dsx.indexOf(DS[di]),q]),{W:960,xl:215,xr:595,H:200,gap:8,dgap:16});
+ const dsx=DS.filter(d=>d.n>0);piSankey("mp-sk",srcs,dsx,lk.map(([si,di,q])=>[si,dsx.indexOf(DS[di]),q]),{W:960,xl:235,xr:595,H:340,gap:10,dgap:22});
  /* origem das vendas */
  if(!ns)$("mp-or").innerHTML='<div class="msg"><b>Sem vendas</b>Nenhuma venda ganha entre as datas selecionadas com esses filtros.</div>';else piDonut("mp-or",GR.map(o=>({k:o.k,n:o.n})),c2N(ns),ns===1?"venda":"vendas");
  /* resumo */
